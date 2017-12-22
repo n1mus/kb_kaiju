@@ -2,7 +2,7 @@ module-name:
     kb_kaiju
 
 module-description:
-    A KBase module
+    A KBase module wrapping the Kaiju metagenomics tool
 
 service-language:
     python
