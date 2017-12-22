@@ -1,0 +1,313 @@
+{
+	"ver": "1.2.8",
+
+	"authors": [
+		"psdehal",
+		"dylan"
+	],
+	"contact": "http://kbase.us/contact-us/",
+	"visible": true,
+	"categories": ["active", "reads" ],
+	"widgets": {
+		"input": null,
+		"output": "no-display"
+	},
+	"parameters": [
+		{
+			"id": "input_reads_ref",
+			"optional": false,
+			"advanced": false,
+			"allow_multiple": false,
+			"default_values": [ "" ],
+			"field_type": "text",
+			"text_options": {
+				"valid_ws_types": ["KBaseRNASeq.RNASeqSampleSet", "KBaseSets.ReadsSet", "KBaseFile.PairedEndLibrary", "KBaseFile.SingleEndLibrary", "KBaseAssembly.PairedEndLibrary", "KBaseAssembly.SingleEndLibrary"]
+			}
+		},
+		{
+			"id": "output_reads_name",
+			"optional": false,
+			"advanced": false,
+			"allow_multiple": false,
+			"default_values": [ "" ],
+			"field_type": "text",
+			"text_options": {
+				"valid_ws_types": ["KBaseSets.ReadsSet", "KBaseFile.PairedEndLibrary", "KBaseFile.SingleEndLibrary"],
+				"is_output_name": true
+			}
+		},
+		{
+			"id": "translate_to_phred33",
+			"optional": true,
+			"advanced": true,
+			"allow_multiple": false,
+			"default_values": [ 1 ],
+			"field_type": "dropdown",
+				"dropdown_options": {
+					"options": [
+						{
+							"value": 0,
+							"display": "no",
+							"id": "phred33_no",
+							"ui-name": "phred33_no"
+						},
+						{
+							"value": 1,
+							"display": "yes",
+							"id": "phred33_yes",
+							"ui-name": "phred33_yes"
+						}
+					]
+				}
+		},
+
+		{
+			"id": "adapterFa",
+			"optional": true,
+			"advanced": true,
+			"allow_multiple": false,
+			"default_values": [""],
+			"field_type": "dropdown",
+				"dropdown_options": {
+					"options": [
+						{
+							"value": "TruSeq3-PE.fa",
+							"display": "TruSeq3-PE",
+							"id": "TruSeq3-PE",
+							"ui-name": "TruSeq3-PE"
+						},
+						{
+							"value": "TruSeq2-PE.fa",
+							"display": "TruSeq2-PE",
+							"id": "TruSeq2-PE",
+							"ui-name": "TruSeq2-PE"
+						},
+						{
+							"value": "TruSeq3-PE-2.fa",
+							"display": "TruSeq3-PE-2",
+							"id": "TruSeq3-PE-2",
+							"ui-name": "TruSeq3-PE-2"
+						},
+						{
+							"value": "TruSeq3-SE.fa",
+							"display": "TruSeq3-SE",
+							"id": "TruSeq3-SE",
+							"ui-name": "TruSeq3-SE"
+						},
+						{
+							"value": "TruSeq2-SE.fa",
+							"display": "TruSeq2-SE",
+							"id": "TruSeq2-SE",
+							"ui-name": "TruSeq2-SE"
+						},
+						{
+							"value": "NexteraPE-PE.fa",
+							"display": "NexteraPE-PE",
+							"id": "NexteraPE-PE",
+							"ui-name": "NexteraPE-PE"
+						}
+					]
+				}
+		},
+		{
+			"id": "seed_mismatches",
+			"optional": true,
+			"advanced": true,
+			"allow_multiple": false,
+			"default_values": [ "2" ],
+			"field_type": "text",
+			"text_options": {
+				"validate_as": "int"
+			}
+		},
+		{
+			"id": "palindrome_clip_threshold",
+			"optional": true,
+			"advanced": true,
+			"allow_multiple": false,
+			"default_values": ["30"],
+			"field_type": "text",
+			"text_options": {
+				"validate_as": "int"
+			}
+		},
+		{
+			"id": "simple_clip_threshold",
+			"optional": true,
+			"advanced": true,
+			"allow_multiple": false,
+			"default_values": [ "10" ],
+			"field_type": "text",
+			"text_options": {
+				"validate_as": "int"
+			}
+		},
+
+		{
+			"id": "sliding_window_size",
+			"optional": true,
+			"advanced": true,
+			"allow_multiple": false,
+			"default_values": [ "4" ],
+			"field_type": "text",
+			"text_options": {
+				"validate_as": "int"
+			}
+		},
+		{
+			"id": "sliding_window_min_quality",
+			"optional": true,
+			"advanced": true,
+			"allow_multiple": false,
+			"default_values": [ "15" ],
+			"field_type": "text",
+			"text_options": {
+				"validate_as": "int"
+			}
+		},
+
+		{
+			"id": "crop_length",
+			"optional": true,
+			"advanced": true,
+			"allow_multiple": false,
+			"default_values": [ "" ],
+			"field_type": "text",
+			"text_options": {
+				"validate_as": "int"
+			}
+		},
+		{
+			"id": "head_crop_length",
+			"optional": true,
+			"advanced": true,
+			"allow_multiple": false,
+			"default_values": [ "0" ],
+			"field_type": "text",
+			"text_options": {
+				"validate_as": "int"
+			}
+		},
+		{
+			"id": "leading_min_quality",
+			"optional": true,
+			"advanced": true,
+			"allow_multiple": false,
+			"default_values": [ "3" ],
+			"field_type": "text",
+			"text_options": {
+				"validate_as": "int"
+			}
+		},
+		{
+			"id": "trailing_min_quality",
+			"optional": true,
+			"advanced": true,
+			"allow_multiple": false,
+			"default_values": [ "3" ],
+			"field_type": "text",
+			"text_options": {
+				"validate_as": "int"
+			}
+		},
+		{
+			"id": "min_length",
+			"optional": true,
+			"advanced": true,
+			"allow_multiple": false,
+			"default_values": [ "36" ],
+			"field_type": "text",
+			"text_options": {
+				"validate_as": "int"
+			}
+		}
+	],
+	"parameter-groups": [
+	    {
+	      "id": "adapter_clip",
+	      "parameters": ["adapterFa", "seed_mismatches", "palindrome_clip_threshold", "simple_clip_threshold"],
+	      "optional": true,
+	      "allow_multiple": false,
+	      "with_border": true
+	    },
+	    {
+	      "id": "sliding_window",
+	      "parameters": ["sliding_window_size", "sliding_window_min_quality"],
+	      "optional": false,
+	      "allow_multiple": false,
+	      "with_border": true
+	    }
+	],
+
+	"behavior": {
+		"service-mapping": {
+			"url": "",
+			"name": "kb_trimmomatic",
+			"method": "runTrimmomatic",
+			"input_mapping": [
+				{
+					"narrative_system_variable": "workspace",
+					"target_property": "input_ws"
+				},
+				{
+					"input_parameter": "input_reads_ref",
+					"target_property": "input_reads_ref",
+					"target_type_transform": "resolved-ref"
+
+				},
+				{
+					"input_parameter": "output_reads_name",
+					"target_property": "output_reads_name"
+
+				},
+				{
+					"input_parameter": "translate_to_phred33",
+					"target_property": "translate_to_phred33"
+				},
+				{
+					"input_parameter": "adapter_clip",
+					"target_property": "adapter_clip"
+				},
+				{
+					"input_parameter": "sliding_window",
+					"target_property": "sliding_window"
+				},
+				{
+					"input_parameter": "leading_min_quality",
+					"target_property": "leading_min_quality"
+				},
+				{
+					"input_parameter": "trailing_min_quality",
+					"target_property": "trailing_min_quality"
+				},
+				{
+					"input_parameter": "crop_length",
+					"target_property": "crop_length"
+				},
+				{
+					"input_parameter": "head_crop_length",
+					"target_property": "head_crop_length"
+				},
+				{
+					"input_parameter": "min_length",
+					"target_property": "min_length"
+				}
+			],
+			"output_mapping": [
+				{
+					"service_method_output_path": [0, "report_name"],
+					"target_property": "report_name"
+				},
+				{
+					"service_method_output_path": [0, "report_ref"],
+					"target_property": "report_ref"
+				},
+				{
+					"narrative_system_variable": "workspace",
+					"target_property": "workspace_name"
+				}
+			]
+		}
+	},
+	"job_id_output_field": "docker"
+}
