@@ -1,12 +1,12 @@
 #
 #  define display information
 #
-name: Trimmomatic - Read Trimming - v0.36
+name: Kaiju - Tax Classifier - v1.5.0
 tooltip: |
-	Trim paired- or single-end Illumina reads with Trimmomatic.
+	Taxonomic Classification of Shotgun Metagenomic Read data
 screenshots: []
 
-icon: trimmomatic-pink.png
+icon: kaiju-green.png
 
 #
 # define a set of similar methods that might be useful to the user
@@ -34,175 +34,108 @@ parameters :
 			The read library or read library set to examine
 		long-hint  : |
 			The read library or read library set for which you want to trim.
-	output_reads_name :
+	output_biom_name :
 		ui-name : |
 			Output library (or Set) name <font color=red>*</font>
 		short-hint : |
 			Base name for output read library or read library set object
 		long-hint : |
 			Base name for output read library or read library set object
-	adapterFa :
+	tax_levels :
 		ui-name : |
 			Adapters
 		short-hint : |
 			The reference sequences for trimming.
 		long-hint : |
 			The reference adapter sequences.
-	seed_mismatches : 
+	db_type : 
 		ui-name : |
 			Seed mismatches
 		short-hint : |
 			Maximum mismatch count which will still allow a full match.
 		long-hint : |
 			Specifies the maximum mismatch count which will still allow a full match to be performed.
-	palindrome_clip_threshold : 
+	seg_filter : 
 		ui-name : |
 			Palindrome clip threshold
 		short-hint : |
 			Specifies how accurate the match between the two 'adapter ligated' reads must be for PE palindrome read alignment.
 		long-hint : |
 			Specifies how accurate the match between the two 'adapter ligated' reads must be for PE palindrome read alignment.
-	simple_clip_threshold : 
-		ui-name : |
-			Simple clip threshold
-		short-hint : |
-			Specifies how accurate the match between any adapter etc. sequence must be against a read.
-		long-hint : |
-			Specifies how accurate the match between any adapter etc. sequence must be against a read.
-	sliding_window_size :
+	min_match_length :
 		ui-name : |
 			Sliding window size
 		short-hint : |
 			Specifies the number of bases to average across.
 		long-hint : |
 			Perform a sliding window trimming, cutting once the average quality within the window falls below a threshold. By considering multiple bases, a single poor quality base will not cause the removal of high quality data later in the read.
-	sliding_window_min_quality :
+	greedy_run_mode : 
+		ui-name : |
+			Simple clip threshold
+		short-hint : |
+			Specifies how accurate the match between any adapter etc. sequence must be against a read.
+		long-hint : |
+			Specifies how accurate the match between any adapter etc. sequence must be against a read.
+	greedy_min_match_score :
 		ui-name : |
 			Sliding window minimum quality
 		short-hint : |
 			Specifies the average quality required.
 		long-hint : |
 			Perform a sliding window trimming, cutting once the average quality within the window falls below a threshold. By considering multiple bases, a single poor quality base will not cause the removal of high quality data later in the read.
-	crop_length :
+	greedy_allowed_mismatches :
 		ui-name : |
 			Post Tail Crop length
 		short-hint : |
 			The number of bases to keep, from the start of the read (e.g. tail crop 10 bases from a 150 base read: enter "140").
 		long-hint : |
 			Removes bases regardless of quality from the end of the read, so that the read has maximally the specified length after this step has been performed. Steps performed after CROP might of course further shorten the read.
-	head_crop_length :
-		ui-name : |
-			Head crop length
-		short-hint : |
-			The number of bases to remove from the start of the read (e.g. head crop 10 bases: enter "10").
-		long-hint : |
-			Removes the specified number of bases, regardless of quality, from the beginning of the read.
-	leading_min_quality :
-		ui-name : |
-			Leading minimum quality
-		short-hint : |
-			Specifies the minimum quality required to keep a base at start of read.
-		long-hint : |
-			Remove low quality bases from the beginning. As long as a base has a value below this threshold the base is removed and the next base will be investigated.
-	trailing_min_quality :
-		ui-name : |
-			Trailing minimum quality
-		short-hint : |
-			Specifies the minimum quality required to keep a base at end of read.
-		long-hint : |
-			Remove low quality bases from the end. As long as a base has a value below this threshold the base is removed and the next base (which as trimmomatic is starting from the 3‟ prime end would be base preceding the just removed base) will be investigated. This approach can be used removing the special illumina „low quality segment‟ regions (which are marked with quality score of 2), but we recommend Sliding Window or MaxInfo instead.
-	min_length :
-		ui-name : |
-			Minimum read length
-		short-hint : |
-			Specifies the minimum length of reads to be kept.
-		long-hint : |
-			This module removes reads that fall below the specified minimal length. Reads removed by this step will be counted and included in the "dropped reads" count presented in the trimmomatic summary.
-	translate_to_phred33 :
-		ui-name : |
-			Translate quality encoding from phred64 to phred33 
-		short-hint : |
-			Modernize and standardize phred64 (Illumina <= 1.7) read quality encoding format to phred33 (Sanger, 454, SRA, Illumina >= 1.8).
-		long-hint : |
-			Modernize and standardize phred64 (Illumina <= 1.7) read quality encoding format to phred33 (Sanger, 454, SRA, Illumina >= 1.8).  Does nothing if already phred33.
-
-#
-# Configure the display and description of parameters
-#
-parameter-groups :
-	adapter_clip :
-		ui-name : |
-			Adapter clipping options
-		short-hint : |
-			Configure if you wish to remove standard adapters
-	sliding_window :
-		ui-name : |
-			Sliding window options
-		short-hint : |
-			Configure quality window options
 
 #
 # Desc
 #
 description : |
-	<p>This is a Narrative Method for running <a href="http://www.usadellab.org/cms/?page=trimmomatic">Trimmomatic: A flexible read trimming tool for Illumina NGS data.</a> 
-	Trimmomatic is written by <a href="http://www.usadellab.org/cms/index.php?page=BolgerAnthony">Anthony Bolger</a> from the <a href="http://www.usadellab.org">Bjorn Usadel Lab</a>. 
+	<p>This is a Narrative Method for running <a href="http://kaiju.binf.ku.dk/">Kaiju: Fast and sensitive taxonomic classification for metagenomics.</a> 
+	Kaiju is written by Peter Menzel and Anders Krogh at the Bioinfomratics Centre, a part of the <a href="http://www1.bio.ku.dk/binf/" target="centre">Section for Computational and RNA Biology</a> at the <a href="http://www.ku.dk/english" target="ucop">University of Copenhagen</a>.
 	 </p>
+	 <hr>
+	 <p>
+	 References:<br>
+	 Kaiju Homepage: http://kaiju.binf.ku.dk/<br>
+	 Krona Homepage: https://github.com/marbl/Krona/wiki<br>
+	 Kaiju DBs from: http://kaiju.binf.ku.dk/server<br>
+	 Github repo for Kaiju: https://github.com/bioinformatics-centre/kaiju<br>
+	 Github repo for Krona: https://github.com/marbl/Krona<br>
+	 <hr>
+	 Kaiju paper: Menzel, P. et al. (2016) Fast and sensitive taxonomic classification for metagenomics with Kaiju. Nat. Commun. 7:11257.
 	 <br>
-	 Trimmomatic version: 0.36: <a href="http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.36.zip">binary</a>, <a href="http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-Src-0.36.zip">source</a>, <a href="http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/TrimmomaticManual_V0.32.pdf">manual</a>.
-	 <br>
+	 Krona paper: Ondov BD, Bergman NH, and Phillippy AM. Interactive metagenomic visualization in a Web browser. BMC Bioinformatics. 2011 Sep 30; 12(1):385.
+	 </p>
+	 <hr>
+	 <p>
+	 wrapped for KBase by Dylan Chivian
+	 </p>
 	 <h3>Description</h3>
-	 <p>Trimmomatic performs a variety of useful trimming tasks for illumina paired-end and single ended data. These tasks are performed as a series of steps. At least one step must be specified and steps are run in order.</p>
-	 <p>The current steps are:</p>
-	 
-	 <h4>Adapter Clipping:</h4> This step will remove Illumina adapters from the reads. To use this, you must select one of the predefined adapter sets and set parameters for match criteria. Suggested adapter sequences are provided for TruSeq2 (as used in GAII machines) and TruSeq3 (as used by HiSeq and MiSeq machines), for both single-end and paired-end mode. You can find more information on the adapters in the <a href="http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/TrimmomaticManual_V0.32.pdf">Trimmomatic manual</a>.
-	 <ul>
-	 <li><b>Adapters</b>: Select one of the predefined adapter sets.</li>
-	 <li><b>Seed Mismatches</b>: The maximum number of mismatches that will allow a full match to be performed. To speed up search, short sections of each adapter (upto 16bp) is tested at all possible positions to find "seeds" that trigger a full alignment. This Seed Mismatch parameters specifies the allowable mismatches for a seed.</li>
-	 <li><b>Simple Clip Threshold</b>: Alignment minimum score threshold for match, suggested values between 7-15. Score equals 0.6 per match minus Q/10 per mismatch.</li>
-	 <li><b>Palindrome Clip Threshold</b>: Using the same scoring as above, the pair of reads are aligned. Suggested value around 30.</li>
-	 </ul>
-	 
-	 <h4>Crop reads:</h4> Removes bases, regardless of quality, from the end of the read, so that the read has maximally the specified length after this step has been performed. Steps performed after Crop migh further shorten the read.
-	 <ul>
-	 <li><b>Crop length</b>: Number of bp to keep, from the start of the read.</li>
-	 </ul>
-
-	 <h4>Head Crop:</h4> Removes the specifed number of bases, regardless of quality, from the beginning of the read.
-	 <ul>
-	 <li><b>Head crop length</b>: Number of bp to remove from start of the read.</li>
-	 </ul>
-	 
-	 <h4>Leading Minimum Quality:</h4> Remove low quality bases from the beginning. As long as a base has a value below this threshold, the base is removed and the next base will be investigated.
-	 <ul>
-	 <li><b>Leading minimum quality</b>: Minimum quality score.</li>
-	 </ul>
-	 
-	 <h4>Trailing Minimum Quality:</h4> Remove low quality bases from the end. As long as a base has a value below this threshold, the base is removed and the next base is investigated. This approach can be used for removing the special illumina 'low quality segment' regions (which have a quality score of 2), but Sliding Window is recommended for this.
-	 <ul>
-	 <li><b>Trailing minimum quality</b>: Minimum quality score.</li>
-	 </ul>
-	 
-	 <h4>Sliding Window:</h4> Performs sliding window trimming by cutting once the average quality within the window falls below specified threshold. By considering multiple bases, a single poor quality base will not cause the removal of high quality data later in the read.
-	 <ul>
-	 <li><b>Sliding Window Size</b>: length of window in bp.</li>
-	 <li><b>Sliding Window Minimum Quality</b>: The average quality required.</li> 
-	 </ul>
-	 
-	 <h4>Minimum Read Length:</h4> This removes reads that fall below the specifed minimum length. Reads removed by this step are included in the 'dropped reads' count.
-	 <ul>
-	 <li><b>Minimum read length</b>: Length in bp.</li>
-	 </ul>
-	 
-	 
 
 
 publications :
     -
-        pmid: 24695404
+        pmid: 27071849
         display-text : |
-            'Bolger AM, Lohse M, Usadel B., (2014) Trimmomatic: a flexible trimmer for Illumina sequence data. Bioinformatics. 2014 Aug 1;30(15):2114-20. doi: 10.1093/bioinformatics/btu170.'
-        link: http://www.ncbi.nlm.nih.gov/pubmed/24695404
+            'Menzel P, Ng KL, Krogh A. (2016) Fast and sensitive taxonomic classification for metagenomics with Kaiju. Nat Commun. 2016 Apr 13;7:11257. doi: 10.1038/ncomms11257'
+        link: http://www.ncbi.nlm.nih.gov/pubmed/27071849
     -
-    	link: http://www.usadellab.org/cms/?page=trimmomatic
-
+        pmid: 21961884
+        display-text : |
+            'Ondov BD, Bergman NH, and Phillippy AM. (2011) Interactive metagenomic visualization in a Web browser. BMC Bioinformatics. 2011 Sep 30; 12(1):385. doi: 10.1186/1471-2105-12-385'
+        link: http://www.ncbi.nlm.nih.gov/pubmed/21961884
+    -
+    	link: http://kaiju.binf.ku.dk/
+    -
+    	link: http://kaiju.binf.ku.dk/server
+    -
+    	link: https://github.com/bioinformatics-centre/kaiju
+    -
+    	link: https://github.com/marbl/Krona/wiki
+    -
+    	link: https://github.com/marbl/Krona

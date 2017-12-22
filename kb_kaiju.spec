@@ -95,13 +95,14 @@ module kb_kaiju {
     */
     typedef structure {
 	workspace_name workspace_name;
-	data_obj_ref   reads_ref;
+	data_obj_ref   input_reads_ref;
+	data_obj_ref   output_biom_name;
 	list<string>   tax_levels;
 
 	string         db_type;
 	bool           seg_filter;
-	bool           greedy_run_mode;
 	int            min_match_length;
+	bool           greedy_run_mode;
 	float          greedy_min_match_score;
 	int            greedy_allowed_mismatches;
     } KaijuInputParams;
