@@ -33,9 +33,10 @@ RUN \
 RUN \
     git clone https://github.com/marbl/Krona && \
     cd Krona/KronaTools && \
-    ./install.pl && \
-    ./updateTaxonomy.sh && \
-    ./updateAccessions.sh
+    ./install.pl
+#    ./install.pl && \
+#    ./updateTaxonomy.sh && \
+#    ./updateAccessions.sh
 
 # For kaiju dbs (rest of db installation to ref data mount in entrypoint.sh init script)
 RUN mkdir -p /data/kaijudb
