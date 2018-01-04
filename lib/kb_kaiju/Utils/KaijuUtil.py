@@ -31,14 +31,33 @@ class KaijuUtil:
         '''
         Main entry point for running kaiju + krona as a KBase App
         '''
-        method = 'run_kaiju_and_krona()'
-        
 
         # 0) validate basic parameters
-        if 'input_refs' not in params:
-            raise ValueError('input_refs field was not set in params for '+method)
-        if 'workspace_name' not in params:
-            raise ValueError('workspace_name field was not set in params for '+method)
+        method = 'run_kaiju_and_krona()'
+        required_params = ['workspace_name',
+                           'input_refs',
+                           'output_biom_name',
+                           'tax_levels',
+                           'db_type',
+                           'seg_filter',
+                           'min_match_length',
+                           'greedy_run_mode',
+                           'filter_percent',
+                           'filter_unclassified',
+                           'full_tax_path'
+                          ]
+        for arg in required_params:
+            if arg not in params or params[arg] == None or params[arg] == '':
+                raise ValueError ("Must define required param: '"+arg+"' for method: '"+str(method)+"'")        
+
+        if 'greedy_run_mode' in params and int(params['greedy_run_mode']) == 1:
+            greedy_required_params = ['greedy_allowed_mismatches',
+                                      'greedy_min_match_score',
+                                      'greedy_max_e_value'
+                                  ]
+            for arg in greedy_required_params:
+                if arg not in params or params[arg] == None or params[arg] == '':
+                    raise ValueError ("Must define GREEDY MODE required param: '"+arg+"' for method: '"+str(method)+"'")        
 
 
         # 1) stage input data
