@@ -45,14 +45,14 @@ class kb_kaiju(object):
            "id" is a numerical identifier of the workspace or object, and
            should just be used for workspace ** "name" is a string identifier
            of a workspace or object.  This is received from Narrative.),
-           parameter "reads_ref" of type "data_obj_ref", parameter
-           "tax_levels" of list of String, parameter "db_type" of String,
-           parameter "seg_filter" of type "bool" (A boolean - 0 for false, 1
-           for true. @range (0, 1)), parameter "greedy_run_mode" of type
-           "bool" (A boolean - 0 for false, 1 for true. @range (0, 1)),
-           parameter "min_match_length" of Long, parameter
-           "greedy_min_match_score" of Double, parameter
-           "greedy_allowed_mismatches" of Long
+           parameter "input_reads_ref" of type "data_obj_ref", parameter
+           "output_biom_name" of type "data_obj_ref", parameter "tax_levels"
+           of list of String, parameter "db_type" of String, parameter
+           "seg_filter" of type "bool" (A boolean - 0 for false, 1 for true.
+           @range (0, 1)), parameter "min_match_length" of Long, parameter
+           "greedy_run_mode" of type "bool" (A boolean - 0 for false, 1 for
+           true. @range (0, 1)), parameter "greedy_min_match_score" of
+           Double, parameter "greedy_allowed_mismatches" of Long
         :returns: instance of type "KaijuOutput" (Kaiju App Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"

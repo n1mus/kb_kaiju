@@ -147,12 +147,13 @@ $params is a kb_kaiju.KaijuInputParams
 $return is a kb_kaiju.KaijuOutput
 KaijuInputParams is a reference to a hash where the following keys are defined:
 	workspace_name has a value which is a kb_kaiju.workspace_name
-	reads_ref has a value which is a kb_kaiju.data_obj_ref
+	input_reads_ref has a value which is a kb_kaiju.data_obj_ref
+	output_biom_name has a value which is a kb_kaiju.data_obj_ref
 	tax_levels has a value which is a reference to a list where each element is a string
 	db_type has a value which is a string
 	seg_filter has a value which is a kb_kaiju.bool
-	greedy_run_mode has a value which is a kb_kaiju.bool
 	min_match_length has a value which is an int
+	greedy_run_mode has a value which is a kb_kaiju.bool
 	greedy_min_match_score has a value which is a float
 	greedy_allowed_mismatches has a value which is an int
 workspace_name is a string
@@ -173,12 +174,13 @@ $params is a kb_kaiju.KaijuInputParams
 $return is a kb_kaiju.KaijuOutput
 KaijuInputParams is a reference to a hash where the following keys are defined:
 	workspace_name has a value which is a kb_kaiju.workspace_name
-	reads_ref has a value which is a kb_kaiju.data_obj_ref
+	input_reads_ref has a value which is a kb_kaiju.data_obj_ref
+	output_biom_name has a value which is a kb_kaiju.data_obj_ref
 	tax_levels has a value which is a reference to a list where each element is a string
 	db_type has a value which is a string
 	seg_filter has a value which is a kb_kaiju.bool
-	greedy_run_mode has a value which is a kb_kaiju.bool
 	min_match_length has a value which is an int
+	greedy_run_mode has a value which is a kb_kaiju.bool
 	greedy_min_match_score has a value which is a float
 	greedy_allowed_mismatches has a value which is an int
 workspace_name is a string
@@ -474,12 +476,13 @@ Kaiju App Input Params
 <pre>
 a reference to a hash where the following keys are defined:
 workspace_name has a value which is a kb_kaiju.workspace_name
-reads_ref has a value which is a kb_kaiju.data_obj_ref
+input_reads_ref has a value which is a kb_kaiju.data_obj_ref
+output_biom_name has a value which is a kb_kaiju.data_obj_ref
 tax_levels has a value which is a reference to a list where each element is a string
 db_type has a value which is a string
 seg_filter has a value which is a kb_kaiju.bool
-greedy_run_mode has a value which is a kb_kaiju.bool
 min_match_length has a value which is an int
+greedy_run_mode has a value which is a kb_kaiju.bool
 greedy_min_match_score has a value which is a float
 greedy_allowed_mismatches has a value which is an int
 
@@ -491,12 +494,13 @@ greedy_allowed_mismatches has a value which is an int
 
 a reference to a hash where the following keys are defined:
 workspace_name has a value which is a kb_kaiju.workspace_name
-reads_ref has a value which is a kb_kaiju.data_obj_ref
+input_reads_ref has a value which is a kb_kaiju.data_obj_ref
+output_biom_name has a value which is a kb_kaiju.data_obj_ref
 tax_levels has a value which is a reference to a list where each element is a string
 db_type has a value which is a string
 seg_filter has a value which is a kb_kaiju.bool
-greedy_run_mode has a value which is a kb_kaiju.bool
 min_match_length has a value which is an int
+greedy_run_mode has a value which is a kb_kaiju.bool
 greedy_min_match_score has a value which is a float
 greedy_allowed_mismatches has a value which is an int
 
