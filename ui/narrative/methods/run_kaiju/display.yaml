@@ -27,69 +27,98 @@ suggestions:
 # Configure the display and description of parameters
 #
 parameters :
-	input_reads_ref :
+	input_refs :
 		ui-name : |
-			Read library (or Set) object <font color=red>*</font>
+			Read library (or Set) objects <font color=red>*</font>
 		short-hint : |
 			The read library or read library set to examine
 		long-hint  : |
 			The read library or read library set for which you want to trim.
 	output_biom_name :
 		ui-name : |
-			Output library (or Set) name <font color=red>*</font>
+			Output BIOM name <font color=red>*</font>
 		short-hint : |
-			Base name for output read library or read library set object
+			Name for output community abundance object
 		long-hint : |
-			Base name for output read library or read library set object
+			Name for output community abundance object
 	tax_levels :
 		ui-name : |
-			Adapters
+			Taxonomic level
 		short-hint : |
-			The reference sequences for trimming.
+			The Taxonomic level that should be used for generating summary plots
 		long-hint : |
-			The reference adapter sequences.
+			The Taxonomic level that should be used for generating summary plots
 	db_type : 
 		ui-name : |
-			Seed mismatches
+			Reference DB
 		short-hint : |
-			Maximum mismatch count which will still allow a full match.
+			Database to search against for classification
 		long-hint : |
-			Specifies the maximum mismatch count which will still allow a full match to be performed.
+			Database to search against for classification
 	seg_filter : 
 		ui-name : |
-			Palindrome clip threshold
+			Filter low-complexity
 		short-hint : |
-			Specifies how accurate the match between the two 'adapter ligated' reads must be for PE palindrome read alignment.
+			Use SEG algorithm to remove low-complexity regions from input sequences (recommended)
 		long-hint : |
-			Specifies how accurate the match between the two 'adapter ligated' reads must be for PE palindrome read alignment.
+			Use SEG algorithm to remove low-complexity regions from input sequences (recommended)
 	min_match_length :
 		ui-name : |
-			Sliding window size
+			Min Match Length
 		short-hint : |
-			Specifies the number of bases to average across.
+			Shortest alignment match to use for classification, in base pairs (default: 11)
 		long-hint : |
-			Perform a sliding window trimming, cutting once the average quality within the window falls below a threshold. By considering multiple bases, a single poor quality base will not cause the removal of high quality data later in the read.
+			Shortest alignment match to use for classification, in base pairs (default: 11)
 	greedy_run_mode : 
 		ui-name : |
-			Simple clip threshold
+			Allow imperfect matches?
 		short-hint : |
-			Specifies how accurate the match between any adapter etc. sequence must be against a read.
+			Imperfect matches can be used for classification with below thresholds (recommended)
 		long-hint : |
-			Specifies how accurate the match between any adapter etc. sequence must be against a read.
-	greedy_min_match_score :
-		ui-name : |
-			Sliding window minimum quality
-		short-hint : |
-			Specifies the average quality required.
-		long-hint : |
-			Perform a sliding window trimming, cutting once the average quality within the window falls below a threshold. By considering multiple bases, a single poor quality base will not cause the removal of high quality data later in the read.
+			Imperfect matches can be used for classification with below thresholds (recommended)
 	greedy_allowed_mismatches :
 		ui-name : |
-			Post Tail Crop length
+			Greedy max mismatches
 		short-hint : |
-			The number of bases to keep, from the start of the read (e.g. tail crop 10 bases from a 150 base read: enter "140").
+			Greedy (imperfect) match maximum mismatches (default: 5)
 		long-hint : |
-			Removes bases regardless of quality from the end of the read, so that the read has maximally the specified length after this step has been performed. Steps performed after CROP might of course further shorten the read.
+			Greedy (imperfect) match maximum mismatches (default: 5)
+	greedy_min_match_score :
+		ui-name : |
+			Greedy min bitscore
+		short-hint : |
+			Greedy (imperfect) match minimum bitscore (def: 75)
+		long-hint : |
+			Greedy (imperfect) match minimum bitscore (def: 75)
+	greedy_max_e_value :
+		ui-name : |
+			Greedy max e-value
+		short-hint : |
+			Greedy (imperfect) match maximum e-value (default: 0.05)
+		long-hint : |
+			Greedy (imperfect) match maximum e-value (default: 0.05)
+	full_tax_path :
+		ui-name : |
+			Summary full tax lineage?
+		short-hint : |
+			Place the full taxonomic lineage into the summary? (default: NO)
+		long-hint : |
+			Place the full taxonomic lineage into the summary? (default: NO)
+	filter_percent :
+		ui-name : |
+			Summary minimum percent
+		short-hint : |
+			Dont include below this percentage of the reads in the summaries (default: 1%, note: must be integer)
+		long-hint : |
+			Dont include below this percentage of the reads in the summaries (default: 1%, note: must be integer)
+	filter_unclassified :
+		ui-name : |
+			Summary classified
+		short-hint : |
+			Do not include unclassified reads in the summaries (default: YES)
+		long-hint : |
+			Do not include unclassified reads in the summaries (default: YES)
+
 
 #
 # Desc

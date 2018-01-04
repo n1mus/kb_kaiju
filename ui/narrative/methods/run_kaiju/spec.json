@@ -1,44 +1,127 @@
 {
-	"ver": "1.2.8",
+	"ver": "0.0.1",
 
 	"authors": [
-		"psdehal",
 		"dylan"
 	],
 	"contact": "http://kbase.us/contact-us/",
 	"visible": true,
-	"categories": ["active", "reads" ],
+	"categories": ["active", "communities" ],
 	"widgets": {
 		"input": null,
 		"output": "no-display"
 	},
 	"parameters": [
 		{
-			"id": "input_reads_ref",
+			"id": "input_refs",
 			"optional": false,
 			"advanced": false,
-			"allow_multiple": false,
+			"allow_multiple": true,
 			"default_values": [ "" ],
 			"field_type": "text",
 			"text_options": {
-				"valid_ws_types": ["KBaseRNASeq.RNASeqSampleSet", "KBaseSets.ReadsSet", "KBaseFile.PairedEndLibrary", "KBaseFile.SingleEndLibrary", "KBaseAssembly.PairedEndLibrary", "KBaseAssembly.SingleEndLibrary"]
+				"valid_ws_types": [ "KBaseSets.ReadsSet", "KBaseFile.PairedEndLibrary", "KBaseFile.SingleEndLibrary", "KBaseAssembly.PairedEndLibrary", "KBaseAssembly.SingleEndLibrary"]
 			}
 		},
 		{
-			"id": "output_reads_name",
+			"id": "output_biom_name",
 			"optional": false,
 			"advanced": false,
 			"allow_multiple": false,
 			"default_values": [ "" ],
 			"field_type": "text",
 			"text_options": {
-				"valid_ws_types": ["KBaseSets.ReadsSet", "KBaseFile.PairedEndLibrary", "KBaseFile.SingleEndLibrary"],
+				"valid_ws_types": ["Communities.Biom"],
 				"is_output_name": true
 			}
 		},
 		{
-			"id": "translate_to_phred33",
-			"optional": true,
+			"id": "tax_levels",
+			"optional": false,
+			"advanced": false,
+			"allow_multiple": true,
+			"default_values": [ 'genus' ],
+			"field_type": "dropdown",
+				"dropdown_options": {
+					"options": [
+						{
+							"value": 'phylum',
+							"display": "phylum",
+							"id": "phylum",
+							"ui-name": "phylum"
+						},
+						{
+							"value": 'class',
+							"display": "class",
+							"id": "class",
+							"ui-name": "class"
+						},
+						{
+							"value": 'order',
+							"display": "order",
+							"id": "order",
+							"ui-name": "order"
+						},
+						{
+							"value": 'family',
+							"display": "family",
+							"id": "family",
+							"ui-name": "family"
+						},
+						{
+							"value": 'genus',
+							"display": "genus",
+							"id": "genus",
+							"ui-name": "genus"
+						},
+						{
+							"value": 'species',
+							"display": "species",
+							"id": "species",
+							"ui-name": "species"
+						}
+					]
+				}
+		},
+		{
+			"id": "db_type",
+			"optional": false,
+			"advanced": false,
+			"allow_multiple": false,
+			"default_values": ["kaiju_index"],
+			"field_type": "dropdown",
+				"dropdown_options": {
+					"options": [
+						{
+							"value": "kaiju_index",
+							"display": "RefSeq Genomes (no Euks)",
+							"id": "kaiju_index",
+							"ui-name": "kaiju_index"
+						},
+						{
+							"value": "kaiju_index_pg",
+							"display": "proGenomes (no Euks)",
+							"id": "kaiju_index_pg",
+							"ui-name": "kaiju_index_pg"
+						},
+						{
+							"value": "kaiju_index_nr",
+							"display": "NCBI BLAST nr (no Euks)",
+							"id": "kaiju_index_nr",
+							"ui-name": "kaiju_index_nr"
+						},
+						{
+							"value": "kaiju_index_nr_euk",
+							"display": "NCBI BLAST nr+euk",
+							"id": "kaiju_index_nr_euk",
+							"ui-name": "kaiju_index_nr_euk"
+						}
+					]
+				}
+		},
+		{
+			"id": "seg_filter",
+			"optional": false,
 			"advanced": true,
 			"allow_multiple": false,
 			"default_values": [ 1 ],
@@ -46,251 +129,218 @@
 				"dropdown_options": {
 					"options": [
 						{
-							"value": 0,
-							"display": "no",
-							"id": "phred33_no",
-							"ui-name": "phred33_no"
+							"value": 1,
+							"display": "filter",
+							"id": "filter",
+							"ui-name": "filter"
 						},
 						{
-							"value": 1,
-							"display": "yes",
-							"id": "phred33_yes",
-							"ui-name": "phred33_yes"
+							"value": 0,
+							"display": "no filter",
+							"id": 'no_filter',
+							"ui-name": "no_filter"
 						}
 					]
 				}
 		},
-
 		{
-			"id": "adapterFa",
-			"optional": true,
+			"id": "min_match_length",
+			"optional": false,
 			"advanced": true,
 			"allow_multiple": false,
-			"default_values": [""],
+			"default_values": [ "11" ],
+			"field_type": "text",
+			"text_options": {
+				"validate_as": "int",
+			        "min_integer" : 9
+			}
+		},
+		{
+			"id": "greedy_run_mode",
+			"optional": false,
+			"advanced": true,
+			"allow_multiple": false,
+			"default_values": [ 1 ],
 			"field_type": "dropdown",
 				"dropdown_options": {
 					"options": [
 						{
-							"value": "TruSeq3-PE.fa",
-							"display": "TruSeq3-PE",
-							"id": "TruSeq3-PE",
-							"ui-name": "TruSeq3-PE"
+							"value": 1,
+							"display": "allow mismatches (Greedy mode)",
+							"id": "greedy",
+							"ui-name": "greedy"
 						},
 						{
-							"value": "TruSeq2-PE.fa",
-							"display": "TruSeq2-PE",
-							"id": "TruSeq2-PE",
-							"ui-name": "TruSeq2-PE"
-						},
-						{
-							"value": "TruSeq3-PE-2.fa",
-							"display": "TruSeq3-PE-2",
-							"id": "TruSeq3-PE-2",
-							"ui-name": "TruSeq3-PE-2"
-						},
-						{
-							"value": "TruSeq3-SE.fa",
-							"display": "TruSeq3-SE",
-							"id": "TruSeq3-SE",
-							"ui-name": "TruSeq3-SE"
-						},
-						{
-							"value": "TruSeq2-SE.fa",
-							"display": "TruSeq2-SE",
-							"id": "TruSeq2-SE",
-							"ui-name": "TruSeq2-SE"
-						},
-						{
-							"value": "NexteraPE-PE.fa",
-							"display": "NexteraPE-PE",
-							"id": "NexteraPE-PE",
-							"ui-name": "NexteraPE-PE"
+							"value": 0,
+							"display": "maximum exact match (MEM mode)",
+							"id": 'perfect',
+							"ui-name": "perfect"
 						}
 					]
 				}
 		},
 		{
-			"id": "seed_mismatches",
-			"optional": true,
+			"id": "greedy_allowed_mismatches",
+			"optional": false,
 			"advanced": true,
 			"allow_multiple": false,
-			"default_values": [ "2" ],
+			"default_values": ["5"],
 			"field_type": "text",
 			"text_options": {
-				"validate_as": "int"
+				"validate_as": "int",
+			        "min_integer": 1
 			}
 		},
 		{
-			"id": "palindrome_clip_threshold",
-			"optional": true,
+			"id": "greedy_min_match_score",
+			"optional": false,
 			"advanced": true,
 			"allow_multiple": false,
-			"default_values": ["30"],
+			"default_values": [ "75.0" ],
 			"field_type": "text",
 			"text_options": {
-				"validate_as": "int"
+				"validate_as": "float",
+			        "min_float": 10.0
 			}
 		},
 		{
-			"id": "simple_clip_threshold",
-			"optional": true,
+			"id": "greedy_max_e_value",
+			"optional": false,
 			"advanced": true,
 			"allow_multiple": false,
-			"default_values": [ "10" ],
+			"default_values": [ "0.05" ],
 			"field_type": "text",
 			"text_options": {
-				"validate_as": "int"
-			}
-		},
-
-		{
-			"id": "sliding_window_size",
-			"optional": true,
-			"advanced": true,
-			"allow_multiple": false,
-			"default_values": [ "4" ],
-			"field_type": "text",
-			"text_options": {
-				"validate_as": "int"
+				"validate_as": "float",
+			        "max_float": 1.0
 			}
 		},
 		{
-			"id": "sliding_window_min_quality",
-			"optional": true,
+			"id": "full_tax_path",
+			"optional": false,
 			"advanced": true,
 			"allow_multiple": false,
-			"default_values": [ "15" ],
-			"field_type": "text",
-			"text_options": {
-				"validate_as": "int"
-			}
-		},
-
-		{
-			"id": "crop_length",
-			"optional": true,
-			"advanced": true,
-			"allow_multiple": false,
-			"default_values": [ "" ],
-			"field_type": "text",
-			"text_options": {
-				"validate_as": "int"
-			}
-		},
-		{
-			"id": "head_crop_length",
-			"optional": true,
-			"advanced": true,
-			"allow_multiple": false,
-			"default_values": [ "0" ],
-			"field_type": "text",
-			"text_options": {
-				"validate_as": "int"
-			}
+			"default_values": [ 0 ],
+			"field_type": "dropdown",
+				"dropdown_options": {
+					"options": [
+						{
+							"value": 0,
+							"display": "single tax level",
+							"id": "single_tax",
+							"ui-name": "single_tax"
+						},
+						{
+							"value": 1,
+							"display": "full tax lineage",
+							"id": 'full_tax',
+							"ui-name": "full_tax"
+						}
+					]
+				}
 		},
 		{
-			"id": "leading_min_quality",
-			"optional": true,
+			"id": "filter_percent",
+			"optional": false,
 			"advanced": true,
 			"allow_multiple": false,
-			"default_values": [ "3" ],
+			"default_values": [ "1" ],
 			"field_type": "text",
 			"text_options": {
-				"validate_as": "int"
+				"validate_as": "int",
+			        "min_integer": 0
 			}
 		},
 		{
-			"id": "trailing_min_quality",
-			"optional": true,
+			"id": "filter_unclassified",
+			"optional": false,
 			"advanced": true,
 			"allow_multiple": false,
-			"default_values": [ "3" ],
-			"field_type": "text",
-			"text_options": {
-				"validate_as": "int"
-			}
-		},
-		{
-			"id": "min_length",
-			"optional": true,
-			"advanced": true,
-			"allow_multiple": false,
-			"default_values": [ "36" ],
-			"field_type": "text",
-			"text_options": {
-				"validate_as": "int"
-			}
+			"default_values": [ 1 ],
+			"field_type": "dropdown",
+				"dropdown_options": {
+					"options": [
+						{
+							"value": 1,
+							"display": "remove unclassified reads from summary",
+							"id": "filter_unclassified_reads",
+							"ui-name": "filter_unclassified_reads"
+						},
+						{
+							"value": 0,
+							"display": "keep unclassified reads in summary",
+							"id": 'keep_unclassified_reads',
+							"ui-name": "keep_unclassified_reads"
+						}
+					]
+				}
 		}
-	],
-	"parameter-groups": [
-	    {
-	      "id": "adapter_clip",
-	      "parameters": ["adapterFa", "seed_mismatches", "palindrome_clip_threshold", "simple_clip_threshold"],
-	      "optional": true,
-	      "allow_multiple": false,
-	      "with_border": true
-	    },
-	    {
-	      "id": "sliding_window",
-	      "parameters": ["sliding_window_size", "sliding_window_min_quality"],
-	      "optional": false,
-	      "allow_multiple": false,
-	      "with_border": true
-	    }
 	],
 
 	"behavior": {
 		"service-mapping": {
 			"url": "",
-			"name": "kb_trimmomatic",
-			"method": "runTrimmomatic",
+			"name": "kb_kaiju",
+			"method": "run_kaiju",
 			"input_mapping": [
 				{
 					"narrative_system_variable": "workspace",
-					"target_property": "input_ws"
+					"target_property": "workspace_name"
 				},
 				{
-					"input_parameter": "input_reads_ref",
-					"target_property": "input_reads_ref",
-					"target_type_transform": "resolved-ref"
+					"input_parameter": "input_refs",
+					"target_property": "input_refs",
+					"target_type_transform": "list<resolved-ref>"
 
 				},
 				{
-					"input_parameter": "output_reads_name",
-					"target_property": "output_reads_name"
+					"input_parameter": "output_biom_name",
+					"target_property": "output_biom_name"
 
 				},
 				{
-					"input_parameter": "translate_to_phred33",
-					"target_property": "translate_to_phred33"
+					"input_parameter": "tax_levels",
+					"target_property": "tax_levels"
 				},
 				{
-					"input_parameter": "adapter_clip",
-					"target_property": "adapter_clip"
+					"input_parameter": "db_type",
+					"target_property": "db_type"
 				},
 				{
-					"input_parameter": "sliding_window",
-					"target_property": "sliding_window"
+					"input_parameter": "seg_filter",
+					"target_property": "seg_filter"
 				},
 				{
-					"input_parameter": "leading_min_quality",
-					"target_property": "leading_min_quality"
+					"input_parameter": "min_match_length",
+					"target_property": "min_match_length"
 				},
 				{
-					"input_parameter": "trailing_min_quality",
-					"target_property": "trailing_min_quality"
+					"input_parameter": "greedy_run_mode",
+					"target_property": "greedy_run_mode"
 				},
 				{
-					"input_parameter": "crop_length",
-					"target_property": "crop_length"
+					"input_parameter": "greedy_allowed_mismatches",
+					"target_property": "greedy_allowed_mismatches"
 				},
 				{
-					"input_parameter": "head_crop_length",
-					"target_property": "head_crop_length"
+					"input_parameter": "greedy_min_match_score",
+					"target_property": "greedy_min_match_score"
 				},
 				{
-					"input_parameter": "min_length",
-					"target_property": "min_length"
+					"input_parameter": "greedy_max_e_value",
+					"target_property": "greedy_max_e_value"
+				},
+				{
+					"input_parameter": "full_tax_path",
+					"target_property": "full_tax_path"
+				},
+				{
+					"input_parameter": "filter_percent",
+					"target_property": "filter_percent"
+				},
+				{
+					"input_parameter": "filter_unclassified",
+					"target_property": "filter_unclassified"
 				}
 			],
 			"output_mapping": [
