@@ -35,7 +35,7 @@ fwd_reads=$RUN_DATA_DIR/seven_species_nonuniform_10K.PE_reads_fwd-0.FASTQ.gz
 #fwd_reads=$RUN_DATA_DIR/seven_species_nonuniform_100K.PE_reads_fwd-0.FASTQ.gz
 rev_reads=$RUN_DATA_DIR/seven_species_nonuniform_10K.PE_reads_rev-0.FASTQ.gz
 #rev_reads=$RUN_DATA_DIR/seven_species_nonuniform_100K.PE_reads_rev-0.FASTQ.gz
-out_basename=test_greedy_verbose
+out_basename=test2_multi_tax
 kaiju_out_file=$RUN_DATA_DIR/$out_basename.kaiju.out
 kaiju_summary_out_file=$kaiju_out_file.summary
 krona_in_file=$kaiju_out_file.krona
@@ -65,7 +65,8 @@ if [ ! -s $kaiju_out_file ] ; then
 fi
 
 # kaiju summary run
-tax_level=genus
+#tax_levels="phylum,class,order,family,genus,species"
+tax_level="family"
 #taxon_fullpath_arg="-p"
 taxon_fullpath_arg=""
 filter_perc=1
