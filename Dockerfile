@@ -22,6 +22,11 @@ RUN pip install cffi --upgrade \
     && pip install 'requests[security]' --upgrade
 
 
+# Install xvfb for matplotlib pdfs
+#RUN apt-get update && \
+RUN apt-get -y install xvfb python-qt4
+
+
 # For kaiju bin
 WORKDIR /kb/module
 RUN \
