@@ -23,12 +23,13 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @Generated("com.googlecode.jsonschema2pojo")
 @JsonPropertyOrder({
     "workspace_name",
-    "reads_ref",
+    "input_reads_ref",
+    "output_biom_name",
     "tax_levels",
     "db_type",
     "seg_filter",
-    "greedy_run_mode",
     "min_match_length",
+    "greedy_run_mode",
     "greedy_min_match_score",
     "greedy_allowed_mismatches"
 })
@@ -36,18 +37,20 @@ public class KaijuInputParams {
 
     @JsonProperty("workspace_name")
     private java.lang.String workspaceName;
-    @JsonProperty("reads_ref")
-    private java.lang.String readsRef;
+    @JsonProperty("input_reads_ref")
+    private java.lang.String inputReadsRef;
+    @JsonProperty("output_biom_name")
+    private java.lang.String outputBiomName;
     @JsonProperty("tax_levels")
     private List<String> taxLevels;
     @JsonProperty("db_type")
     private java.lang.String dbType;
     @JsonProperty("seg_filter")
     private Long segFilter;
-    @JsonProperty("greedy_run_mode")
-    private Long greedyRunMode;
     @JsonProperty("min_match_length")
     private Long minMatchLength;
+    @JsonProperty("greedy_run_mode")
+    private Long greedyRunMode;
     @JsonProperty("greedy_min_match_score")
     private Double greedyMinMatchScore;
     @JsonProperty("greedy_allowed_mismatches")
@@ -69,18 +72,33 @@ public class KaijuInputParams {
         return this;
     }
 
-    @JsonProperty("reads_ref")
-    public java.lang.String getReadsRef() {
-        return readsRef;
+    @JsonProperty("input_reads_ref")
+    public java.lang.String getInputReadsRef() {
+        return inputReadsRef;
     }
 
-    @JsonProperty("reads_ref")
-    public void setReadsRef(java.lang.String readsRef) {
-        this.readsRef = readsRef;
+    @JsonProperty("input_reads_ref")
+    public void setInputReadsRef(java.lang.String inputReadsRef) {
+        this.inputReadsRef = inputReadsRef;
     }
 
-    public KaijuInputParams withReadsRef(java.lang.String readsRef) {
-        this.readsRef = readsRef;
+    public KaijuInputParams withInputReadsRef(java.lang.String inputReadsRef) {
+        this.inputReadsRef = inputReadsRef;
+        return this;
+    }
+
+    @JsonProperty("output_biom_name")
+    public java.lang.String getOutputBiomName() {
+        return outputBiomName;
+    }
+
+    @JsonProperty("output_biom_name")
+    public void setOutputBiomName(java.lang.String outputBiomName) {
+        this.outputBiomName = outputBiomName;
+    }
+
+    public KaijuInputParams withOutputBiomName(java.lang.String outputBiomName) {
+        this.outputBiomName = outputBiomName;
         return this;
     }
 
@@ -129,21 +147,6 @@ public class KaijuInputParams {
         return this;
     }
 
-    @JsonProperty("greedy_run_mode")
-    public Long getGreedyRunMode() {
-        return greedyRunMode;
-    }
-
-    @JsonProperty("greedy_run_mode")
-    public void setGreedyRunMode(Long greedyRunMode) {
-        this.greedyRunMode = greedyRunMode;
-    }
-
-    public KaijuInputParams withGreedyRunMode(Long greedyRunMode) {
-        this.greedyRunMode = greedyRunMode;
-        return this;
-    }
-
     @JsonProperty("min_match_length")
     public Long getMinMatchLength() {
         return minMatchLength;
@@ -156,6 +159,21 @@ public class KaijuInputParams {
 
     public KaijuInputParams withMinMatchLength(Long minMatchLength) {
         this.minMatchLength = minMatchLength;
+        return this;
+    }
+
+    @JsonProperty("greedy_run_mode")
+    public Long getGreedyRunMode() {
+        return greedyRunMode;
+    }
+
+    @JsonProperty("greedy_run_mode")
+    public void setGreedyRunMode(Long greedyRunMode) {
+        this.greedyRunMode = greedyRunMode;
+    }
+
+    public KaijuInputParams withGreedyRunMode(Long greedyRunMode) {
+        this.greedyRunMode = greedyRunMode;
         return this;
     }
 
@@ -201,7 +219,7 @@ public class KaijuInputParams {
 
     @Override
     public java.lang.String toString() {
-        return ((((((((((((((((((((("KaijuInputParams"+" [workspaceName=")+ workspaceName)+", readsRef=")+ readsRef)+", taxLevels=")+ taxLevels)+", dbType=")+ dbType)+", segFilter=")+ segFilter)+", greedyRunMode=")+ greedyRunMode)+", minMatchLength=")+ minMatchLength)+", greedyMinMatchScore=")+ greedyMinMatchScore)+", greedyAllowedMismatches=")+ greedyAllowedMismatches)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((((((((((((((((("KaijuInputParams"+" [workspaceName=")+ workspaceName)+", inputReadsRef=")+ inputReadsRef)+", outputBiomName=")+ outputBiomName)+", taxLevels=")+ taxLevels)+", dbType=")+ dbType)+", segFilter=")+ segFilter)+", minMatchLength=")+ minMatchLength)+", greedyRunMode=")+ greedyRunMode)+", greedyMinMatchScore=")+ greedyMinMatchScore)+", greedyAllowedMismatches=")+ greedyAllowedMismatches)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }
