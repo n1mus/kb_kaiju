@@ -95,7 +95,7 @@ module kb_kaiju {
     */
     typedef structure {
 	workspace_name workspace_name;
-	data_obj_ref   input_reads_ref;
+	data_obj_ref   input_refs;
 	data_obj_ref   output_biom_name;
 	list<string>   tax_levels;
 
