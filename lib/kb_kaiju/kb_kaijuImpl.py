@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 #BEGIN_HEADER
+import is
+import json
+
+from kb_kaiju.Utils.KaijuUtil import KaijuUtil
 #END_HEADER
 
 
@@ -43,8 +47,8 @@ You should have received a copy of the GNU General Public License along with the
     # the latter method is running.
     ######################################### noqa
     VERSION = "0.0.1"
-    GIT_URL = "https://github.com/dcchivian/kb_kaiju"
-    GIT_COMMIT_HASH = "46ba0e89a766bec4aca985bb3156553b52b9dde9"
+    GIT_URL = "https://github.com/kbaseapps/kb_kaiju"
+    GIT_COMMIT_HASH = "cd7fa32028846715ba52af9252a458ea78aca821"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -53,6 +57,9 @@ You should have received a copy of the GNU General Public License along with the
     # be found
     def __init__(self, config):
         #BEGIN_CONSTRUCTOR
+        self.config = config
+        self.config['SDK_CALLBACK_URL'] = os.environ['SDK_CALLBACK_URL']
+        self.config['KB_AUTH_TOKEN'] = os.environ['KB_AUTH_TOKEN']
         #END_CONSTRUCTOR
         pass
 
@@ -69,14 +76,14 @@ You should have received a copy of the GNU General Public License along with the
            "id" is a numerical identifier of the workspace or object, and
            should just be used for workspace ** "name" is a string identifier
            of a workspace or object.  This is received from Narrative.),
-           parameter "reads_ref" of type "data_obj_ref", parameter
-           "tax_levels" of list of String, parameter "db_type" of String,
-           parameter "seg_filter" of type "bool" (A boolean - 0 for false, 1
-           for true. @range (0, 1)), parameter "greedy_run_mode" of type
-           "bool" (A boolean - 0 for false, 1 for true. @range (0, 1)),
-           parameter "min_match_length" of Long, parameter
-           "greedy_min_match_score" of Double, parameter
-           "greedy_allowed_mismatches" of Long
+           parameter "input_reads_ref" of type "data_obj_ref", parameter
+           "output_biom_name" of type "data_obj_ref", parameter "tax_levels"
+           of list of String, parameter "db_type" of String, parameter
+           "seg_filter" of type "bool" (A boolean - 0 for false, 1 for true.
+           @range (0, 1)), parameter "min_match_length" of Long, parameter
+           "greedy_run_mode" of type "bool" (A boolean - 0 for false, 1 for
+           true. @range (0, 1)), parameter "greedy_min_match_score" of
+           Double, parameter "greedy_allowed_mismatches" of Long
         :returns: instance of type "KaijuOutput" (Kaiju App Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -84,6 +91,11 @@ You should have received a copy of the GNU General Public License along with the
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN run_kaiju
+        print('--->\nRunning kb_kaiju.run_kaiju\nparams:')
+        print(json.dumps(params, indent=1))
+
+        ku = KaijuUtil(self.config, ctx)
+        result = ku.run_kaiju_with_krona(params)
         #END run_kaiju
 
         # At some point might do deeper type checking...
