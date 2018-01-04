@@ -45,6 +45,8 @@ krona_out_html_file=$kaiju_out_file.krona.html
 #### STEP 1: kaiju run and summary
 #
 threads="-z 4"
+minlength="-m 11"
+minscore="-s 65"
 mismatches="-e 5"
 e_value="-E 0.05"
 verbose="-v"
@@ -56,7 +58,7 @@ if [ -s rev_reads ] ; then
 else
     rev_reads_arg=""
 fi
-cmd="$KAIJU_BIN -t $KAIJU_NODES -f $KAIJU_DBPATH $fwd_reads_arg $rev_reads_arg -o $kaiju_out_file $SEG_filter $greedy $mismatches $e_value $threads $verbose"
+cmd="$KAIJU_BIN -t $KAIJU_NODES -f $KAIJU_DBPATH $fwd_reads_arg $rev_reads_arg -o $kaiju_out_file $SEG_filter $minlength $minscore $greedy $mismatches $e_value $threads $verbose"
 if [ ! -s $kaiju_out_file ] ; then
     echo $cmd
     exec $cmd
