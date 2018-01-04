@@ -11,11 +11,29 @@ import us.kbase.auth.AuthToken;
 import us.kbase.common.service.JsonClientCaller;
 import us.kbase.common.service.JsonClientException;
 import us.kbase.common.service.RpcContext;
+import us.kbase.common.service.UnauthorizedException;
 
 /**
  * <p>Original spec-file module name: kb_kaiju</p>
  * <pre>
  * A KBase module: kb_kaiju
+ * This SDK module is developed to wrap the open source package Kaiju
+ * determines taxonomic structure for microbial communities from shotgun metagenomic sequence data
+ * Module also utilizes Krona for visualization of results
+ * References: 
+ * Kaiju Homepage: http://kaiju.binf.ku.dk/
+ * Krona Homepage: https://github.com/marbl/Krona/wiki
+ * Kaiju DBs from: http://kaiju.binf.ku.dk/server
+ * Github repo for Kaiju: https://github.com/bioinformatics-centre/kaiju
+ * Github repo for Krona: https://github.com/marbl/Krona
+ * Kaiju paper: Menzel, P. et al. (2016) Fast and sensitive taxonomic classification for metagenomics with Kaiju. Nat. Commun. 7:11257.
+ * Krona paper: Ondov BD, Bergman NH, and Phillippy AM. Interactive metagenomic visualization in a Web browser. BMC Bioinformatics. 2011 Sep 30; 12(1):385.
+ * Kaiju License:
+ * Copyright (c) 2015, 2016, 2017 Peter Menzel and Anders Krogh
+ * Kaiju is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * Kaiju is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the file LICENSE for more details.
+ * You should have received a copy of the GNU General Public License along with the source code. If not, see http://www.gnu.org/licenses/.
  * </pre>
  */
 public class KbKaijuClient {
@@ -28,6 +46,49 @@ public class KbKaijuClient {
      */
     public KbKaijuClient(URL url) {
         caller = new JsonClientCaller(url);
+    }
+    /** Constructs a client with a custom URL.
+     * @param url the URL of the service.
+     * @param token the user's authorization token.
+     * @throws UnauthorizedException if the token is not valid.
+     * @throws IOException if an IOException occurs when checking the token's
+     * validity.
+     */
+    public KbKaijuClient(URL url, AuthToken token) throws UnauthorizedException, IOException {
+        caller = new JsonClientCaller(url, token);
+    }
+
+    /** Constructs a client with a custom URL.
+     * @param url the URL of the service.
+     * @param user the user name.
+     * @param password the password for the user name.
+     * @throws UnauthorizedException if the credentials are not valid.
+     * @throws IOException if an IOException occurs when checking the user's
+     * credentials.
+     */
+    public KbKaijuClient(URL url, String user, String password) throws UnauthorizedException, IOException {
+        caller = new JsonClientCaller(url, user, password);
+    }
+
+    /** Constructs a client with a custom URL
+     * and a custom authorization service URL.
+     * @param url the URL of the service.
+     * @param user the user name.
+     * @param password the password for the user name.
+     * @param auth the URL of the authorization server.
+     * @throws UnauthorizedException if the credentials are not valid.
+     * @throws IOException if an IOException occurs when checking the user's
+     * credentials.
+     */
+    public KbKaijuClient(URL url, String user, String password, URL auth) throws UnauthorizedException, IOException {
+        caller = new JsonClientCaller(url, user, password, auth);
+    }
+
+    /** Get the token this client uses to communicate with the server.
+     * @return the authorization token.
+     */
+    public AuthToken getToken() {
+        return caller.getToken();
     }
 
     /** Get the URL of the service with which this client communicates.
@@ -116,6 +177,24 @@ public class KbKaijuClient {
 
     public void setServiceVersion(String newValue) {
         this.serviceVersion = newValue;
+    }
+
+    /**
+     * <p>Original spec-file function name: run_kaiju</p>
+     * <pre>
+     * Kaiju Method
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.kbkaiju.KaijuInputParams KaijuInputParams}
+     * @return   instance of type {@link us.kbase.kbkaiju.KaijuOutput KaijuOutput}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public KaijuOutput runKaiju(KaijuInputParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<KaijuOutput>> retType = new TypeReference<List<KaijuOutput>>() {};
+        List<KaijuOutput> res = caller.jsonrpcCall("kb_kaiju.run_kaiju", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
     }
 
     public Map<String, Object> status(RpcContext... jsonRpcContext) throws IOException, JsonClientException {
