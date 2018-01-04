@@ -27,97 +27,97 @@ suggestions:
 # Configure the display and description of parameters
 #
 parameters :
-	input_refs :
-		ui-name : |
-			Read library (or Set) objects <font color=red>*</font>
-		short-hint : |
-			The read library or read library set to examine
-		long-hint  : |
-			The read library or read library set for which you want to trim.
-	output_biom_name :
-		ui-name : |
-			Output BIOM name <font color=red>*</font>
-		short-hint : |
-			Name for output community abundance object
-		long-hint : |
-			Name for output community abundance object
-	tax_levels :
-		ui-name : |
-			Taxonomic level
-		short-hint : |
-			The Taxonomic level that should be used for generating summary plots
-		long-hint : |
-			The Taxonomic level that should be used for generating summary plots
-	db_type : 
-		ui-name : |
-			Reference DB
-		short-hint : |
-			Database to search against for classification
-		long-hint : |
-			Database to search against for classification
-	seg_filter : 
-		ui-name : |
-			Filter low-complexity
-		short-hint : |
-			Use SEG algorithm to remove low-complexity regions from input sequences (recommended)
-		long-hint : |
-			Use SEG algorithm to remove low-complexity regions from input sequences (recommended)
-	min_match_length :
-		ui-name : |
-			Min Match Length
-		short-hint : |
-			Shortest alignment match to use for classification, in base pairs (default: 11)
-		long-hint : |
-			Shortest alignment match to use for classification, in base pairs (default: 11)
-	greedy_run_mode : 
-		ui-name : |
-			Allow imperfect matches?
-		short-hint : |
-			Imperfect matches can be used for classification with below thresholds (recommended)
-		long-hint : |
-			Imperfect matches can be used for classification with below thresholds (recommended)
-	greedy_allowed_mismatches :
-		ui-name : |
-			Greedy max mismatches
-		short-hint : |
-			Greedy (imperfect) match maximum mismatches (default: 5)
-		long-hint : |
-			Greedy (imperfect) match maximum mismatches (default: 5)
-	greedy_min_match_score :
-		ui-name : |
-			Greedy min bitscore
-		short-hint : |
-			Greedy (imperfect) match minimum bitscore (def: 75)
-		long-hint : |
-			Greedy (imperfect) match minimum bitscore (def: 75)
-	greedy_max_e_value :
-		ui-name : |
-			Greedy max e-value
-		short-hint : |
-			Greedy (imperfect) match maximum e-value (default: 0.05)
-		long-hint : |
-			Greedy (imperfect) match maximum e-value (default: 0.05)
-	full_tax_path :
-		ui-name : |
-			Summary full tax lineage?
-		short-hint : |
-			Place the full taxonomic lineage into the summary? (default: NO)
-		long-hint : |
-			Place the full taxonomic lineage into the summary? (default: NO)
-	filter_percent :
-		ui-name : |
-			Summary minimum percent
-		short-hint : |
-			Dont include below this percentage of the reads in the summaries (default: 1%, note: must be integer)
-		long-hint : |
-			Dont include below this percentage of the reads in the summaries (default: 1%, note: must be integer)
-	filter_unclassified :
-		ui-name : |
-			Summary classified
-		short-hint : |
-			Do not include unclassified reads in the summaries (default: YES)
-		long-hint : |
-			Do not include unclassified reads in the summaries (default: YES)
+    input_refs :
+        ui-name : |
+            Read library (or Set) objects <font color=red>*</font>
+        short-hint : |
+            The read library or read library set to examine
+        long-hint  : |
+            The read library or read library set for which you want to trim.
+    output_biom_name :
+        ui-name : |
+            Output BIOM name <font color=red>*</font>
+        short-hint : |
+            Name for output community abundance object
+        long-hint : |
+            Name for output community abundance object
+    tax_levels :
+        ui-name : |
+            Taxonomic level
+        short-hint : |
+            The Taxonomic level that should be used for generating summary plots
+        long-hint : |
+            The Taxonomic level that should be used for generating summary plots
+    db_type : 
+        ui-name : |
+            Reference DB
+        short-hint : |
+            Database to search against for classification
+        long-hint : |
+            Database to search against for classification
+    seg_filter : 
+        ui-name : |
+            Filter low-complexity
+        short-hint : |
+            Use SEG algorithm to remove low-complexity regions from input sequences (recommended)
+        long-hint : |
+            Use SEG algorithm to remove low-complexity regions from input sequences (recommended)
+    min_match_length :
+        ui-name : |
+            Min Match Length
+        short-hint : |
+            Shortest alignment match to use for classification, in base pairs (default: 11)
+        long-hint : |
+            Shortest alignment match to use for classification, in base pairs (default: 11)
+    greedy_run_mode : 
+        ui-name : |
+            Allow imperfect matches?
+        short-hint : |
+            Imperfect matches can be used for classification with below thresholds (recommended)
+        long-hint : |
+            Imperfect matches can be used for classification with below thresholds (recommended)
+    greedy_allowed_mismatches :
+        ui-name : |
+            Greedy max mismatches
+        short-hint : |
+            Greedy (imperfect) match maximum mismatches (default: 5)
+        long-hint : |
+            Greedy (imperfect) match maximum mismatches (default: 5)
+    greedy_min_match_score :
+        ui-name : |
+            Greedy min bitscore
+        short-hint : |
+            Greedy (imperfect) match minimum bitscore (def: 75)
+        long-hint : |
+            Greedy (imperfect) match minimum bitscore (def: 75)
+    greedy_max_e_value :
+        ui-name : |
+            Greedy max e-value
+        short-hint : |
+            Greedy (imperfect) match maximum e-value (default: 0.05)
+        long-hint : |
+            Greedy (imperfect) match maximum e-value (default: 0.05)
+    full_tax_path :
+        ui-name : |
+            Summary full tax lineage?
+        short-hint : |
+            Place the full taxonomic lineage into the summary? (default: NO)
+        long-hint : |
+            Place the full taxonomic lineage into the summary? (default: NO)
+    filter_percent :
+        ui-name : |
+            Summary minimum percent
+        short-hint : |
+            Dont include below this percentage of the reads in the summaries (default: 1%, note: must be integer)
+        long-hint : |
+            Dont include below this percentage of the reads in the summaries (default: 1%, note: must be integer)
+    filter_unclassified :
+        ui-name : |
+            Summary classified
+        short-hint : |
+            Do not include unclassified reads in the summaries (default: YES)
+        long-hint : |
+            Do not include unclassified reads in the summaries (default: YES)
 
 
 #
