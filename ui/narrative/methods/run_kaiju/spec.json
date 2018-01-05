@@ -152,7 +152,7 @@
 			"field_type": "text",
 			"text_options": {
 				"validate_as": "int",
-			        "min_integer" : 9
+			        "min_int" : 9
 			}
 		},
 		{
@@ -188,7 +188,7 @@
 			"field_type": "text",
 			"text_options": {
 				"validate_as": "int",
-			        "min_integer": 1
+			        "min_int": 1
 			}
 		},
 		{
@@ -199,8 +199,8 @@
 			"default_values": [ "75.0" ],
 			"field_type": "text",
 			"text_options": {
-				"validate_as": "float",
-			        "min_float": 10.0
+				"validate_as": "int",
+			        "min_int": 10
 			}
 		},
 		{
@@ -248,7 +248,7 @@
 			"field_type": "text",
 			"text_options": {
 				"validate_as": "int",
-			        "min_integer": 0
+			        "min_int": 0
 			}
 		},
 		{
