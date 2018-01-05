@@ -5,6 +5,7 @@ import json  # noqa: F401
 import time
 import requests
 import shutil
+import gzip
 
 from os import environ
 try:
@@ -16,6 +17,7 @@ from pprint import pprint  # noqa: F401
 
 from Workspace.WorkspaceClient import Workspace as workspaceService
 from SetAPI.SetAPIServiceClient import SetAPI
+from ReadsUtils.ReadsUtilsClient import ReadsUtils
 
 from kb_kaiju.kb_kaijuImpl import kb_kaiju
 from kb_kaiju.kb_kaijuServer import MethodContext
@@ -58,6 +60,18 @@ class kb_kaijuTest(unittest.TestCase):
         cls.scratch = cls.cfg['scratch']
         cls.callback_url = os.environ['SDK_CALLBACK_URL']
 
+        suffix = int(time.time() * 1000)
+        cls.wsName = "test_kb_kaiju_" + str(suffix)
+        cls.ws_info = cls.wsClient.create_workspace({'workspace': cls.wsName})
+
+        cls.kaiju_runner = KaijuUtil(cls.cfg, cls.ctx)
+        cls.ru = ReadsUtils(os.environ['SDK_CALLBACK_URL'])
+        cls.setAPI = SetAPI(url=cls.cfg['srv-wiz-url'], token=cls.ctx['token'])
+
+        # prepare WS data
+        cls.prepare_data()
+
+
     @classmethod
     def tearDownClass(cls):
         if hasattr(cls, 'wsName'):
@@ -81,6 +95,42 @@ class kb_kaijuTest(unittest.TestCase):
 
     def getContext(self):
         return self.__class__.ctx
+
+
+    @classmethod
+    def prepare_data(cls):
+        test_directory_name = 'test_kb_kaiju'
+        cls.test_directory_path = os.path.join(cls.scratch, test_directory_name)
+        os.makedirs(cls.test_directory_path)
+
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
+
+        # upload sequences
+        basename = 'seven_species_nonuniform_10K.PE_reads_'
+        fwd_filename = basename+'fwd-0.FASTQ'
+        rev_filename = basename+'rev-0.FASTQ'
+        reads_objname = 'seven_species_nonuniform_test1.PElib'
+        #shutil.copy(os.path.join("data", fwd_filename), fwd_fastq_file_path)
+        #shutil.copy(os.path.join("data", rev_filename), rev_fastq_file_path)
+
+        # unzip and put where ReadsUtils can see them (only sees shared scratch)
+        fwd_fastq_file_path = os.path.join(cls.scratch, fwd_filename)
+        rev_fastq_file_path = os.path.join(cls.scratch, rev_filename)
+        with gzip.open(os.path.join("data", fwd_filename+'.gz'), 'rb') as f_in, open(fwd_fastq_file_path, 'wb') as f_out:
+            shutil.copyfileobj(f_in, f_out)
+        with gzip.open(os.path.join("data", rev_filename+'.gz'), 'rb') as f_in, open(rev_fastq_file_path, 'wb') as f_out:
+            shutil.copyfileobj(f_in, f_out)
+
+        read_upload_params = {'fwd_file': fwd_fastq_file_path,
+                              'rev_file': rev_fastq_file_path,
+                              'sequencing_tech': 'artificial reads',
+                              'interleaved': 0,
+                              'wsname': cls.ws_info[1],
+                              'name': reads_objname
+                          }
+        cls.reads_ref1 = cls.ru.upload_reads(read_upload_params)['obj_ref']
+        pprint('Saved PE Lib Reads: ' + cls.reads_ref1)
+
 
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
     def test_your_method(self):
