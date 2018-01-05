@@ -155,7 +155,7 @@ KaijuInputParams is a reference to a hash where the following keys are defined:
 	min_match_length has a value which is an int
 	greedy_run_mode has a value which is a kb_kaiju.bool
 	greedy_allowed_mismatches has a value which is an int
-	greedy_min_match_score has a value which is a float
+	greedy_min_match_score has a value which is an int
 	greedy_max_e_value has a value which is a float
 	filter_percent has a value which is a float
 	filter_unclassified has a value which is a kb_kaiju.bool
@@ -186,7 +186,7 @@ KaijuInputParams is a reference to a hash where the following keys are defined:
 	min_match_length has a value which is an int
 	greedy_run_mode has a value which is a kb_kaiju.bool
 	greedy_allowed_mismatches has a value which is an int
-	greedy_min_match_score has a value which is a float
+	greedy_min_match_score has a value which is an int
 	greedy_max_e_value has a value which is a float
 	filter_percent has a value which is a float
 	filter_unclassified has a value which is a kb_kaiju.bool
@@ -492,7 +492,7 @@ seg_filter has a value which is a kb_kaiju.bool
 min_match_length has a value which is an int
 greedy_run_mode has a value which is a kb_kaiju.bool
 greedy_allowed_mismatches has a value which is an int
-greedy_min_match_score has a value which is a float
+greedy_min_match_score has a value which is an int
 greedy_max_e_value has a value which is a float
 filter_percent has a value which is a float
 filter_unclassified has a value which is a kb_kaiju.bool
@@ -514,7 +514,7 @@ seg_filter has a value which is a kb_kaiju.bool
 min_match_length has a value which is an int
 greedy_run_mode has a value which is a kb_kaiju.bool
 greedy_allowed_mismatches has a value which is an int
-greedy_min_match_score has a value which is a float
+greedy_min_match_score has a value which is an int
 greedy_max_e_value has a value which is a float
 filter_percent has a value which is a float
 filter_unclassified has a value which is a kb_kaiju.bool

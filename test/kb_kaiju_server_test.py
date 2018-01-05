@@ -133,14 +133,49 @@ class kb_kaijuTest(unittest.TestCase):
 
 
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
-    def test_your_method(self):
-        # Prepare test objects in workspace if needed using
-        # self.getWsClient().save_objects({'workspace': self.getWsName(),
-        #                                  'objects': []})
-        #
-        # Run your method by
-        # ret = self.getImpl().your_method(self.getContext(), parameters...)
-        #
-        # Check returned data with
-        # self.assertEqual(ret[...], ...) or other unittest methods
+
+
+    ### Test 1: single PE lib object
+    #
+    # Uncomment to skip this test
+    #HIDE @unittest.skip("skipped test_1_kaiju_PE_lib")
+    def test_1_kaiju_PE_lib(self):
+        method_name = 'test_1_kaiju_PE_lib'
+        print ("\n"+('='*(10+len(method_name))))
+        print ("RUNNING "+method_name+"()")
+        print (('='*(10+len(method_name)))+"\n")
+
+        # run checkM lineage_wf app on a single assembly
+        input_ref = self.reads_ref1
+        output_biom_name = 'test_kb_kaiju_test1.BIOM'
+        params = {
+            'workspace_name':            self.ws_info[1],
+            'input_refs':                [input_ref],
+            'output_biom_name':          output_biom_name,
+            'tax_levels':                ['phylum','genus'],
+            'db_type':                   'kaiju_index',
+            'seg_filter':                1,
+            'min_match_length':          11,
+            'greedy_run_mode':           1,
+            'greedy_allowed_mismatches': 5,
+            'greedy_min_match_score':    75,
+            'greedy_max_e_value':        0.05,
+            'filter_percent':            1,
+            'filter_unclassified':       1,
+            'full_tax_path':             0
+        }
+#        result = self.getImpl().run_kaiju(self.getContext(), params)[0]
+#
+#        pprint('End to end test result:')
+#        pprint(result)
+#
+#        self.assertIn('report_name', result)
+#        self.assertIn('report_ref', result)
+
+        # make sure the report was created and includes the HTML report and download links
+        #rep = self.getWsClient().get_objects2({'objects': [{'ref': result['report_ref']}]})['data'][0]['data']
+        #self.assertEquals(rep['direct_html_link_index'], 0)
+        #self.assertEquals(len(rep['file_links']), 2)
+        #self.assertEquals(len(rep['html_links']), 1)
+        #self.assertEquals(rep['html_links'][0]['name'], 'report.html')
         pass
