@@ -13,6 +13,9 @@ RUN apt-get update
 
 RUN pip install coverage
 
+# Solve the "Could not find .egg-info directory, etc."
+RUN pip install --upgrade setuptools pip
+
 # update security libraries in the base image
 RUN pip install cffi --upgrade \
     && pip install pyopenssl --upgrade \
@@ -23,8 +26,8 @@ RUN pip install cffi --upgrade \
 
 
 # Install xvfb for matplotlib pdfs
-#RUN apt-get update && \
-RUN apt-get -y install xvfb python-qt4
+RUN apt-get update && \
+    apt-get -y install xvfb
 
 
 # For kaiju bin

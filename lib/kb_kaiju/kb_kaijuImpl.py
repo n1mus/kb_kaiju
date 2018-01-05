@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #BEGIN_HEADER
-import is
+import os
 import json
 
 from kb_kaiju.Utils.KaijuUtil import KaijuUtil
@@ -47,8 +47,8 @@ You should have received a copy of the GNU General Public License along with the
     # the latter method is running.
     ######################################### noqa
     VERSION = "0.0.1"
-    GIT_URL = "https://github.com/kbaseapps/kb_kaiju"
-    GIT_COMMIT_HASH = "cd7fa32028846715ba52af9252a458ea78aca821"
+    GIT_URL = "https://github.com/dcchivian/kb_kaiju"
+    GIT_COMMIT_HASH = "4b83ae82db4d6e26a130d4a5c1626dada9ccb399"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -76,14 +76,19 @@ You should have received a copy of the GNU General Public License along with the
            "id" is a numerical identifier of the workspace or object, and
            should just be used for workspace ** "name" is a string identifier
            of a workspace or object.  This is received from Narrative.),
-           parameter "input_reads_ref" of type "data_obj_ref", parameter
+           parameter "input_refs" of type "data_obj_ref", parameter
            "output_biom_name" of type "data_obj_ref", parameter "tax_levels"
            of list of String, parameter "db_type" of String, parameter
            "seg_filter" of type "bool" (A boolean - 0 for false, 1 for true.
            @range (0, 1)), parameter "min_match_length" of Long, parameter
            "greedy_run_mode" of type "bool" (A boolean - 0 for false, 1 for
-           true. @range (0, 1)), parameter "greedy_min_match_score" of
-           Double, parameter "greedy_allowed_mismatches" of Long
+           true. @range (0, 1)), parameter "greedy_allowed_mismatches" of
+           Long, parameter "greedy_min_match_score" of Double, parameter
+           "greedy_max_e_value" of Double, parameter "filter_percent" of
+           Double, parameter "filter_unclassified" of type "bool" (A boolean
+           - 0 for false, 1 for true. @range (0, 1)), parameter
+           "full_tax_path" of type "bool" (A boolean - 0 for false, 1 for
+           true. @range (0, 1))
         :returns: instance of type "KaijuOutput" (Kaiju App Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
