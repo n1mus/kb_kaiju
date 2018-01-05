@@ -4,7 +4,7 @@ import glob
 import subprocess
 
 from Workspace.WorkspaceClient import Workspace
-from ReadsUtils.ReadsUtilClient import ReadsUtils
+from ReadsUtils.ReadsUtilsClient import ReadsUtils
 from SetAPI.SetAPIServiceClient import SetAPI
 
 

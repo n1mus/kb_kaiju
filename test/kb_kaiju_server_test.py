@@ -4,6 +4,7 @@ import os  # noqa: F401
 import json  # noqa: F401
 import time
 import requests
+import shutil
 
 from os import environ
 try:
@@ -14,9 +15,15 @@ except:
 from pprint import pprint  # noqa: F401
 
 from Workspace.WorkspaceClient import Workspace as workspaceService
+from SetAPI.SetAPIServiceClient import SetAPI
+
 from kb_kaiju.kb_kaijuImpl import kb_kaiju
 from kb_kaiju.kb_kaijuServer import MethodContext
 from kb_kaiju.authclient import KBaseAuth as _KBaseAuth
+
+from kb_kaiju.Utils.KaijuUtil import KaijuUtil
+from kb_kaiju.Utils.DataStagingUtils import DataStagingUtils
+from kb_kaiju.Utils.OutputBuilder import OutputBuilder
 
 
 class kb_kaijuTest(unittest.TestCase):
