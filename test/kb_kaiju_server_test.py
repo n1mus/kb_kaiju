@@ -13,7 +13,7 @@ except:
 
 from pprint import pprint  # noqa: F401
 
-from biokbase.workspace.client import Workspace as workspaceService
+from Workspace.WorkspaceClient import Workspace as workspaceService
 from kb_kaiju.kb_kaijuImpl import kb_kaiju
 from kb_kaiju.kb_kaijuServer import MethodContext
 from kb_kaiju.authclient import KBaseAuth as _KBaseAuth

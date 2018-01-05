@@ -49,8 +49,9 @@ elif [ "${1}" = "init" ] ; then
 #  rm kaiju_index_nr_euk.tgz
 
   cd /data/kaijudb
-  if [ (-s "/data/kaijudb/kaiju_index/kaiju_db.fmi" -eq 15851683711) ] ; then
-#  if [ (-s "/data/kaijudb/kaiju_index/kaiju_db.fmi" -eq 15851683711) -a (-s "/data/kaijudb/kaiju_index_pg/kaiju_db.fmi" -eq 12737853741) -a (-s "/data/kaijudb/kaiju_index_nr/kaiju_db_nr.fmi" -eq 45220614796) -a (-s "/data/kaijudb/kaiju_index_nr_euk/kaiju_db_nr_euk.fmi" -eq 51503967892) ] ; then
+  if [ -s "/data/kaijudb/kaiju_index/kaiju_db.fmi" ] ; then
+#  if [ -s "/data/kaijudb/kaiju_index/kaiju_db.fmi" -eq 15851683711 -a -s "/data/kaijudb/kaiju_index_pg/kaiju_db.fmi" -eq 12737853741 -a -s "/data/kaijudb/kaiju_index_nr/kaiju_db_nr.fmi" -eq 45220614796 -a -s "/data/kaijudb/kaiju_index_nr_euk/kaiju_db_nr_euk.fmi" -eq 51503967892 ] ; then
+#  if [ -s "/data/kaijudb/kaiju_index/kaiju_db.fmi" -a -s "/data/kaijudb/kaiju_index_pg/kaiju_db.fmi" -a -s "/data/kaijudb/kaiju_index_nr/kaiju_db_nr.fmi" -a -s "/data/kaijudb/kaiju_index_nr_euk/kaiju_db_nr_euk.fmi" ] ; then
     echo "DATA DOWNLOADED SUCCESSFULLY"
 #    touch /data/__READY__
   else
