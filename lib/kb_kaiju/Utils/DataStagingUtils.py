@@ -42,36 +42,15 @@ class DataStagingUtils(object):
 
         # generate a folder in scratch to hold the input
         suffix = str(int(time.time() * 1000))
-        input_dir = os.path.join(self.scratch, 'bins_' + suffix)
-        all_seq_fasta = os.path.join(self.scratch, 'all_sequences_' + suffix + '.' + fasta_file_extension)
+        input_dir = os.path.join(self.scratch, 'input_reads_' + suffix)
         if not os.path.exists(input_dir):
             os.makedirs(input_dir)
 
-
-        # 2) based on type, download the files
-        ws = Workspace(self.ws_url)
-        input_info = ws.get_object_info3({'objects': [{'ref': input_ref}]})['infos'][0]
-        # 0 obj_id objid - the numerical id of the object.
-        # 1 obj_name name - the name of the object.
-        # 2 type_string type - the type of the object.
-        # 3 timestamp save_date - the save date of the object.
-        # 4 obj_ver ver - the version of the object.
-        # 5 username saved_by - the user that saved or copied the object.
-        # 6 ws_id wsid - the workspace containing the object.
-        # 7 ws_name workspace - the workspace containing the object.
-        # 8 string chsum - the md5 checksum of the object.
-        # 9 int size - the size of the object in bytes.
-        # 10 usermeta meta - arbitrary user-supplied metadata about
-        #     the object.
-        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
-        obj_name = input_info[NAME_I]
-        type_name = input_info[TYPE_I].split('-')[0]
-
-        # auClient
+        # ruClient
         try:
-            auClient = AssemblyUtil(self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
+            ruClient = ReadsUtils(self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
         except Exception as e:
-            raise ValueError('Unable to instantiate auClient with callbackURL: '+ self.callbackURL +' ERROR: ' + str(e))
+            raise ValueError('Unable to instantiate ruClient with callbackURL: '+ self.callbackURL +' ERROR: ' + str(e))
 
         # setAPI_Client
         try:
@@ -80,151 +59,126 @@ class DataStagingUtils(object):
         except Exception as e:
             raise ValueError('Unable to instantiate setAPI_Client with serviceWizardURL: '+ self.serviceWizardURL +' ERROR: ' + str(e))
 
-        # mguClient
-        try:
-            mguClient = MetagenomeUtils(self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
-        except Exception as e:
-            raise ValueError('Unable to instantiate mguClient with callbackURL: '+ self.callbackURL +' ERROR: ' + str(e))
 
+        # 2) expand any sets and build a non-redundant list of reads input objs
+        ws = Workspace(self.ws_url)
+        expanded_input = []
+        input_ref_seen = dict()
+        SE_types = ['KBaseFile.SingleEndLibrary', 'KBaseAssembly.SingleEndLibrary']
+        PE_types = ['KBaseFile.PairedEndLibrary', 'KBaseAssembly.PairedEndLibrary']
+        SE_flag = 'SE'
+        PE_flag = 'PE'
 
-        # Standard Single Assembly
-        #
-        if type_name in ['KBaseGenomeAnnotations.Assembly', 'KBaseGenomes.ContigSet']:
-            # create file data
-            filename = os.path.join(input_dir, obj_name + '.' + fasta_file_extension)
-            auClient.get_assembly_as_fasta({'ref': input_ref, 'filename': filename})
-            if not os.path.isfile(filename):
-                raise ValueError('Error generating fasta file from an Assembly or ContigSet with AssemblyUtil')
-            # make sure fasta file isn't empty
-            min_fasta_len = 1
-            if not self.fasta_seq_len_at_least(filename, min_fasta_len):
-                raise ValueError('Assembly or ContigSet is empty in filename: '+str(filename))
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
+        for input_ref in input_refs:
+            input_info = ws.get_object_info3({'objects': [{'ref': input_ref}]})['infos'][0]
+            obj_name = input_info[NAME_I]
+            type_name = input_info[TYPE_I].split('-')[0]
 
-        # AssemblySet
-        #
-        elif type_name == 'KBaseSets.AssemblySet':
-            
-            # read assemblySet
-            try:
-                assemblySet_obj = setAPI_Client.get_assembly_set_v1 ({'ref':input_ref, 'include_item_info':1})
-            except Exception as e:
-                raise ValueError('Unable to get object from workspace: (' + input_ref +')' + str(e))
-            assembly_refs = []
-            assembly_names = []
-            for assembly_item in assemblySet_obj['data']['items']:            
-                this_assembly_ref = assembly_item['ref']
-                # assembly obj info
+            # ReadsSet
+            if type_name in ['KBaseSets.ReadsSet']:
                 try:
-                    this_assembly_info = ws.get_object_info_new ({'objects':[{'ref':this_assembly_ref}]})[0]
-                    this_assembly_name = this_assembly_info[NAME_I]
+                    input_readsSet_obj = setAPI_Client.get_reads_set_v1 ({'ref':input_ref,'include_item_info':1})
+
                 except Exception as e:
-                    raise ValueError('Unable to get object from workspace: (' + this_assembly_ref +'): ' + str(e))
-                assembly_refs.append(this_assembly_ref)
-                assembly_names.append(this_assembly_name)    
+                    raise ValueError('SetAPI FAILURE: Unable to get read library set object from workspace: (' + str(input_ref)+")\n" + str(e))
 
-            # create file data (name for file is what's reported in results)
-            for ass_i,assembly_ref in enumerate(assembly_refs):
-                this_name = assembly_names[ass_i]
-                filename = os.path.join(input_dir, this_name + '.' + fasta_file_extension)
-                auClient.get_assembly_as_fasta({'ref': assembly_ref, 'filename': filename})
-                if not os.path.isfile(filename):
-                    raise ValueError('Error generating fasta file from an Assembly or ContigSet with AssemblyUtil')
-                # make sure fasta file isn't empty
-                min_fasta_len = 1
-                if not self.fasta_seq_len_at_least(filename, min_fasta_len):
-                    raise ValueError('Assembly or ContigSet is empty in filename: '+str(filename))
+                for readsLibrary_obj in input_readsSet_obj['data']['items']:
+                    this_reads_ref = readsLibrary_obj['ref']
+                    if this_reads_ref in input_ref_seen:
+                        continue
+                    input_ref_seen[this_reads_ref] = True
 
-        # Binned Contigs
-        #
-        elif type_name == 'KBaseMetagenomes.BinnedContigs':
-
-            # download the bins as fasta and set the input folder name
-            bin_file_dir = mguClient.binned_contigs_to_file({'input_ref': input_ref, 'save_to_shock': 0})['bin_file_directory']
-            os.rename(bin_file_dir, input_dir)
-            # make sure fasta file isn't empty
-            self.set_fasta_file_extensions(input_dir, fasta_file_extension)
-            for (dirpath, dirnames, filenames) in os.walk(input_dir):
-                for fasta_file in filenames:
-                    fasta_path = os.path.join (input_dir,fasta_file)
-                    min_fasta_len = 1
-                    if not self.fasta_seq_len_at_least(fasta_path, min_fasta_len):
-                        raise ValueError('Binned Assembly is empty for fasta_path: '+str(fasta_path))
-                break
-
-        # Genome and GenomeSet
-        #
-        elif type_name == 'KBaseGenomes.Genome' or type_name == 'KBaseSearch.GenomeSet':
-            genome_obj_names = []
-            genome_sci_names = []
-            genome_assembly_refs = []
-
-            if type_name == 'KBaseGenomes.Genome':
-                genomeSet_refs = [input_ref]
-            else:  # get genomeSet_refs from GenomeSet object
-                genomeSet_refs = []
-                try:
-                    genomeSet_object = ws.get_objects2({'objects':[{'ref':input_ref}]})['data'][0]['data']
-                except Exception as e:
-                    raise ValueError('Unable to fetch '+str(input_ref)+' object from workspace: ' + str(e))
-                    #to get the full stack trace: traceback.format_exc()
-
-                # iterate through genomeSet members
-                for genome_id in genomeSet_object['elements'].keys():
-                    if 'ref' not in genomeSet_object['elements'][genome_id] or \
-                       genomeSet_object['elements'][genome_id]['ref'] == None or \
-                       genomeSet_object['elements'][genome_id]['ref'] == '':
-                        raise ValueError('genome_ref not found for genome_id: '+str(genome_id)+' in genomeSet: '+str(input_ref))
+                    this_reads_name = readsLibrary_obj['info'][NAME_I]
+                    reads_item_type = readsLibrary_obj['info'][TYPE_I]
+                    reads_item_type = re.sub ('-[0-9]+\.[0-9]+$', "", reads_item_type)  # remove trailing version
+                    if reads_item_type in PE_types:
+                        this_read_type = PE_flag
+                    elif reads_item_type in SE_types:
+                        this_read_type = SE_flag
                     else:
-                        genomeSet_refs.append(genomeSet_object['elements'][genome_id]['ref'])
-
-            # genome obj data
-            for i,this_input_ref in enumerate(genomeSet_refs):
-                try:
-                    objects = ws.get_objects2({'objects':[{'ref':this_input_ref}]})['data']
-                    genome_obj = objects[0]['data']
-                    genome_obj_info = objects[0]['info']
-                    genome_obj_names.append(genome_obj_info[NAME_I])
-                    genome_sci_names.append(genome_obj['scientific_name'])
-                except:
-                    raise ValueError ("unable to fetch genome: "+this_input_ref)
-
-                # Get genome_assembly_ref
-                if ('contigset_ref' not in genome_obj or genome_obj['contigset_ref'] == None) \
-                   and ('assembly_ref' not in genome_obj or genome_obj['assembly_ref'] == None):
-                    msg = "Genome "+genome_obj_names[i]+" (ref:"+input_ref+") "+genome_sci_names[i]+" MISSING BOTH contigset_ref AND assembly_ref.  Cannot process.  Exiting."
-                    raise ValueError (msg)
+                        raise ValueError ("Can't handle read item type '"+reads_item_type+"' obj_name: '"+this_reads_name+" in Set: '"+str(input_ref)+"'")
+                    expanded_input.append({'ref':  this_reads_ref,
+                                           'name': this_reads_name,
+                                           'type': this_reads_type
+                                       })
+            # SingleEnd Library
+            elif type_name in [SE_types]:
+                this_reads_ref = input_ref
+                if this_reads_ref in input_ref_seen:
                     continue
-                elif 'assembly_ref' in genome_obj and genome_obj['assembly_ref'] != None:
-                    msg = "Genome "+genome_obj_names[i]+" (ref:"+input_ref+") "+genome_sci_names[i]+" USING assembly_ref: "+str(genome_obj['assembly_ref'])
-                    print (msg)
-                    genome_assembly_refs.append(genome_obj['assembly_ref'])
-                elif 'contigset_ref' in genome_obj and genome_obj['contigset_ref'] != None:
-                    msg = "Genome "+genome_obj_names[i]+" (ref:"+input_ref+") "+genome_sci_names[i]+" USING contigset_ref: "+str(genome_obj['contigset_ref'])
-                    print (msg)
-                    genome_assembly_refs.append(genome_obj['contigset_ref'])
+                input_ref_seen[this_reads_ref] = True
+                this_reads_name = obj_name
+                this_reads_type = SE_flag
+                expanded_input.append({'ref':  this_reads_ref,
+                                       'name': this_reads_name,
+                                       'type': this_reads_type
+                                   })
+            # PairedEnd Library
+            elif type_name in [PE_types]:
+                this_reads_ref = input_ref
+                if this_reads_ref in input_ref_seen:
+                    continue
+                input_ref_seen[this_reads_ref] = True
+                this_reads_name = obj_name
+                this_reads_type = PE_flag
+                expanded_input.append({'ref':  this_reads_ref,
+                                       'name': this_reads_name,
+                                       'type': this_reads_type
+                                   })
+            else:
+                raise ValueError ("Illegal type in input_refs: "+str(obj_name)+" ("+str(input_ref)+") is of type: '"+str(type_name)+"'")
 
-            # create file data (name for file is what's reported in results)
-            for ass_i,assembly_ref in enumerate(genome_assembly_refs):
-                this_name = genome_obj_names[ass_i]
-                filename = os.path.join(input_dir, this_name + '.' + fasta_file_extension)
-                auClient.get_assembly_as_fasta({'ref': assembly_ref, 'filename': filename})
-                if not os.path.isfile(filename):
-                    raise ValueError('Error generating fasta file from an Assembly or ContigSet with AssemblyUtil')
+
+        # 3) Download reads
+        for input_item_i,input_item in enumerate(expanded_input):
+
+            try:
+                readsLibrary = readsUtils_Client.download_reads ({'read_libraries': [input_item['ref']],
+                                                                  'interleaved': 'false'})
+            except Exception as e:
+                raise ValueError('Unable to get read library object from workspace: (' + str(input_item['ref']) +")\n" + str(e))
+
+            # PE Lib
+            if input_item['type'] eq PE_flag:
+                input_fwd_file_path = readsLibrary['files'][input_item['ref']]['files']['fwd']
+                input_rev_file_path = readsLibrary['files'][input_item['ref']]['files']['rev']
+                fwd_filename = os.path.join(input_dir, input_item['name'] + '.fwd.' + fasta_file_extension)
+                rev_filename = os.path.join(input_dir, input_item['name'] + '.rev.' + fasta_file_extension)
+                if input_fwd_file_path != fwd_filename:
+                    shutil.move(input_fwd_file_path, fwd_filename)
+                if input_rev_file_path != rev_filename:
+                    shutil.move(input_rev_file_path, rev_filename)
+                expanded_input[input_item_i]['fwd_file'] = fwd_filename
+                expanded_input[input_item_i]['rev_file'] = rev_filename
+
+                if not os.path.isfile(fwd_filename):
+                    raise ValueError('Error generating reads file '+fwd_filename)
+                if not os.path.isfile(rev_filename):
+                    raise ValueError('Error generating reads file '+rev_filename)
                 # make sure fasta file isn't empty
                 min_fasta_len = 1
-                if not self.fasta_seq_len_at_least(filename, min_fasta_len):
-                    raise ValueError('Assembly or ContigSet is empty in filename: '+str(filename))
+                if not self.fasta_seq_len_at_least(fwd_filename, min_fasta_len):
+                    raise ValueError('Reads Library is empty in filename: '+str(fwd_filename))
+                if not self.fasta_seq_len_at_least(input_rev_file_path, min_fasta_len):
+                    raise ValueError('Reads Library is empty in filename: '+str(rev_filename))
 
-        # Unknown type slipped through
-        #
-        else:
-            raise ValueError('Cannot stage fasta file input directory from type: ' + type_name)
+            elif input_item['type'] eq SE_flag:
+                input_fwd_file_path = readsLibrary['files'][input_item['ref']]['files']['fwd']
+                fwd_filename = os.path.join(input_dir, input_item['name'] + '.fwd.' + fasta_file_extension)
+                if input_fwd_file_path != fwd_filename:
+                    shutil.move(input_fwd_file_path, fwd_filename)
+                expanded_input[input_item_i]['fwd_file'] = fwd_filename
 
-
-        # create summary fasta file with all bins
-        self.cat_fasta_files(input_dir, fasta_file_extension, all_seq_fasta)
-
-        return {'input_dir': input_dir, 'folder_suffix': suffix, 'all_seq_fasta': all_seq_fasta}
+                if not os.path.isfile(fwd_filename):
+                    raise ValueError('Error generating reads file '+fwd_filename)
+                # make sure fasta file isn't empty
+                min_fasta_len = 1
+                if not self.fasta_seq_len_at_least(fwd_filename, min_fasta_len):
+                    raise ValueError('Reads Library is empty in filename: '+str(fwd_filename))
+            
+            
+        return {'input_dir': input_dir, 'folder_suffix': suffix, 'expanded_input': expanded_input}
 
 
     def fasta_seq_len_at_least(self, fasta_path, min_fasta_len=1):
@@ -242,40 +196,3 @@ class DataStagingUtils(object):
                 if seq_len >= min_fasta_len:
                     return True
         return False
-
-
-    def set_fasta_file_extensions(self, folder, new_extension):
-        '''
-        Renames all detected fasta files in folder to the specified extension.
-        fasta files are detected based on its existing extension, which must be one of:
-            ['.fasta', '.fas', '.fa', '.fsa', '.seq', '.fna', '.ffn', '.faa', '.frn']
-
-        Note that this is probably not well behaved if the operation will rename to a
-        file that already exists
-        '''
-        extensions = ['.fasta', '.fas', '.fa', '.fsa', '.seq', '.fna', '.ffn', '.faa', '.frn']
-
-        for file in os.listdir(folder):
-            if not os.path.isfile(os.path.join(folder, file)):
-                continue
-            filename, file_extension = os.path.splitext(file)
-            if file_extension in extensions:
-                os.rename(os.path.join(folder, file),
-                          os.path.join(folder, filename + '.' + new_extension))
-
-
-    def cat_fasta_files(self, folder, extension, output_fasta_file):
-        '''
-        Given a folder of fasta files with the specified extension, cat them together
-        using 'cat' into the target new_fasta_file
-        '''
-        files = glob.glob(os.path.join(folder, '*.' + extension))
-        cat_cmd = ['cat'] + files
-        fasta_file_handle = open(output_fasta_file, 'w')
-        p = subprocess.Popen(cat_cmd, cwd=self.scratch, stdout=fasta_file_handle, shell=False)
-        exitCode = p.wait()
-        fasta_file_handle.close()
-
-        if exitCode != 0:
-            raise ValueError('Error running command: ' + ' '.join(cat_cmd) + '\n' +
-                             'Exit Code: ' + str(exitCode))
