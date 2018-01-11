@@ -2,7 +2,7 @@ module-name:
     kb_kaiju
 
 module-description:
-    A KBase module wrapping the Kaiju metagenomics tool
+    A KBase module wrapping the Kaiju tool for taxonomic classification of shotgun metagenomic read data
 
 service-language:
     python
