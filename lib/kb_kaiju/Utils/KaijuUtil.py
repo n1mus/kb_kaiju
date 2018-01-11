@@ -25,7 +25,9 @@ class KaijuUtil:
         self.callback_url = config['SDK_CALLBACK_URL']
         self.scratch = config['scratch']
         self.threads = config['threads']
-
+        self.SE_flag = 'SE'
+        self.PE_flag = 'PE'
+        
 
     def run_kaiju_and_krona(self, params):
         '''
@@ -33,7 +35,7 @@ class KaijuUtil:
         '''
 
         # 0) validate basic parameters
-        method = 'run_kaiju_and_krona()'
+        method = 'run_kaiju_and_krona'
         required_params = ['workspace_name',
                            'input_refs',
                            'output_biom_name',
@@ -48,7 +50,7 @@ class KaijuUtil:
                           ]
         for arg in required_params:
             if arg not in params or params[arg] == None or params[arg] == '':
-                raise ValueError ("Must define required param: '"+arg+"' for method: '"+str(method)+"'")        
+                raise ValueError ("Must define required param: '"+arg+"' for method: '"+str(method)+"()'")
 
         if 'greedy_run_mode' in params and int(params['greedy_run_mode']) == 1:
             greedy_required_params = ['greedy_allowed_mismatches',
@@ -57,7 +59,7 @@ class KaijuUtil:
                                   ]
             for arg in greedy_required_params:
                 if arg not in params or params[arg] == None or params[arg] == '':
-                    raise ValueError ("Must define GREEDY MODE required param: '"+arg+"' for method: '"+str(method)+"'")        
+                    raise ValueError ("Must define GREEDY MODE required param: '"+arg+"' for method: '"+str(method)+"()'")
 
 
         # 1) stage input data
@@ -65,47 +67,59 @@ class KaijuUtil:
         staged_input = dsu.stage_input(params['input_refs'], 'fastq')
         input_dir = staged_input['input_dir']
         suffix = staged_input['folder_suffix']
+        expanded_input = staged_input['expanded_input']
 
         output_dir = os.path.join(self.scratch, 'output_' + suffix)
-        plots_dir = os.path.join(self.scratch, 'plot_' + suffix)
+        #plots_dir = os.path.join(self.scratch, 'plot_' + suffix)
         html_dir = os.path.join(self.scratch, 'html_' + suffix)
 
         log('Staged input directory: ' + input_dir)
 
 
-        # 2) run the lineage workflow
-        lineage_wf_options = {'bin_folder': input_dir,
-                              'out_folder': output_dir,
-                              'thread': self.threads
-                              #'reduced_tree': self.reduced_tree
-                              }
-        if 'reduced_tree' in params and params['reduced_tree'] != None and int(params['reduced_tree']) == 1:
-            lineage_wf_options['reduced_tree'] = params['reduced_tree']
+        # 2) run Kaiju and make summaries
+        kaiju_options = {'input_reads':               expanded_input,
+                         'out_folder':                output_dir,
+                         'tax_levels':                params['tax_levels'],
+                         'db_type':                   params['db_type'],
+                         'seg_filter':                params['seg_filter'],
+                         'min_match_length':          params['min_match_length'],
+                         'greedy_run_mode':           params['greedy_run_mode'],
+                         'greedy_allowed_mismatches': params['greedy_allowed_mismatches'],
+                         'greedy_min_match_score':    params['greedy_min_match_score'],
+                         'filter_percent':            params['filter_percent'],
+                         'filter_unclassified':       params['filter_unclassified'],
+                         'full_tax_path':             params['full_tax_path'],
+                         'threads':                   self.threads
+                        }
+        self.run_kaiju_batch (kaiju_options)
 
-        self.run_checkM('lineage_wf', lineage_wf_options)
-
-
-        # 3) make the plots:
-        self.build_checkM_lineage_wf_plots(input_dir, output_dir, plots_dir, all_seq_fasta_file, tetra_file)
-
-
-        # 4) Package results
-        outputBuilder = OutputBuilder(output_dir, plots_dir, self.scratch, self.callback_url)
-        output_packages = self._build_output_packages(params, outputBuilder, input_dir)
-
-
-        # 5) build the HTML report
-        os.makedirs(html_dir)
-        outputBuilder.build_html_output_for_lineage_wf(html_dir, params['input_ref'])
-        html_zipped = outputBuilder.package_folder(html_dir, 'report.html', 'Summarized report from CheckM')
+# HERE
 
 
-        # 6) save report
+        # 3) create Krona plots
+        #self.build_checkM_lineage_wf_plots(input_dir, output_dir, plots_dir, all_seq_fasta_file, tetra_file)
+
+
+        # 4) create Summary abundance plots 
+
+
+        # 5) Package results
+        #outputBuilder = OutputBuilder(output_dir, plots_dir, self.scratch, self.callback_url)
+        #output_packages = self._build_output_packages(params, outputBuilder, input_dir)
+
+
+        # 6) build the HTML report
+        #os.makedirs(html_dir)
+        #outputBuilder.build_html_output_for_lineage_wf(html_dir, params['input_ref'])
+        #html_zipped = outputBuilder.package_folder(html_dir, 'report.html', 'Summarized report from CheckM')
+
+
+        # 7) save report
         report_params = {'message': '',
-                         'direct_html_link_index': 0,
-                         'html_links': [html_zipped],
-                         'file_links': output_packages,
-                         'report_object_name': 'kb_checkM_report_' + str(uuid.uuid4()),
+                         #'direct_html_link_index': 0,
+                         #'html_links': [html_zipped],
+                         #'file_links': output_packages,
+                         'report_object_name': 'kb_kaiju_report_' + str(uuid.uuid4()),
                          'workspace_name': params['workspace_name']
                          }
 
@@ -113,88 +127,173 @@ class KaijuUtil:
         report_output = kr.create_extended_report(report_params)
 
         return {'report_name': report_output['name'],
-                'report_ref': report_output['ref']}
+                'report_ref':  report_output['ref']}
 
 
-    def build_checkM_lineage_wf_plots(self, bin_folder, out_folder, plots_folder, all_seq_fasta_file, tetra_file):
-
-        # first build generic plot for entire dataset
-        log('Creating basic QA plot (checkm bin_qa_plot) ...')
-        bin_qa_plot_options = {'bin_folder': bin_folder,
-                               'out_folder': out_folder,
-                               'plots_folder': plots_folder
-                               }
-        self.run_checkM('bin_qa_plot', bin_qa_plot_options, dropOutput=True)
-
-        # compute tetranucleotide frequencies based on the concatenated fasta file
-        log('Computing tetranucleotide distributions...')
-        tetra_options = {'seq_file': all_seq_fasta_file,
-                         'tetra_file': tetra_file,
-                         'thread': self.threads,
-                         'quiet': 1
-                         }
-        self.run_checkM('tetra', tetra_options, dropOutput=True)
-
-        # plot distributions for each bin
-        log('Creating distribution plots per bin...')
-        dist_plot_options = {'bin_folder': bin_folder,
-                             'out_folder': out_folder,
-                             'plots_folder': plots_folder,
-                             'tetra_file': tetra_file,
-                             'dist_value': 95,
-                             'quiet': 1
-                             }
-        self.run_checkM('dist_plot', dist_plot_options, dropOutput=True)
+    def run_kaiju_batch(self, options, dropOutput=False):
+        kaiju_options = {'input_reads':               expanded_input,
+                         'out_folder':                output_dir,
+                         'tax_levels':                params['tax_levels'],
+                         'db_type':                   params['db_type'],
+                         'seg_filter':                params['seg_filter'],
+                         'min_match_length':          params['min_match_length'],
+                         'greedy_run_mode':           params['greedy_run_mode'],
+                         'greedy_allowed_mismatches': params['greedy_allowed_mismatches'],
+                         'greedy_min_match_score':    params['greedy_min_match_score'],
+                         'filter_percent':            params['filter_percent'],
+                         'filter_unclassified':       params['filter_unclassified'],
+                         'full_tax_path':             params['full_tax_path'],
+                         'threads':                   self.threads
+                        }
 
 
-    def run_checkM(self, subcommand, options, dropOutput=False):
-        '''
-            subcommand is the checkm subcommand (eg lineage_wf, tetra, bin_qa_plot)
-            options indicate, depending on the subcommand:
-                bin_folder
-                out_folder
-                plots_folder
-                seq_file
-                tetra_file
+        input_reads = options['input_reads']
+        for input_reads_item in input_reads:
+            single_kaiju_run_options = kaiju_options
+            single_kaiju_run_options['input_item'] = input_reads_item
+            
+            command = self._build_kaiju_command(options)
+            log('Running: ' + ' '.join(command))
 
-                reduced_tree
-                thread
-                dist_value
-        '''
-        command = self._build_command(subcommand, options)
-        log('Running: ' + ' '.join(command))
+            log_output_file = None
+            if dropOutput:  # if output is too chatty for STDOUT
+                log_output_file = open(os.path.join(self.scratch, input_reads_item['name'] + '.out'), 'w')
+                p = subprocess.Popen(command, cwd=self.scratch, shell=False, stdout=log_output_file, stderr=subprocess.STDOUT)
+            else:
+                p = subprocess.Popen(command, cwd=self.scratch, shell=False)
+            exitCode = p.wait()
 
-        log_output_file = None
-        if dropOutput:
-            # necessary because the checkM --quiet flag doesn't work on the tetra subcommand,
-            # and that produces a line per contig
-            log_output_file = open(os.path.join(self.scratch, subcommand + '.out'), 'w')
-            p = subprocess.Popen(command, cwd=self.scratch, shell=False, stdout=log_output_file, stderr=subprocess.STDOUT)
-        else:
-            p = subprocess.Popen(command, cwd=self.scratch, shell=False)
-        exitCode = p.wait()
+            if log_output_file:
+                log_output_file.close()
 
-        if log_output_file:
-            log_output_file.close()
-
-        if (exitCode == 0):
-            log('Executed command: ' + ' '.join(command) + '\n' +
-                'Exit Code: ' + str(exitCode))
-        else:
-            raise ValueError('Error running command: ' + ' '.join(command) + '\n' +
-                             'Exit Code: ' + str(exitCode))
+            if (exitCode == 0):
+                log('Executed command: ' + ' '.join(command) + '\n' +
+                    'Exit Code: ' + str(exitCode))
+            else:
+                raise ValueError('Error running command: ' + ' '.join(command) + '\n' +
+                                 'Exit Code: ' + str(exitCode))
 
 
-    def _process_universal_options(self, command_list, options):
-        if options.get('thread'):
+    def _validate_kaiju_options(self, options):
+        # 1st order required
+        func_name = 'kaiju'
+        required_opts = [ 'db_type',
+                          'min_match_length',
+                          'greedy_run_mode'
+                      ]
+        for opt in required_opts:
+            if opt not in options or options[opt] == None or options[opt] == '':
+                raise ValueError ("Must define required opt: '"+opt+"' for func: '"+str(func_name)+"()'")
+
+        # 2nd order required
+        if 'greedy_run_mode' in options and int(options['greedy_run_mode']) == 1:
+            opt = 'greedy_allowed_mismatches'
+            if opt not in options or int(options[opt]) < 1:
+                raise ValueError ("Must define required opt: '"+opt+"' for func: '"+str(func_name)+"()' if running in greedy_run_mode")
+
+        # input file validation
+        if not os.path.getsize(options['input_reads']['fwd_file']) > 0:
+            raise ValueError ('missing or empty fwd reads file: '+options['input_reads']['fwd_file'])
+        if options['input_reads']['type'] == self.PE_flag:
+            if not os.path.getsize(options['input_reads']['rev_file']) > 0:
+                raise ValueError ('missing or empty rev reads file: '+options['input_reads']['rev_file'])
+
+        # db validation
+        DB = 'KAIJU_DB_PATH'
+        if not os.path.getsize(options[DB]) > 0:
+            raise ValueError ('missing or empty '+DB+' file: '+options[DB])
+        DB = 'KAIJU_DB_NODES'
+        if not os.path.getsize(options[DB]) > 0:
+            raise ValueError ('missing or empty '+DB+' file: '+options[DB])
+
+
+    def _process_kaiju_options(self, command_list, options):
+        kaiju_options = {'input_reads':               expanded_input,
+                         'out_folder':                output_dir,
+                         'tax_levels':                params['tax_levels'],
+                         'db_type':                   params['db_type'],
+                         'seg_filter':                params['seg_filter'],
+                         'min_match_length':          params['min_match_length'],
+                         'greedy_run_mode':           params['greedy_run_mode'],
+                         'greedy_allowed_mismatches': params['greedy_allowed_mismatches'],
+                         'greedy_min_match_score':    params['greedy_min_match_score'],
+                         'filter_percent':            params['filter_percent'],
+                         'filter_unclassified':       params['filter_unclassified'],
+                         'full_tax_path':             params['full_tax_path'],
+                         'threads':                   self.threads
+                        }
+
+        if options.get('KAIJU_DB_NODES'):
             command_list.append('-t')
-            command_list.append(str(options.get('thread')))
+            command_list.append(str(options.get('KAIJU_DB_NODES')))
+        if options.get('KAIJU_DB_PATH'):
+            command_list.append('-f')
+            command_list.append(str(options.get('KAIJU_DB_PATH')))
+        if options['input_reads'].get('fwd_file'):
+            command_list.append('-i')
+            command_list.append(str(options['input_reads'].get('fwd_file')))
+        if options['input_reads'].get('type') == self.PE_flag:
+            command_list.append('-j')
+            command_list.append(str(options['input_reads'].get('rev_file')))
+        if options.get('out_folder'):
+            out_file = options['input_reads']['name']+'.kaiju'
+            out_path = os.path.join (str(options.get('out_folder')), out_file)
+            command_list.append('-o')
+            command_list.append(out_path)
+        if int(options.get('seg_filter')) == 1:
+            command_list.append('-x')
+        if options.get('min_match_length'):
+            command_list.append('-m')
+            command_list.append(str(options.get('min_match_length')))
+        if int(options.get('greedy_mode')) == 1:
+            command_list.append('-a')
+            command_list.append('greedy')
+            if options.get('greedy_allowed_mismatches'):
+                command_list.append('-e')
+                command_list.append(str(options.get('greedy_allowed_mismatches')))
+            if options.get('greedy_min_match_score'):
+                command_list.append('-s')
+                command_list.append(str(options.get('greedy_min_match_score')))
 
-        if options.get('quiet') and str(options.get('quiet')) == '1':
-            command_list.append('--quiet')
+        if options.get('threads'):
+            command_list.append('-z')
+            command_list.append(str(options.get('threads')))
+        if options.get('verbose'):
+            command_list.append('-v')
+        
+
+    def _build_kaiju_command(self, options, verbose=True):
+
+        KAIJU_BIN_DIR  = os.path.join(os.path.sep, 'kb', 'module', 'kaiju', 'bin')
+        KAIJU_BIN      = os.path.join(KAIJU_BIN_DIR, 'kaiju')
+        KAIJU_DB_DIR   = os.path.join(os.path.sep, 'data', 'kb_kaiju', 'kaijudb', options['db_type'])
+        options['verbose'] = verbose
+        if self.threads and self.threads > 1:
+            options['threads'] = self.threads
+
+        options['KAIJU_NODES'] = os.path.join(KAIJU_DB_DIR, 'nodes.dmp')
+        #options['KAIJU_NAMES'] = os.path.join(KAIJU_DB_DIR, 'names.dmp')  # don't need for kaiju cmd
+
+        if options['db_type'] == 'kaiju_index':
+            options['KAIJU_DB_PATH'] = os.path.join(KAIJU_DB_DIR, 'kaiju_db.fmi')
+        elif options['db_type'] == 'kaiju_index_pg':
+            options['KAIJU_DB_PATH'] = os.path.join(KAIJU_DB_DIR, 'kaiju_db.fmi')
+        elif options['db_type'] == 'kaiju_index_nr':
+            options['KAIJU_DB_PATH'] = os.path.join(KAIJU_DB_DIR, 'kaiju_db_nr.fmi')
+        elif options['db_type'] == 'kaiju_index_nr_euk':
+            options['KAIJU_DB_PATH'] = os.path.join(KAIJU_DB_DIR, 'kaiju_db_nr_euk.fmi')
+        else:
+            raise ValueError ('bad db_type: '+options['db_type']+' (must be one of "kaiju_index", "kaiju_index_pg", "kaiju_index_nr", "kaiju_index_nr_euk")')
+
+        self._validate_kaiju_options(options)
+
+        command = [KAIJU_BIN]
+        self._process_kaiju_options(command, options)
+
+        return command
 
 
-    def _validate_options(self, options,
+    def _validate_kaijuReport_options(self, options,
                           checkBin=False,
                           checkOut=False,
                           checkPlots=False,
@@ -211,44 +310,102 @@ class KaijuUtil:
             raise ValueError('cannot run checkm ' + subcommand + ' without tetra_file option set')
 
 
-    def _build_command(self, subcommand, options):
+    def _process_kaijuReport_options(self, command_list, options):
+        if options.get('thread'):
+            command_list.append('-t')
+            command_list.append(str(options.get('thread')))
 
-        command = ['checkm', subcommand]
-        self._process_universal_options(command, options)
+        if options.get('quiet') and str(options.get('quiet')) == '1':
+            command_list.append('--quiet')
 
-        if subcommand == 'lineage_wf':
-            self._validate_options(options, checkBin=True, checkOut=True, subcommand='lineage_wf')
-            if 'reduced_tree' in options and str(options['reduced_tree']) == '1':
-                command.append('--reduced_tree')
-            command.append(options['bin_folder'])
-            command.append(options['out_folder'])
 
-        elif subcommand == 'bin_qa_plot':
-            self._validate_options(options, checkBin=True, checkOut=True, checkPlots=True, subcommand='bin_qa_plot')
-            command.append(options['out_folder'])
-            command.append(options['bin_folder'])
-            command.append(options['plots_folder'])
+    def _build_kaijuReport_command(self, options):
 
-        elif subcommand == 'tetra':
-            self._validate_options(options, checkTetraFile=True, subcommand='tetra')
-            if 'seq_file' not in options:
-                raise ValueError('cannot run checkm tetra without seq_file option set')
-            command.append(options['seq_file'])
-            command.append(options['tetra_file'])
+        KAIJU_BIN_DIR    = os.path.join(os.path.sep, 'kb', 'module', 'kaiju', 'bin')
+        KAIJU_REPORT_BIN = os.path.join(KAIJU_BIN_DIR, 'kaijuReport')
 
-        elif subcommand == 'dist_plot':
-            self._validate_options(options, checkBin=True, checkOut=True, checkPlots=True, checkTetraFile=True,
-                                   subcommand='dist_plot')
-            command.append(options['out_folder'])
-            command.append(options['bin_folder'])
-            command.append(options['plots_folder'])
-            command.append(options['tetra_file'])
-            if 'dist_value' not in options:
-                raise ValueError('cannot run checkm dist_plot without dist_value option set')
-            command.append(str(options['dist_value']))
+        self._validate_kaijuReport_options(options)
 
-        else:
-            raise ValueError('Invalid or unsupported checkM subcommand: ' + str(subcommand))
+        command = [KAIJU_REPORT_BIN]
+        self._process_kaijuReport_options(command, options)
+
+        return command
+
+
+    def _validate_kaiju2krona_options(self, options,
+                          checkBin=False,
+                          checkOut=False,
+                          checkPlots=False,
+                          checkTetraFile=False,
+                          subcommand=''):
+        # Note: we can, maybe should, add additional checks on the contents of the folders here
+        if checkBin and 'bin_folder' not in options:
+            raise ValueError('cannot run checkm ' + subcommand + ' without bin_folder option set')
+        if checkOut and 'out_folder' not in options:
+            raise ValueError('cannot run checkm ' + subcommand + ' without bin_folder option set')
+        if checkPlots and 'plots_folder' not in options:
+            raise ValueError('cannot run checkm ' + subcommand + ' without plots_folder option set')
+        if checkTetraFile and 'tetra_file' not in options:
+            raise ValueError('cannot run checkm ' + subcommand + ' without tetra_file option set')
+
+
+    def _process_kaiju2krona_options(self, command_list, options):
+        if options.get('thread'):
+            command_list.append('-t')
+            command_list.append(str(options.get('thread')))
+
+        if options.get('quiet') and str(options.get('quiet')) == '1':
+            command_list.append('--quiet')
+
+
+    def _build_kaiju2krona_command(self, options):
+
+        KAIJU_BIN_DIR   = os.path.join(os.path.sep, 'kb', 'module', 'kaiju', 'bin')
+        KAIJU2KRONA_BIN = os.path.join(KAIJU_BIN_DIR, 'kaiju2krona')
+
+        self._validate_kaiju2krona_options(options)
+
+        command = [KAIJU2KRONA_BIN]
+        self._process_kaiju2krona_options(command, options)
+
+        return command
+
+
+    def _validate_kronaImport_options(self, options,
+                          checkBin=False,
+                          checkOut=False,
+                          checkPlots=False,
+                          checkTetraFile=False,
+                          subcommand=''):
+        # Note: we can, maybe should, add additional checks on the contents of the folders here
+        if checkBin and 'bin_folder' not in options:
+            raise ValueError('cannot run checkm ' + subcommand + ' without bin_folder option set')
+        if checkOut and 'out_folder' not in options:
+            raise ValueError('cannot run checkm ' + subcommand + ' without bin_folder option set')
+        if checkPlots and 'plots_folder' not in options:
+            raise ValueError('cannot run checkm ' + subcommand + ' without plots_folder option set')
+        if checkTetraFile and 'tetra_file' not in options:
+            raise ValueError('cannot run checkm ' + subcommand + ' without tetra_file option set')
+
+
+    def _process_kronaImport_options(self, command_list, options):
+        if options.get('thread'):
+            command_list.append('-t')
+            command_list.append(str(options.get('thread')))
+
+        if options.get('quiet') and str(options.get('quiet')) == '1':
+            command_list.append('--quiet')
+
+
+    def _build_kronaImport_command(self, options):
+
+        KRONA_BIN_DIR    = os.path.join(os.path.sep, 'kb', 'module', 'Krona', 'bin')
+        KRONA_IMPORT_BIN = os.path.join(KRONA_BIN_DIR, 'ktImportText')
+
+        self._validate_kronaImport_options(options)
+
+        command = [KRONA_IMPORT_BIN]
+        self._process_kronaImport_options(command, options)
 
         return command
 

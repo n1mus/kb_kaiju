@@ -19,6 +19,9 @@ class DataStagingUtils(object):
         if not os.path.exists(self.scratch):
             os.makedirs(self.scratch)
 
+        self.SE_flag = 'SE'
+        self.PE_lfag = 'PE'
+
 
     def stage_input(self, input_refs, fasta_file_extension):
         '''
@@ -66,8 +69,6 @@ class DataStagingUtils(object):
         input_ref_seen = dict()
         SE_types = ['KBaseFile.SingleEndLibrary', 'KBaseAssembly.SingleEndLibrary']
         PE_types = ['KBaseFile.PairedEndLibrary', 'KBaseAssembly.PairedEndLibrary']
-        SE_flag = 'SE'
-        PE_flag = 'PE'
 
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
         for input_ref in input_refs:
@@ -93,9 +94,9 @@ class DataStagingUtils(object):
                     reads_item_type = readsLibrary_obj['info'][TYPE_I]
                     reads_item_type = re.sub ('-[0-9]+\.[0-9]+$', "", reads_item_type)  # remove trailing version
                     if reads_item_type in PE_types:
-                        this_read_type = PE_flag
+                        this_read_type = self.PE_flag
                     elif reads_item_type in SE_types:
-                        this_read_type = SE_flag
+                        this_read_type = self.SE_flag
                     else:
                         raise ValueError ("Can't handle read item type '"+reads_item_type+"' obj_name: '"+this_reads_name+" in Set: '"+str(input_ref)+"'")
                     expanded_input.append({'ref':  this_reads_ref,
@@ -109,7 +110,7 @@ class DataStagingUtils(object):
                     continue
                 input_ref_seen[this_reads_ref] = True
                 this_reads_name = obj_name
-                this_reads_type = SE_flag
+                this_reads_type = self.SE_flag
                 expanded_input.append({'ref':  this_reads_ref,
                                        'name': this_reads_name,
                                        'type': this_reads_type
@@ -121,7 +122,7 @@ class DataStagingUtils(object):
                     continue
                 input_ref_seen[this_reads_ref] = True
                 this_reads_name = obj_name
-                this_reads_type = PE_flag
+                this_reads_type = self.PE_flag
                 expanded_input.append({'ref':  this_reads_ref,
                                        'name': this_reads_name,
                                        'type': this_reads_type
@@ -140,7 +141,7 @@ class DataStagingUtils(object):
                 raise ValueError('Unable to get read library object from workspace: (' + str(input_item['ref']) +")\n" + str(e))
 
             # PE Lib
-            if input_item['type'] eq PE_flag:
+            if input_item['type'] == self.PE_flag:
                 input_fwd_file_path = readsLibrary['files'][input_item['ref']]['files']['fwd']
                 input_rev_file_path = readsLibrary['files'][input_item['ref']]['files']['rev']
                 fwd_filename = os.path.join(input_dir, input_item['name'] + '.fwd.' + fasta_file_extension)
@@ -163,7 +164,7 @@ class DataStagingUtils(object):
                 if not self.fasta_seq_len_at_least(input_rev_file_path, min_fasta_len):
                     raise ValueError('Reads Library is empty in filename: '+str(rev_filename))
 
-            elif input_item['type'] eq SE_flag:
+            elif input_item['type'] == self.SE_flag:
                 input_fwd_file_path = readsLibrary['files'][input_item['ref']]['files']['fwd']
                 fwd_filename = os.path.join(input_dir, input_item['name'] + '.fwd.' + fasta_file_extension)
                 if input_fwd_file_path != fwd_filename:
