@@ -164,13 +164,13 @@ class kb_kaijuTest(unittest.TestCase):
             'filter_unclassified':       1,
             'full_tax_path':             0
         }
-#        result = self.getImpl().run_kaiju(self.getContext(), params)[0]
-#
-#        pprint('End to end test result:')
-#        pprint(result)
-#
-#        self.assertIn('report_name', result)
-#        self.assertIn('report_ref', result)
+        result = self.getImpl().run_kaiju(self.getContext(), params)[0]
+
+        pprint('End to end test result:')
+        pprint(result)
+
+        self.assertIn('report_name', result)
+        self.assertIn('report_ref', result)
 
         # make sure the report was created and includes the HTML report and download links
         #rep = self.getWsClient().get_objects2({'objects': [{'ref': result['report_ref']}]})['data'][0]['data']

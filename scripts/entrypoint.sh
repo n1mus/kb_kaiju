@@ -18,6 +18,7 @@ elif [ "${1}" = "async" ] ; then
   xvfb-run bash ./scripts/run_async.sh
 elif [ "${1}" = "init" ] ; then
   echo "Initialize module"
+  mkdir -p /data/kaijudb
   cd /data/kaijudb
 
   echo "downloading: http://kaiju.binf.ku.dk/database/kaiju_index.tgz"

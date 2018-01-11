@@ -29,7 +29,7 @@ class KaijuUtil:
         self.PE_flag = 'PE'
         
 
-    def run_kaiju_and_krona(self, params):
+    def run_kaiju_with_krona(self, params):
         '''
         Main entry point for running kaiju + krona as a KBase App
         '''
@@ -69,6 +69,12 @@ class KaijuUtil:
         suffix = staged_input['folder_suffix']
         expanded_input = staged_input['expanded_input']
 
+        print ("INPUT_DIR: "+input_dir)
+        print ("SUFFIX: "+suffix)
+        print ("EXPANDED_INPUT: ")
+        print (expanded_input)
+            
+
         output_dir = os.path.join(self.scratch, 'output_' + suffix)
         #plots_dir = os.path.join(self.scratch, 'plot_' + suffix)
         html_dir = os.path.join(self.scratch, 'html_' + suffix)
@@ -95,12 +101,12 @@ class KaijuUtil:
 
 # HERE
 
+        # 3) create Summary abundance plots 
 
-        # 3) create Krona plots
+
+
+        # 4) create Krona plots
         #self.build_checkM_lineage_wf_plots(input_dir, output_dir, plots_dir, all_seq_fasta_file, tetra_file)
-
-
-        # 4) create Summary abundance plots 
 
 
         # 5) Package results
@@ -131,28 +137,12 @@ class KaijuUtil:
 
 
     def run_kaiju_batch(self, options, dropOutput=False):
-        kaiju_options = {'input_reads':               expanded_input,
-                         'out_folder':                output_dir,
-                         'tax_levels':                params['tax_levels'],
-                         'db_type':                   params['db_type'],
-                         'seg_filter':                params['seg_filter'],
-                         'min_match_length':          params['min_match_length'],
-                         'greedy_run_mode':           params['greedy_run_mode'],
-                         'greedy_allowed_mismatches': params['greedy_allowed_mismatches'],
-                         'greedy_min_match_score':    params['greedy_min_match_score'],
-                         'filter_percent':            params['filter_percent'],
-                         'filter_unclassified':       params['filter_unclassified'],
-                         'full_tax_path':             params['full_tax_path'],
-                         'threads':                   self.threads
-                        }
-
-
         input_reads = options['input_reads']
         for input_reads_item in input_reads:
-            single_kaiju_run_options = kaiju_options
+            single_kaiju_run_options = options
             single_kaiju_run_options['input_item'] = input_reads_item
             
-            command = self._build_kaiju_command(options)
+            command = self._build_kaiju_command(single_kaiju_run_options)
             log('Running: ' + ' '.join(command))
 
             log_output_file = None
@@ -192,11 +182,11 @@ class KaijuUtil:
                 raise ValueError ("Must define required opt: '"+opt+"' for func: '"+str(func_name)+"()' if running in greedy_run_mode")
 
         # input file validation
-        if not os.path.getsize(options['input_reads']['fwd_file']) > 0:
-            raise ValueError ('missing or empty fwd reads file: '+options['input_reads']['fwd_file'])
-        if options['input_reads']['type'] == self.PE_flag:
-            if not os.path.getsize(options['input_reads']['rev_file']) > 0:
-                raise ValueError ('missing or empty rev reads file: '+options['input_reads']['rev_file'])
+        if not os.path.getsize(options['input_item']['fwd_file']) > 0:
+            raise ValueError ('missing or empty fwd reads file: '+options['input_item']['fwd_file'])
+        if options['input_item']['type'] == self.PE_flag:
+            if not os.path.getsize(options['input_item']['rev_file']) > 0:
+                raise ValueError ('missing or empty rev reads file: '+options['input_item']['rev_file'])
 
         # db validation
         DB = 'KAIJU_DB_PATH'
@@ -208,35 +198,20 @@ class KaijuUtil:
 
 
     def _process_kaiju_options(self, command_list, options):
-        kaiju_options = {'input_reads':               expanded_input,
-                         'out_folder':                output_dir,
-                         'tax_levels':                params['tax_levels'],
-                         'db_type':                   params['db_type'],
-                         'seg_filter':                params['seg_filter'],
-                         'min_match_length':          params['min_match_length'],
-                         'greedy_run_mode':           params['greedy_run_mode'],
-                         'greedy_allowed_mismatches': params['greedy_allowed_mismatches'],
-                         'greedy_min_match_score':    params['greedy_min_match_score'],
-                         'filter_percent':            params['filter_percent'],
-                         'filter_unclassified':       params['filter_unclassified'],
-                         'full_tax_path':             params['full_tax_path'],
-                         'threads':                   self.threads
-                        }
-
         if options.get('KAIJU_DB_NODES'):
             command_list.append('-t')
             command_list.append(str(options.get('KAIJU_DB_NODES')))
         if options.get('KAIJU_DB_PATH'):
             command_list.append('-f')
             command_list.append(str(options.get('KAIJU_DB_PATH')))
-        if options['input_reads'].get('fwd_file'):
+        if options['input_item'].get('fwd_file'):
             command_list.append('-i')
-            command_list.append(str(options['input_reads'].get('fwd_file')))
-        if options['input_reads'].get('type') == self.PE_flag:
+            command_list.append(str(options['input_item'].get('fwd_file')))
+        if options['input_item'].get('type') == self.PE_flag:
             command_list.append('-j')
-            command_list.append(str(options['input_reads'].get('rev_file')))
+            command_list.append(str(options['input_item'].get('rev_file')))
         if options.get('out_folder'):
-            out_file = options['input_reads']['name']+'.kaiju'
+            out_file = options['input_item']['name']+'.kaiju'
             out_path = os.path.join (str(options.get('out_folder')), out_file)
             command_list.append('-o')
             command_list.append(out_path)

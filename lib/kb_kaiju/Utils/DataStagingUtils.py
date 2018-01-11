@@ -1,7 +1,8 @@
 import os
 import time
-import glob
-import subprocess
+import shutil
+#import subprocess
+#import glob
 
 from Workspace.WorkspaceClient import Workspace
 from ReadsUtils.ReadsUtilsClient import ReadsUtils
@@ -20,7 +21,22 @@ class DataStagingUtils(object):
             os.makedirs(self.scratch)
 
         self.SE_flag = 'SE'
-        self.PE_lfag = 'PE'
+        self.PE_flag = 'PE'
+
+        SERVICE_VER = 'release'
+
+        # readsUtils_Client
+        try:
+            self.readsUtils_Client = ReadsUtils(self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
+        except Exception as e:
+            raise ValueError('Unable to instantiate readsUtils_Client with callbackURL: '+ self.callbackURL +' ERROR: ' + str(e))
+
+        # setAPI_Client
+        try:
+            #setAPI_Client = SetAPI (url=self.callbackURL, token=self.ctx['token'])  # for SDK local.  local doesn't work for SetAPI
+            self.setAPI_Client = SetAPI (url=self.serviceWizardURL, token=self.ctx['token'])  # for dynamic service
+        except Exception as e:
+            raise ValueError('Unable to instantiate setAPI_Client with serviceWizardURL: '+ self.serviceWizardURL +' ERROR: ' + str(e))
 
 
     def stage_input(self, input_refs, fasta_file_extension):
@@ -49,19 +65,6 @@ class DataStagingUtils(object):
         if not os.path.exists(input_dir):
             os.makedirs(input_dir)
 
-        # ruClient
-        try:
-            ruClient = ReadsUtils(self.callbackURL, token=self.ctx['token'], service_ver=SERVICE_VER)
-        except Exception as e:
-            raise ValueError('Unable to instantiate ruClient with callbackURL: '+ self.callbackURL +' ERROR: ' + str(e))
-
-        # setAPI_Client
-        try:
-            #setAPI_Client = SetAPI (url=self.callbackURL, token=self.ctx['token'])  # for SDK local.  local doesn't work for SetAPI
-            setAPI_Client = SetAPI (url=self.serviceWizardURL, token=self.ctx['token'])  # for dynamic service
-        except Exception as e:
-            raise ValueError('Unable to instantiate setAPI_Client with serviceWizardURL: '+ self.serviceWizardURL +' ERROR: ' + str(e))
-
 
         # 2) expand any sets and build a non-redundant list of reads input objs
         ws = Workspace(self.ws_url)
@@ -79,7 +82,7 @@ class DataStagingUtils(object):
             # ReadsSet
             if type_name in ['KBaseSets.ReadsSet']:
                 try:
-                    input_readsSet_obj = setAPI_Client.get_reads_set_v1 ({'ref':input_ref,'include_item_info':1})
+                    input_readsSet_obj = self.setAPI_Client.get_reads_set_v1 ({'ref':input_ref,'include_item_info':1})
 
                 except Exception as e:
                     raise ValueError('SetAPI FAILURE: Unable to get read library set object from workspace: (' + str(input_ref)+")\n" + str(e))
@@ -104,7 +107,7 @@ class DataStagingUtils(object):
                                            'type': this_reads_type
                                        })
             # SingleEnd Library
-            elif type_name in [SE_types]:
+            elif type_name in SE_types:
                 this_reads_ref = input_ref
                 if this_reads_ref in input_ref_seen:
                     continue
@@ -116,7 +119,7 @@ class DataStagingUtils(object):
                                        'type': this_reads_type
                                    })
             # PairedEnd Library
-            elif type_name in [PE_types]:
+            elif type_name in PE_types:
                 this_reads_ref = input_ref
                 if this_reads_ref in input_ref_seen:
                     continue
@@ -135,8 +138,8 @@ class DataStagingUtils(object):
         for input_item_i,input_item in enumerate(expanded_input):
 
             try:
-                readsLibrary = readsUtils_Client.download_reads ({'read_libraries': [input_item['ref']],
-                                                                  'interleaved': 'false'})
+                readsLibrary = self.readsUtils_Client.download_reads ({'read_libraries': [input_item['ref']],
+                                                                       'interleaved': 'false'})
             except Exception as e:
                 raise ValueError('Unable to get read library object from workspace: (' + str(input_item['ref']) +")\n" + str(e))
 
@@ -161,7 +164,7 @@ class DataStagingUtils(object):
                 min_fasta_len = 1
                 if not self.fasta_seq_len_at_least(fwd_filename, min_fasta_len):
                     raise ValueError('Reads Library is empty in filename: '+str(fwd_filename))
-                if not self.fasta_seq_len_at_least(input_rev_file_path, min_fasta_len):
+                if not self.fasta_seq_len_at_least(rev_filename, min_fasta_len):
                     raise ValueError('Reads Library is empty in filename: '+str(rev_filename))
 
             elif input_item['type'] == self.SE_flag:
