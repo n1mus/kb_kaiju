@@ -104,7 +104,7 @@ module kb_kaiju {
 	int            min_match_length;
 	bool           greedy_run_mode;
 	int            greedy_allowed_mismatches;
-	float          greedy_min_match_score;
+	int            greedy_min_match_score;
 	float          greedy_max_e_value;
 	float          filter_percent;
 	bool           filter_unclassified;

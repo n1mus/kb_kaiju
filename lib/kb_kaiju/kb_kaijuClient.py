@@ -52,7 +52,7 @@ class kb_kaiju(object):
            @range (0, 1)), parameter "min_match_length" of Long, parameter
            "greedy_run_mode" of type "bool" (A boolean - 0 for false, 1 for
            true. @range (0, 1)), parameter "greedy_allowed_mismatches" of
-           Long, parameter "greedy_min_match_score" of Double, parameter
+           Long, parameter "greedy_min_match_score" of Long, parameter
            "greedy_max_e_value" of Double, parameter "filter_percent" of
            Double, parameter "filter_unclassified" of type "bool" (A boolean
            - 0 for false, 1 for true. @range (0, 1)), parameter

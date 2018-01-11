@@ -58,7 +58,7 @@ public class KaijuInputParams {
     @JsonProperty("greedy_allowed_mismatches")
     private Long greedyAllowedMismatches;
     @JsonProperty("greedy_min_match_score")
-    private Double greedyMinMatchScore;
+    private Long greedyMinMatchScore;
     @JsonProperty("greedy_max_e_value")
     private Double greedyMaxEValue;
     @JsonProperty("filter_percent")
@@ -205,16 +205,16 @@ public class KaijuInputParams {
     }
 
     @JsonProperty("greedy_min_match_score")
-    public Double getGreedyMinMatchScore() {
+    public Long getGreedyMinMatchScore() {
         return greedyMinMatchScore;
     }
 
     @JsonProperty("greedy_min_match_score")
-    public void setGreedyMinMatchScore(Double greedyMinMatchScore) {
+    public void setGreedyMinMatchScore(Long greedyMinMatchScore) {
         this.greedyMinMatchScore = greedyMinMatchScore;
     }
 
-    public KaijuInputParams withGreedyMinMatchScore(Double greedyMinMatchScore) {
+    public KaijuInputParams withGreedyMinMatchScore(Long greedyMinMatchScore) {
         this.greedyMinMatchScore = greedyMinMatchScore;
         return this;
     }

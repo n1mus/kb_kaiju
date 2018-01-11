@@ -48,7 +48,7 @@ You should have received a copy of the GNU General Public License along with the
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "https://github.com/dcchivian/kb_kaiju"
-    GIT_COMMIT_HASH = "4b83ae82db4d6e26a130d4a5c1626dada9ccb399"
+    GIT_COMMIT_HASH = "77ed4e6ca157676f7b4803849045713d9ccacc23"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -83,7 +83,7 @@ You should have received a copy of the GNU General Public License along with the
            @range (0, 1)), parameter "min_match_length" of Long, parameter
            "greedy_run_mode" of type "bool" (A boolean - 0 for false, 1 for
            true. @range (0, 1)), parameter "greedy_allowed_mismatches" of
-           Long, parameter "greedy_min_match_score" of Double, parameter
+           Long, parameter "greedy_min_match_score" of Long, parameter
            "greedy_max_e_value" of Double, parameter "filter_percent" of
            Double, parameter "filter_unclassified" of type "bool" (A boolean
            - 0 for false, 1 for true. @range (0, 1)), parameter
