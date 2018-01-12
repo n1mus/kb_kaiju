@@ -38,6 +38,7 @@ RUN \
     make
 
 # For Krona Tools
+WORKDIR /kb/module
 RUN \
     git clone https://github.com/marbl/Krona && \
     cd Krona/KronaTools && \
