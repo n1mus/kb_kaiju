@@ -100,7 +100,7 @@ You should have received a copy of the GNU General Public License along with the
         print(json.dumps(params, indent=1))
 
         ku = KaijuUtil(self.config, ctx)
-        result = ku.run_kaiju_with_krona(params)
+        returnVal = ku.run_kaiju_with_krona(params)
         #END run_kaiju
 
         # At some point might do deeper type checking...
