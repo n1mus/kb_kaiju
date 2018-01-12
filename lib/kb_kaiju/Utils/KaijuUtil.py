@@ -147,21 +147,33 @@ class KaijuUtil:
 
 
         # 6) Package results
-        #outputBuilder = OutputBuilder(output_dir, plots_dir, self.scratch, self.callback_url)
-        #output_packages = self._build_output_packages(params, outputBuilder, input_dir)
+        output_dirs = [ {'name': 'kaiju_classifications',
+                         'desc': 'Kaiju Classification',
+                         'path': kaiju_output_folder
+                        },
+                        { 'name': 'kaiju_summaries',
+                          'desc': 'Kaiju Summaries',
+                          'path': kaijuReport_output_folder
+                        },
+                        { 'name': 'krona_data',
+                          'desc': 'Krona Data',
+                          'path': krona_output_folder
+                        }
+                      ]
+        outputBuilder = OutputBuilder(output_dirs, self.scratch, self.callback_url)
+        output_packages = self._build_output_packages(params, outputBuilder)
 
 
         # 7) build the HTML report
-        #os.makedirs(html_dir)
-        #outputBuilder.build_html_output_for_lineage_wf(html_dir, params['input_ref'])
-        #html_zipped = outputBuilder.package_folder(html_dir, 'report.html', 'Summarized report from CheckM')
+        #outputBuilder.build_html_output_for_kaiju_with_krona_wf(html_dir, expanded_input)
+        html_zipped = outputBuilder.package_folder(html_dir, 'report.html', 'Kaiju abundance and Krona plots')
 
 
         # 8) save report
         report_params = {'message': '',
-                         #'direct_html_link_index': 0,
-                         #'html_links': [html_zipped],
-                         #'file_links': output_packages,
+                         'direct_html_link_index': 0,
+                         'html_links': [html_zipped],
+                         'file_links': output_packages,
                          'report_object_name': 'kb_kaiju_report_' + str(uuid.uuid4()),
                          'workspace_name': params['workspace_name']
                          }
@@ -526,31 +538,18 @@ class KaijuUtil:
         return command
 
 
-    def _build_output_packages(self, params, outputBuilder, input_dir):
+    def _build_output_packages(self, params, outputBuilder):
 
         output_packages = []
+        for output_folder in outputBuilder.output_dirs:
+            if 'skip_output_dirs' in params and output_folder['name'] in params['skip_output_dirs']:
+                log('skipping output directory '+output_folder['name'])
+                continue
 
-        #if 'save_output_dir' in params and str(params['save_output_dir']) == '1':
-        if True:
-            log('packaging full output directory')
-            zipped_output_file = outputBuilder.package_folder(outputBuilder.output_dir, 'full_output.zip',
-                                                              'Full output of CheckM')
+            log('packaging output directory '+output_folder['name'])
+            zipped_output_file = outputBuilder.package_folder(output_folder['path'],
+                                                              output_folder['name']+'.zip',
+                                                              output_folder['desc'])
             output_packages.append(zipped_output_file)
-        else:  # ADD LATER?
-            log('not packaging full output directory, selecting specific files')
-            crit_out_dir = os.path.join(self.scratch, 'critical_output_' + os.path.basename(input_dir))
-            os.makedirs(crit_out_dir)
-            zipped_output_file = outputBuilder.package_folder(outputBuilder.output_dir, 'selected_output.zip',
-                                                              'Selected output from the CheckM analysis')
-            output_packages.append(zipped_output_file)
-
-
-        if 'save_plots_dir' in params and str(params['save_plots_dir']) == '1':
-            log('packaging output plots directory')
-            zipped_output_file = outputBuilder.package_folder(outputBuilder.plots_dir, 'plots.zip',
-                                                              'Output plots from CheckM')
-            output_packages.append(zipped_output_file)
-        else:
-            log('not packaging output plots directory')
 
         return output_packages

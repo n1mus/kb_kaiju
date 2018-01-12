@@ -15,17 +15,15 @@ def log(message, prefix_newline=False):
 
 class OutputBuilder(object):
     '''
-    Constructs the output HTML report and artifacts based on a CheckM lineage_wf
-    run.  This includes running any necssary plotting utilities of CheckM.
+    Constructs the output HTML report and artifacts based on Kaiju and Krona
+    runs.  This includes creating matplotlib graphs of the summaries and
+    modifying the Krona HTML to offer tabbed href links between html pages
     '''
 
-    def __init__(self, output_dir, plots_dir, scratch_dir, callback_url):
-        self.output_dir = output_dir
-        self.plots_dir = plots_dir
+    def __init__(self, output_dirs, scratch_dir, callback_url):
+        self.output_dirs = output_dirs
         self.scratch = scratch_dir
         self.callback_url = callback_url
-
-        self.DIST_PLOT_EXT = '.ref_dist_plots.png'
 
 
     def package_folder(self, folder_path, zip_file_name, zip_file_description):
@@ -41,23 +39,6 @@ class OutputBuilder(object):
         return {'shock_id': output['shock_id'],
                 'name': zip_file_name,
                 'description': zip_file_description}
-
-
-    def build_critical_output(self, critical_out_dir):
-        src = self.output_dir
-        dest = critical_out_dir
-
-        self._copy_file_ignore_errors('lineage.ms', src, dest)
-
-        storage_folder = os.path.join(dest, 'storage') 
-        if not os.path.exists(storage_folder):
-            os.makedirs(storage_folder)
-
-        self._copy_file_ignore_errors(os.path.join('storage', 'bin_stats.analyze.tsv'), src, dest)
-        self._copy_file_ignore_errors(os.path.join('storage', 'bin_stats.tree.tsv'), src, dest)
-        self._copy_file_ignore_errors(os.path.join('storage', 'bin_stats_ext.tsv'), src, dest)
-        self._copy_file_ignore_errors(os.path.join('storage', 'marker_gene_stats.tsv'), src, dest)
-        self._copy_file_ignore_errors(os.path.join('storage', 'tree', 'concatenated.tre'), src, dest)
 
 
     def build_html_output_for_lineage_wf(self, html_dir, object_name):
