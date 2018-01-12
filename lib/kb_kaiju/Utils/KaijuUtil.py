@@ -124,16 +124,26 @@ class KaijuUtil:
 
 
         # 4) create HTML Summary Reports in batch
-        kaijuReportHTML_options = {'input_reads':               expanded_input,
-                                   'in_folder':                 kaijuReport_output_folder,
-                                   'out_folder':                html_dir,
-                                   'tax_levels':                params['tax_levels']
-        }
+        #kaijuReportHTML_options = {'input_reads':               expanded_input,
+        #                           'in_folder':                 kaijuReport_output_folder,
+        #                           'out_folder':                html_dir,
+        #                           'tax_levels':                params['tax_levels']
+        #}
         #self.run_kaijuReportHTML_batch (kaijuReportHTML_options)
 
 
         # 5) create Krona plots
-        #self.build_checkM_lineage_wf_plots(input_dir, output_dir, plots_dir, all_seq_fasta_file, tetra_file)
+        krona_output_folder = os.path.join(output_dir, 'krona_data')
+        if not os.path.exists(krona_output_folder):
+            os.makedirs(krona_output_folder)
+        krona_options = {'input_reads':               expanded_input,
+                         'in_folder':                 kaiju_output_folder,
+                         'out_folder':                krona_output_folder,
+                         'html_folder':               html_dir,
+                         'db_type':                   params['db_type']
+                     }
+        self.run_krona_batch (krona_options)
+
 
 
         # 6) Package results
@@ -216,10 +226,39 @@ class KaijuUtil:
                 self.run_proc (command, log_output_file)
 
 
+    def run_krona_batch(self, options, dropOutput=False):
+        input_reads = options['input_reads']
+        for input_reads_item in input_reads:
+
+            # kaiju2krona
+            single_kaiju2krona_run_options = options
+            single_kaiju2krona_run_options['input_item'] = input_reads_item
+
+            log_output_file = None
+            if dropOutput:  # if output is too chatty for STDOUT
+                log_output_file = os.path.join(self.scratch, input_reads_item['name'] + '.kaiju2krona' + '.stdout')
+            
+            command = self._build_kaiju2krona_command(single_kaiju2krona_run_options)
+            self.run_proc (command, log_output_file)
+
+            # kronaImport
+            single_kronaImport_run_options = options
+            single_kronaImport_run_options['input_item'] = input_reads_item
+
+            log_output_file = None
+            if dropOutput:  # if output is too chatty for STDOUT
+                log_output_file = os.path.join(self.scratch, input_reads_item['name'] + '.kronaImport' + '.stdout')
+            
+            command = self._build_kronaImport_command(single_kronaImport_run_options)
+            self.run_proc (command, log_output_file)
+
+
     def _validate_kaiju_options(self, options):
         # 1st order required
         func_name = 'kaiju'
-        required_opts = [ 'db_type',
+        required_opts = [ 'input_item',
+                          'out_folder',
+                          'db_type',
                           'min_match_length',
                           'greedy_run_mode'
                       ]
@@ -290,18 +329,15 @@ class KaijuUtil:
         
 
     def _build_kaiju_command(self, options, verbose=True):
-
-        KAIJU_BIN_DIR  = os.path.join(os.path.sep, 'kb', 'module', 'kaiju', 'bin')
+        KAIJU_BIN_DIR  = os.path.join(os.path.sep, 'kb', 'module', 'bin', 'kaiju', 'bin')
         KAIJU_BIN      = os.path.join(KAIJU_BIN_DIR, 'kaiju')
         KAIJU_DB_DIR   = os.path.join(os.path.sep, 'data', 'kaijudb', options['db_type'])
 
         options['verbose'] = verbose
         if self.threads and self.threads > 1:
             options['threads'] = self.threads
-
         options['KAIJU_DB_NODES'] = os.path.join(KAIJU_DB_DIR, 'nodes.dmp')
-        #options['KAIJU_NAMES'] = os.path.join(KAIJU_DB_DIR, 'names.dmp')  # don't need for kaiju cmd
-
+        #options['KAIJU_DB_NAMES'] = os.path.join(KAIJU_DB_DIR, 'names.dmp')  # don't need for kaiju cmd
         if options['db_type'] == 'kaiju_index':
             options['KAIJU_DB_PATH'] = os.path.join(KAIJU_DB_DIR, 'kaiju_db.fmi')
         elif options['db_type'] == 'kaiju_index_pg':
@@ -314,42 +350,34 @@ class KaijuUtil:
             raise ValueError ('bad db_type: '+options['db_type']+' (must be one of "kaiju_index", "kaiju_index_pg", "kaiju_index_nr", "kaiju_index_nr_euk")')
 
         self._validate_kaiju_options(options)
-
         command = [KAIJU_BIN]
         self._process_kaiju_options(command, options)
-
         return command
-
 
 
     def _validate_kaijuReport_options(self, options):
         # 1st order required
         func_name = 'kaijuReport'
-        required_opts = [ 'db_type',
-
+        required_opts = [ 'in_folder',
+                          'input_item',
+                          'out_folder',
+                          'db_type',
+                          'tax_level'
                       ]
         for opt in required_opts:
             if opt not in options or options[opt] == None or options[opt] == '':
                 raise ValueError ("Must define required opt: '"+opt+"' for func: '"+str(func_name)+"()'")
 
-        # 2nd order required
-        if 'greedy_run_mode' in options and int(options['greedy_run_mode']) == 1:
-            opt = 'greedy_allowed_mismatches'
-            if opt not in options or int(options[opt]) < 1:
-                raise ValueError ("Must define required opt: '"+opt+"' for func: '"+str(func_name)+"()' if running in greedy_run_mode")
-
         # input file validation
-        if not os.path.getsize(options['input_item']['fwd_file']) > 0:
-            raise ValueError ('missing or empty fwd reads file: '+options['input_item']['fwd_file'])
-        if options['input_item']['type'] == self.PE_flag:
-            if not os.path.getsize(options['input_item']['rev_file']) > 0:
-                raise ValueError ('missing or empty rev reads file: '+options['input_item']['rev_file'])
+        in_file = os.path.join(options['in_folder'], options['input_item']['name']+'.kaiju')
+        if not os.path.getsize(in_file) > 0:
+            raise ValueError ('missing or empty kaiju classification file: '+in_file)
 
         # db validation
-        DB = 'KAIJU_DB_PATH'
+        DB = 'KAIJU_DB_NODES'
         if not os.path.getsize(options[DB]) > 0:
             raise ValueError ('missing or empty '+DB+' file: '+options[DB])
-        DB = 'KAIJU_DB_NODES'
+        DB = 'KAIJU_DB_NAMES'
         if not os.path.getsize(options[DB]) > 0:
             raise ValueError ('missing or empty '+DB+' file: '+options[DB])
 
@@ -358,71 +386,143 @@ class KaijuUtil:
         if options.get('KAIJU_DB_NODES'):
             command_list.append('-t')
             command_list.append(str(options.get('KAIJU_DB_NODES')))
-        if options.get('KAIJU_DB_PATH'):
-            command_list.append('-f')
-            command_list.append(str(options.get('KAIJU_DB_PATH')))
-        if options['input_item'].get('fwd_file'):
+        if options.get('KAIJU_DB_NAMES'):
+            command_list.append('-n')
+            command_list.append(str(options.get('KAIJU_DB_NAMES')))
+        if options.get('in_folder'):
+            in_file = options['input_item']['name']+'.kaiju'
+            in_path = os.path.join(options['in_folder'], in_file)
             command_list.append('-i')
-            command_list.append(str(options['input_item'].get('fwd_file')))
-        if options['input_item'].get('type') == self.PE_flag:
-            command_list.append('-j')
-            command_list.append(str(options['input_item'].get('rev_file')))
+            command_list.append(in_path)
+        if options.get('tax_level'):
+            command_list.append('-r')
+            command_list.append(str(options.get('tax_level')))
         if options.get('out_folder'):
-            out_file = options['input_item']['name']+'.kaiju'
+            out_file = options['input_item']['name']+'-'+str(options.get('tax_level'))+'.kaijuReport'
             out_path = os.path.join (str(options.get('out_folder')), out_file)
             command_list.append('-o')
             command_list.append(out_path)
-        if int(options.get('seg_filter')) == 1:
-            command_list.append('-x')
-        if options.get('min_match_length'):
+        if options.get('filter_percent'):
             command_list.append('-m')
-            command_list.append(str(options.get('min_match_length')))
-        if int(options.get('greedy_run_mode')) == 1:
-            command_list.append('-a')
-            command_list.append('greedy')
-            if options.get('greedy_allowed_mismatches'):
-                command_list.append('-e')
-                command_list.append(str(options.get('greedy_allowed_mismatches')))
-            if options.get('greedy_min_match_score'):
-                command_list.append('-s')
-                command_list.append(str(options.get('greedy_min_match_score')))
-
-        if options.get('threads'):
-            command_list.append('-z')
-            command_list.append(str(options.get('threads')))
-        if options.get('verbose'):
-            command_list.append('-v')
+            command_list.append(str(options.get('filter_percent')))
+        if int(options.get('filter_unclassified')) == 1:
+            command_list.append('-u')
+        if int(options.get('full_tax_path')) == 1:
+            command_list.append('-p')
         
 
-    def _build_kaijuReport_command(self, options, verbose=True):
-
-        KAIJU_BIN_DIR  = os.path.join(os.path.sep, 'kb', 'module', 'kaiju', 'bin')
-        KAIJU_BIN      = os.path.join(KAIJU_BIN_DIR, 'kaiju')
-        KAIJU_DB_DIR   = os.path.join(os.path.sep, 'data', 'kaijudb', options['db_type'])
-
-        options['verbose'] = verbose
-        if self.threads and self.threads > 1:
-            options['threads'] = self.threads
+    def _build_kaijuReport_command(self, options):
+        KAIJU_BIN_DIR    = os.path.join(os.path.sep, 'kb', 'module', 'bin', 'kaiju', 'bin')
+        KAIJU_REPORT_BIN = os.path.join(KAIJU_BIN_DIR, 'kaijuReport')
+        KAIJU_DB_DIR     = os.path.join(os.path.sep, 'data', 'kaijudb', options['db_type'])
 
         options['KAIJU_DB_NODES'] = os.path.join(KAIJU_DB_DIR, 'nodes.dmp')
-        #options['KAIJU_NAMES'] = os.path.join(KAIJU_DB_DIR, 'names.dmp')  # don't need for kaiju cmd
+        options['KAIJU_DB_NAMES'] = os.path.join(KAIJU_DB_DIR, 'names.dmp')
 
-        if options['db_type'] == 'kaiju_index':
-            options['KAIJU_DB_PATH'] = os.path.join(KAIJU_DB_DIR, 'kaiju_db.fmi')
-        elif options['db_type'] == 'kaiju_index_pg':
-            options['KAIJU_DB_PATH'] = os.path.join(KAIJU_DB_DIR, 'kaiju_db.fmi')
-        elif options['db_type'] == 'kaiju_index_nr':
-            options['KAIJU_DB_PATH'] = os.path.join(KAIJU_DB_DIR, 'kaiju_db_nr.fmi')
-        elif options['db_type'] == 'kaiju_index_nr_euk':
-            options['KAIJU_DB_PATH'] = os.path.join(KAIJU_DB_DIR, 'kaiju_db_nr_euk.fmi')
-        else:
-            raise ValueError ('bad db_type: '+options['db_type']+' (must be one of "kaiju_index", "kaiju_index_pg", "kaiju_index_nr", "kaiju_index_nr_euk")')
+        self._validate_kaijuReport_options(options)
+        command = [KAIJU_REPORT_BIN]
+        self._process_kaijuReport_options(command, options)
+        return command
 
-        self._validate_kaiju_options(options)
 
-        command = [KAIJU_BIN]
-        self._process_kaiju_options(command, options)
+    def _validate_kaiju2krona_options(self, options):
+        # 1st order required
+        func_name = 'kaiju2krona'
+        required_opts = [ 'in_folder',
+                          'input_item',
+                          'out_folder',
+                          'db_type'
+                      ]
+        for opt in required_opts:
+            if opt not in options or options[opt] == None or options[opt] == '':
+                raise ValueError ("Must define required opt: '"+opt+"' for func: '"+str(func_name)+"()'")
 
+        # input file validation
+        in_file = os.path.join(options['in_folder'], options['input_item']['name']+'.kaiju')
+        if not os.path.getsize(in_file) > 0:
+            raise ValueError ('missing or empty kaiju classification file: '+in_file)
+
+        # db validation
+        DB = 'KAIJU_DB_NODES'
+        if not os.path.getsize(options[DB]) > 0:
+            raise ValueError ('missing or empty '+DB+' file: '+options[DB])
+        DB = 'KAIJU_DB_NAMES'
+        if not os.path.getsize(options[DB]) > 0:
+            raise ValueError ('missing or empty '+DB+' file: '+options[DB])
+
+
+    def _process_kaiju2krona_options(self, command_list, options):
+        if options.get('KAIJU_DB_NODES'):
+            command_list.append('-t')
+            command_list.append(str(options.get('KAIJU_DB_NODES')))
+        if options.get('KAIJU_DB_NAMES'):
+            command_list.append('-n')
+            command_list.append(str(options.get('KAIJU_DB_NAMES')))
+        if options.get('in_folder'):
+            in_file = options['input_item']['name']+'.kaiju'
+            in_path = os.path.join(options['in_folder'], in_file)
+            command_list.append('-i')
+            command_list.append(in_path)
+        if options.get('out_folder'):
+            out_file = options['input_item']['name']+'.krona'
+            out_path = os.path.join (str(options.get('out_folder')), out_file)
+            command_list.append('-o')
+            command_list.append(out_path)
+        
+
+    def _build_kaiju2krona_command(self, options):
+        KAIJU_BIN_DIR     = os.path.join(os.path.sep, 'kb', 'module', 'bin', 'kaiju', 'bin')
+        KAIJU_2_KRONA_BIN = os.path.join(KAIJU_BIN_DIR, 'kaiju2krona')
+        KAIJU_DB_DIR      = os.path.join(os.path.sep, 'data', 'kaijudb', options['db_type'])
+
+        options['KAIJU_DB_NODES'] = os.path.join(KAIJU_DB_DIR, 'nodes.dmp')
+        options['KAIJU_DB_NAMES'] = os.path.join(KAIJU_DB_DIR, 'names.dmp')
+
+        self._validate_kaiju2krona_options(options)
+        command = [KAIJU_2_KRONA_BIN]
+        self._process_kaiju2krona_options(command, options)
+        return command
+
+
+    def _validate_kronaImport_options(self, options):
+        # 1st order required
+        func_name = 'kronaImport'
+        required_opts = [ 'html_folder',
+                          'input_item',
+                          'out_folder',
+                          'db_type'
+                      ]
+        for opt in required_opts:
+            if opt not in options or options[opt] == None or options[opt] == '':
+                raise ValueError ("Must define required opt: '"+opt+"' for func: '"+str(func_name)+"()'")
+
+        # input file validation
+        in_file = os.path.join(options['out_folder'], options['input_item']['name']+'.krona')
+        if not os.path.getsize(in_file) > 0:
+            raise ValueError ('missing or empty krona input file: '+in_file)
+
+
+    def _process_kronaImport_options(self, command_list, options):
+        if options.get('html_folder'):
+            html_file = options['input_item']['name']+'.krona.html'
+            html_path = os.path.join (str(options.get('html_folder')), html_file)
+            command_list.append('-o')
+            command_list.append(html_path)
+        if options.get('out_folder'):
+            in_file = options['input_item']['name']+'.krona'
+            in_path = os.path.join(options['out_folder'], in_file)
+            command_list.append(in_path)
+        
+
+    def _build_kronaImport_command(self, options):
+        #KRONA_BIN_DIR    = os.path.join(os.path.sep, 'kb', 'module', 'bin', 'Krona', 'bin', 'bin')
+        #KRONA_IMPORT_BIN = os.path.join(KRONA_BIN_DIR, 'ktImportText')
+        KRONA_BIN_DIR    = os.path.join(os.path.sep, 'kb', 'module', 'Krona', 'KronaTools', 'scripts')
+        KRONA_IMPORT_BIN = os.path.join(KRONA_BIN_DIR, 'ImportText.pl')
+
+        self._validate_kronaImport_options(options)
+        command = [KRONA_IMPORT_BIN]
+        self._process_kronaImport_options(command, options)
         return command
 
 
