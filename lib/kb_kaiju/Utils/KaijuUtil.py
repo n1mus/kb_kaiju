@@ -341,7 +341,7 @@ class KaijuUtil:
         
 
     def _build_kaiju_command(self, options, verbose=True):
-        KAIJU_BIN_DIR  = os.path.join(os.path.sep, 'kb', 'module', 'bin', 'kaiju', 'bin')
+        KAIJU_BIN_DIR  = os.path.join(os.path.sep, 'kb', 'module', 'kaiju', 'bin')
         KAIJU_BIN      = os.path.join(KAIJU_BIN_DIR, 'kaiju')
         KAIJU_DB_DIR   = os.path.join(os.path.sep, 'data', 'kaijudb', options['db_type'])
 
@@ -424,7 +424,7 @@ class KaijuUtil:
         
 
     def _build_kaijuReport_command(self, options):
-        KAIJU_BIN_DIR    = os.path.join(os.path.sep, 'kb', 'module', 'bin', 'kaiju', 'bin')
+        KAIJU_BIN_DIR    = os.path.join(os.path.sep, 'kb', 'module', 'kaiju', 'bin')
         KAIJU_REPORT_BIN = os.path.join(KAIJU_BIN_DIR, 'kaijuReport')
         KAIJU_DB_DIR     = os.path.join(os.path.sep, 'data', 'kaijudb', options['db_type'])
 
@@ -483,7 +483,7 @@ class KaijuUtil:
         
 
     def _build_kaiju2krona_command(self, options):
-        KAIJU_BIN_DIR     = os.path.join(os.path.sep, 'kb', 'module', 'bin', 'kaiju', 'bin')
+        KAIJU_BIN_DIR     = os.path.join(os.path.sep, 'kb', 'module', 'kaiju', 'bin')
         KAIJU_2_KRONA_BIN = os.path.join(KAIJU_BIN_DIR, 'kaiju2krona')
         KAIJU_DB_DIR      = os.path.join(os.path.sep, 'data', 'kaijudb', options['db_type'])
 
@@ -527,10 +527,10 @@ class KaijuUtil:
         
 
     def _build_kronaImport_command(self, options):
-        #KRONA_BIN_DIR    = os.path.join(os.path.sep, 'kb', 'module', 'bin', 'Krona', 'bin', 'bin')
-        #KRONA_IMPORT_BIN = os.path.join(KRONA_BIN_DIR, 'ktImportText')
-        KRONA_BIN_DIR    = os.path.join(os.path.sep, 'kb', 'module', 'Krona', 'KronaTools', 'scripts')
-        KRONA_IMPORT_BIN = os.path.join(KRONA_BIN_DIR, 'ImportText.pl')
+        KRONA_BIN_DIR    = os.path.join(os.path.sep, 'usr', 'local', 'bin')
+        KRONA_IMPORT_BIN = os.path.join(KRONA_BIN_DIR, 'ktImportText')
+        #KRONA_BIN_DIR    = os.path.join(os.path.sep, 'kb', 'module', 'Krona', 'KronaTools', 'scripts')
+        #KRONA_IMPORT_BIN = os.path.join(KRONA_BIN_DIR, 'ImportText.pl')
 
         self._validate_kronaImport_options(options)
         command = [KRONA_IMPORT_BIN]
