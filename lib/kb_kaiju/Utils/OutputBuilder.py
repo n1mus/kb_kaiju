@@ -38,7 +38,7 @@ class OutputBuilder(object):
                                     'pack': 'zip'})
         return {'shock_id': output['shock_id'],
                 'name': zip_file_name,
-                'description': zip_file_description}
+                'label': zip_file_description}
 
 
     def build_html_output_for_lineage_wf(self, html_dir, object_name):
