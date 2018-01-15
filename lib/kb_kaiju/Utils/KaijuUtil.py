@@ -166,7 +166,7 @@ class KaijuUtil:
 
         # 7) build the HTML report
         #outputBuilder.build_html_output_for_kaiju_with_krona_wf(html_dir, expanded_input)
-        html_zipped = outputBuilder.package_folder(html_dir, 'report.html', 'Kaiju abundance and Krona plots')
+        html_zipped = outputBuilder.package_folder(html_dir, 'report.html.zip', 'Kaiju abundance and Krona plots')
 
 
         # 8) save report
