@@ -399,7 +399,7 @@ class OutputBuilder(object):
         # save
         img_dpi = 200
         #plt.show()
-        self.log(console, "SAVING STACKED BAR PLOT")
+        log("SAVING STACKED BAR PLOT")
         png_file = tax_level+'-stacked_bar_plot'+'.png'
         pdf_file = tax_level+'-stacked_bar_plot'+'.pdf'
         output_png_file_path = os.path.join(out_folder, png_file);
