@@ -167,19 +167,45 @@ class OutputBuilder(object):
                 'name': zip_file_name,
                 'label': zip_file_description}
 
-
-    def make_kaiju_summary_plots(self, in_folder_path, bar_plot_out_folder_path, area_plot_out_folder_path):
-        ''' Simple utility for packaging a folder and saving to shock '''
-        if not os.path.exists(in_folder_path):
-            raise ValueError ("kaiju summary folder doesn't exist: "+in_folder_path)
-
-        # read each sample file for each tax level and store abundances
-        abundances = dict()
-
-        self._create_bar_plots (abundances)
-        self._create_area_plots (abundances)
         
+    def generate_kaijuReport_PerSamplePlots(self, options):
+        pass
 
+    def generate_kaijuReport_StackedBarPlots(self, options):
+        tax_level = options['tax_level']
+        abundance_matrix = []
+        abundance_by_sample = []
+        lineage_seen = dict()
+        lineage_order = []
+        sample_order = []
+        
+        # parse summary
+        for input_reads_item in options['input_reads']:
+            sample_order.append(input_reads_item['name'])
+
+            this_summary_file = os.path.join (options['in_folder'], input_reads_item['name']+'-'+tax_level+'.kaijuReport')
+            (this_abundance, this_lineage_order) = self._parse_kaiju_summary_file (this_summary_file)
+            for lineage_name in this_lineage_order:
+                if lineage_name not in lineage_seen:
+                    lineage_seen[lineage_name] = True
+                    lineage_order.append(lineage_name)
+            abundance_by_sample.append(this_abundance)
+
+        for lineage_i,lineage_name in enumerate(lineage_order):
+            abundance_matrix.append([])
+            for sample_i,sample_name in enumerate(sample_order):
+                if lineage_name in abundance_by_sample[sample_i]:
+                    abundance_matrix[lineage_i].append(abundance_by_sample[sample_i][lineage_name])
+                else:
+                    abundance_matrix.append(0.0)
+
+        # make plots
+        return self._create_bar_plots(options['stacked_bar_plots_out_folder'], abundance_matrix, tax_level+' Lineage Proportions', sample_order, lineage_order)
+
+
+    def generate_kaijuReport_StackedAreaPlots(self, options):
+        pass
+        
 
     def build_html_output_for_lineage_wf(self, html_dir, object_name):
         '''
@@ -272,7 +298,7 @@ class OutputBuilder(object):
         html.write('</table>\n')
 
 
-    def _create_bar_plots (self, abundances):
+    def _create_bar_plots (self, vals, title, sample_labels, element_labels):
         color_names = self.no_light_color_names
 
         import numpy as np
@@ -281,21 +307,12 @@ class OutputBuilder(object):
         from random import shuffle
 
         y_label = 'percent'
-        title = 'Lineage Proportion'
-        sample_labels = ['sample1', 'sample2', 'sample3', 'sample4', 'sample5']
-        element_labels = ['OTU_1', 'OTU_2', 'OTU_3', 'OTU_4']
 
         N = len(sample_labels)
         random.seed(a=len(element_labels))
         r = random.random()
         shuffle(color_names, lambda: r)
 
-
-        vals = [[20, 35, 20, 35, 27],
-                [25, 22, 34, 20, 15],
-                [45, 33, 36, 35, 48],
-                [10, 10, 10, 10, 10]
-            ]
         ind = np.arange(N)    # the x locations for the groups
         bar_width = 0.5      # the width of the bars: can also be len(x) sequence
         label_ind = []
