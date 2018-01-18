@@ -25,6 +25,133 @@ class OutputBuilder(object):
         self.scratch = scratch_dir
         self.callback_url = callback_url
 
+        # leave out light colors
+        self.no_light_color_names = [
+            #'aliceblue',
+            'aqua',
+            'aquamarine',
+            #'azure',
+            #'beige',
+            #'bisque',
+            #'blanchedalmond',
+            'blue',
+            'blueviolet',
+            'brown',
+            'burlywood',
+            'cadetblue',
+            'chartreuse',
+            'chocolate',
+            'coral',
+            'cornflowerblue',
+            #'cornsilk',
+            'crimson',
+            'cyan',
+            'darkblue',
+            'darkcyan',
+            'darkgoldenrod',
+            'darkgreen',
+            'darkkhaki',
+            'darkmagenta',
+            'darkolivegreen',
+            'darkorange',
+            'darkorchid',
+            'darkred',
+            'darksalmon',
+            'darkseagreen',
+            'darkslateblue',
+            #'darkslategray',
+            'darkturquoise',
+            'darkviolet',
+            'deeppink',
+            'deepskyblue',
+            'dodgerblue',
+            'firebrick',
+            'forestgreen',
+            'fuchsia',
+            #'gainsboro',
+            'gold',
+            'goldenrod',
+            'green',
+            'greenyellow',
+            #'honeydew',
+            'hotpink',
+            'indianred',
+            'indigo',
+            'khaki',
+            #'lavender',
+            #'lavenderblush',
+            'lawngreen',
+            #'lemonchiffon',
+            'lightblue',
+            #'lightcoral',
+            #'lightcyan'
+            #'lightgoldenrodyellow',
+            'lightgreen',
+            'lightpink',
+            'lightsalmon',
+            'lightseagreen',
+            'lightskyblue',
+            #'lightslategray',
+            #'lightsteelblue',
+            #'lightyellow',
+            'lime',
+            'limegreen',
+            'magenta',
+            'maroon',
+            'mediumaquamarine',
+            'mediumblue',
+            'mediumorchid',
+            'mediumpurple',
+            'mediumseagreen',
+            'mediumslateblue',
+            'mediumspringgreen',
+            'mediumturquoise',
+            'mediumvioletred',
+            'midnightblue',
+            #'mintcream',
+            #'mistyrose',
+            #'moccasin',
+            'navy',
+            #'oldlace',
+            'olive',
+            'olivedrab',
+            'orange',
+            'orangered',
+            'orchid',
+            #'palegoldenrod',
+            'palegreen',
+            'paleturquoise',
+            'palevioletred',
+            #'papayawhip',
+            'peachpuff',
+            #'peru',
+            'pink',
+            'plum',
+            'powderblue',
+            'purple',
+            'red',
+            'rosybrown',
+            'royalblue',
+            'saddlebrown',
+            'salmon',
+            'sandybrown',
+            'seagreen',
+            #'seashell',
+            'sienna',
+            'skyblue',
+            'slateblue',
+            'springgreen',
+            'steelblue',
+            #'tan',
+            'teal',
+            #'thistle',
+            'tomato',
+            'turquoise',
+            'violet',
+            #'wheat',
+            #'yellow',
+            #'yellowgreen'
+        ]
 
     def package_folder(self, folder_path, zip_file_name, zip_file_description):
         ''' Simple utility for packaging a folder and saving to shock '''
@@ -39,6 +166,19 @@ class OutputBuilder(object):
         return {'shock_id': output['shock_id'],
                 'name': zip_file_name,
                 'label': zip_file_description}
+
+
+    def make_kaiju_summary_plots(self, in_folder_path, bar_plot_out_folder_path, area_plot_out_folder_path):
+        ''' Simple utility for packaging a folder and saving to shock '''
+        if not os.path.exists(in_folder_path):
+            raise ValueError ("kaiju summary folder doesn't exist: "+in_folder_path)
+
+        # read each sample file for each tax level and store abundances
+        abundances = dict()
+
+        self._create_bar_plots (abundances)
+        self._create_area_plots (abundances)
+        
 
 
     def build_html_output_for_lineage_wf(self, html_dir, object_name):
@@ -130,6 +270,164 @@ class OutputBuilder(object):
             html.write('  </tr>\n')
 
         html.write('</table>\n')
+
+
+    def _create_bar_plots (self, abundances):
+        color_names = self.no_light_color_names
+
+        import numpy as np
+        import matplotlib.pyplot as plt
+        import random
+        from random import shuffle
+
+        y_label = 'percent'
+        title = 'Lineage Proportion'
+        sample_labels = ['sample1', 'sample2', 'sample3', 'sample4', 'sample5']
+        element_labels = ['OTU_1', 'OTU_2', 'OTU_3', 'OTU_4']
+
+        N = len(sample_labels)
+        random.seed(a=len(element_labels))
+        r = random.random()
+        shuffle(color_names, lambda: r)
+
+
+        vals = [[20, 35, 20, 35, 27],
+                [25, 22, 34, 20, 15],
+                [45, 33, 36, 35, 48],
+                [10, 10, 10, 10, 10]
+            ]
+        ind = np.arange(N)    # the x locations for the groups
+        bar_width = 0.5      # the width of the bars: can also be len(x) sequence
+        label_ind = []
+        for ind_i,this_ind in enumerate(ind):
+            ind[ind_i] = this_ind+bar_width/2
+            label_ind.append(this_ind + bar_width/2)
+        np_vals = []
+        for vec_i,val_vec in enumerate(vals):
+            np_vals.append(np.array(val_vec))
+    
+        # Build image
+        if N < 10:
+            img_in_width = 2*N
+        elif N < 20:
+            img_in_width = N
+        else:
+            img_in_width = 20
+        img_in_height = 5
+        fig = plt.figure()
+        fig.set_size_inches(img_in_width, img_in_height)
+        ax = plt.subplot(111)
+
+        #for ax in fig.axes:
+        #    ax.xaxis.set_visible(False)  # remove axis labels and ticks
+        #    ax.yaxis.set_visible(False)
+        #    for t in ax.get_xticklabels()+ax.get_yticklabels():  # remove tick labels
+        #        t.set_visible(False)
+        #for ax in fig.axes:
+        #    ax.spines['top'].set_visible(False) # Get rid of top axis line
+        #    ax.spines['bottom'].set_visible(False) #  bottom axis line
+        #    ax.spines['left'].set_visible(False) #  Get rid of bottom axis line
+        #    ax.spines['right'].set_visible(False) #  Get rid of bottom axis line
+    
+        last_bottom = None
+        p = []
+        for vec_i,val_vec in enumerate(np_vals):
+            if vec_i == 0:
+                this_bottom = 0
+                last_bottom = val_vec
+            else:
+                this_bottom = last_bottom
+                last_bottom = this_bottom + val_vec
+            p.append (ax.bar (ind, val_vec, bar_width, bottom=this_bottom, color=color_names[vec_i], alpha=0.4, ec='none'))
+
+        plt.ylabel(y_label)
+        plt.title(title)
+        plt.xticks(label_ind, sample_labels, ha='right', rotation=45)
+        plt.yticks(np.arange(0, 101, 10))
+
+        # Shrink current axis by 20%
+        box = ax.get_position()
+        ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])    
+        key_colors = []
+        for each_p in reversed(p):
+            key_colors.append(each_p[0])
+        plt.legend(key_colors, reversed(element_labels), loc='upper left', bbox_to_anchor=(1, 1))
+
+        plt.show()
+
+
+    def _create_area_plots (self, abundances):
+        color_names = self.no_light_color_names
+        
+        import numpy as np
+        import matplotlib.pyplot as plt
+        import matplotlib.patches as mpatches
+        import random
+        from random import shuffle
+        
+        y_label = 'percent'
+        title = 'Lineage Proportion'
+        sample_labels = ['sample1', 'sample2', 'sample3', 'sample4', 'sample5']
+        element_labels = ['OTU_1', 'OTU_2', 'OTU_3', 'OTU_4']
+
+        N = len(sample_labels)
+        random.seed(a=len(element_labels))
+
+        r = random.random()
+        shuffle(color_names, lambda: r)
+
+        vals = [[20, 35, 20, 35, 27],
+                [25, 22, 34, 20, 15],
+                [45, 33, 36, 35, 48],
+                [10, 10, 10, 10, 10]
+            ]
+        ind = np.arange(N)    # the x locations for the groups
+        label_ind = ind
+
+        np_vals = []
+        for vec_i,val_vec in enumerate(vals):
+            np_vals.append(np.array(val_vec))
+    
+        # Build image
+        if N < 10:
+            img_in_width = 2*N
+        elif N < 20:
+            img_in_width = N
+        else:
+            img_in_width = 20
+        img_in_height = 5
+        fig = plt.figure()
+        fig.set_size_inches(img_in_width, img_in_height)
+        ax = plt.subplot(111)
+
+        # Let's turn off visibility of all tic labels and boxes here
+        #for ax in fig.axes:
+        #    ax.xaxis.set_visible(False)  # remove axis labels and tics
+        #    ax.yaxis.set_visible(False)
+        #    for t in ax.get_xticklabels()+ax.get_yticklabels():  # remove tics
+        #        t.set_visible(False)
+        #    ax.spines['top'].set_visible(False)     # Get rid of top axis line
+        #    ax.spines['bottom'].set_visible(False)  # bottom axis line
+        #    ax.spines['left'].set_visible(False)    # left axis line
+        #    ax.spines['right'].set_visible(False)   # right axis line
+
+        ax.stackplot (ind, np_vals, colors=color_names, alpha=0.4, edgecolor='none')
+
+        plt.ylabel(y_label)
+        plt.title(title)
+        plt.xticks(label_ind, sample_labels, ha='right', rotation=45)
+        plt.yticks(np.arange(0, 101, 10))
+
+        # creating the legend manually
+        key_colors = []
+        for color_i in reversed(np.arange(N-1)):
+            key_colors.append(mpatches.Patch(color=color_names[color_i], alpha=0.4, ec='black'))
+        box = ax.get_position()
+        ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])   
+        plt.legend(key_colors, reversed(element_labels), loc='upper left', bbox_to_anchor=(1, 1))
+
+        #plt.grid()
+        plt.show()
 
 
     def _write_html_header(self, html, object_name):
