@@ -6,7 +6,7 @@ MAINTAINER KBase Developer
 # install line here, a git checkout to download code, or run any other
 # installation scripts.
 
-RUN apt-get update
+#RUN apt-get update
 
 # Here we install a python coverage tool and an
 # https library that is out of date in the base image.
@@ -26,8 +26,9 @@ RUN pip install cffi --upgrade \
 
 
 # Install xvfb for matplotlib pdfs
+#    apt-get -y install xvfb
 RUN apt-get update && \
-    apt-get -y install xvfb
+    apt-get -y install xvfb python-qt4
 
 
 # For kaiju bin

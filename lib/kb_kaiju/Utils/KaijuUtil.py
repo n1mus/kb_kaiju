@@ -72,12 +72,10 @@ class KaijuUtil:
         suffix = staged_input['folder_suffix']
         expanded_input = staged_input['expanded_input']
 
-        #print ("INPUT_DIR: "+input_dir)
-        #print ("SUFFIX: "+suffix)
-        #print ("EXPANDED_INPUT: ")
-        #print (expanded_input)
-            
+        log('Staged input directory: ' + input_dir)
 
+
+        # 2) establish output folders
         output_dir = os.path.join(self.scratch, 'output_' + suffix)
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
@@ -86,13 +84,59 @@ class KaijuUtil:
         if not os.path.exists(html_dir):
             os.makedirs(html_dir)
 
-        log('Staged input directory: ' + input_dir)
-
-
-        # 2) run Kaiju in batch
         kaiju_output_folder = os.path.join(output_dir, 'kaiju_output')
         if not os.path.exists(kaiju_output_folder):
             os.makedirs(kaiju_output_folder)
+
+        kaijuReport_output_folder = os.path.join(output_dir, 'kaiju_report')
+        if not os.path.exists(kaijuReport_output_folder):
+            os.makedirs(kaijuReport_output_folder)
+
+        kaijuReport_PerSamplePlots_output_folder = os.path.join(output_dir, 'kaiju_report_per_sample_plots')
+        kaijuReport_StackedBarPlots_output_folder = os.path.join(output_dir, 'kaiju_report_stacked_bar_plots')
+        kaijuReport_StackedAreaPlots_output_folder = os.path.join(output_dir, 'kaiju_report_stacked_area_plots')
+        if not os.path.exists(kaijuReport_PerSamplePlots_output_folder):
+            os.makedirs(kaijuReport_PerSamplePlots_output_folder)
+        if not os.path.exists(kaijuReport_StackedBarPlots_output_folder):
+            os.makedirs(kaijuReport_StackedBarPlots_output_folder)
+        if not os.path.exists(kaijuReport_StackedAreaPlots_output_folder):
+            os.makedirs(kaijuReport_StackedAreaPlots_output_folder)
+
+        krona_output_folder = os.path.join(output_dir, 'krona_data')
+        if not os.path.exists(krona_output_folder):
+            os.makedirs(krona_output_folder)
+
+
+        # 3) instantiate OutputBuilder
+        output_dirs = [ { 'name': 'kaiju_classifications',
+                          'desc': 'Kaiju Classification',
+                          'path': kaiju_output_folder
+                        },
+                        { 'name': 'kaiju_summaries',
+                          'desc': 'Kaiju Summaries',
+                          'path': kaijuReport_output_folder
+                        },
+                        { 'name': 'krona_data',
+                          'desc': 'Krona Data',
+                          'path': krona_output_folder
+                        },
+                        #{ 'name': 'per_sample_ranked_abundance_plots',
+                        #  'desc': 'Per Sample Ranked Abundance Plots',
+                        #  'path': kaijuReport_PerSamplePlots_output_folder
+                        #}, 
+                        { 'name': 'stacked_bar_abundance_plots',
+                          'desc': 'Stacked Bar Abundance Plots',
+                          'path': kaijuReport_StackedBarPlots_output_folder
+                        }
+                        #{ 'name': 'stacked_area_abundance_plots',
+                        #  'desc': 'Stacked Area Abundance Plots',
+                        #  'path': kaijuReport_StackedAreaPlots_output_folder
+                        #}
+                      ]
+        self.outputBuilder_client = OutputBuilder(output_dirs, self.scratch, self.callback_url)
+
+
+        # 4) run Kaiju in batch
         kaiju_options = {'input_reads':               expanded_input,
                          'out_folder':                kaiju_output_folder,
                          'tax_levels':                params['tax_levels'],
@@ -107,10 +151,7 @@ class KaijuUtil:
         self.run_kaiju_batch (kaiju_options)
 
 
-        # 3) create Summary Reports in batch
-        kaijuReport_output_folder = os.path.join(output_dir, 'kaiju_report')
-        if not os.path.exists(kaijuReport_output_folder):
-            os.makedirs(kaijuReport_output_folder)
+        # 5) create Summary Reports in batch
         kaijuReport_options = {'input_reads':               expanded_input,
                                'in_folder':                 kaiju_output_folder,
                                'out_folder':                kaijuReport_output_folder,
@@ -123,19 +164,30 @@ class KaijuUtil:
         self.run_kaijuReport_batch (kaijuReport_options)
 
 
-        # 4) create HTML Summary Reports in batch
+        # 6) create Summary Report plots in batch
+        kaijuReportPlots_options = {'input_reads':               expanded_input,
+                                    'in_folder':                 kaijuReport_output_folder,
+                                    'per_sample_plots_out_folder': kaijuReport_PerSamplePlots_output_folder,
+                                    'stacked_bar_plots_out_folder': kaijuReport_StackedBarPlots_output_folder,
+                                    'stacked_area_plots_out_folder': kaijuReport_StackedAreaPlots_output_folder,
+                                    'tax_levels':                params['tax_levels']
+                                    #'filter_percent':            params['filter_percent'],
+                                    #'filter_unclassified':       params['filter_unclassified'],
+                                    #'full_tax_path':             params['full_tax_path']
+                                }
+        kaijuReport_plot_files = self.run_kaijuReportPlots_batch (kaijuReportPlots_options)
+
+
+        # 7) create HTML Summary Reports in batch
         #kaijuReportHTML_options = {'input_reads':               expanded_input,
-        #                           'in_folder':                 kaijuReport_output_folder,
+        #                           'plot_files':                kaijuReport_plot_files,
         #                           'out_folder':                html_dir,
         #                           'tax_levels':                params['tax_levels']
         #}
         #self.run_kaijuReportHTML_batch (kaijuReportHTML_options)
 
 
-        # 5) create Krona plots
-        krona_output_folder = os.path.join(output_dir, 'krona_data')
-        if not os.path.exists(krona_output_folder):
-            os.makedirs(krona_output_folder)
+        # 8) create Krona plots
         krona_options = {'input_reads':               expanded_input,
                          'in_folder':                 kaiju_output_folder,
                          'out_folder':                krona_output_folder,
@@ -145,36 +197,21 @@ class KaijuUtil:
         self.run_krona_batch (krona_options)
 
 
-
-        # 6) Package results
-        output_dirs = [ {'name': 'kaiju_classifications',
-                         'desc': 'Kaiju Classification',
-                         'path': kaiju_output_folder
-                        },
-                        { 'name': 'kaiju_summaries',
-                          'desc': 'Kaiju Summaries',
-                          'path': kaijuReport_output_folder
-                        },
-                        { 'name': 'krona_data',
-                          'desc': 'Krona Data',
-                          'path': krona_output_folder
-                        }
-                      ]
-        outputBuilder = OutputBuilder(output_dirs, self.scratch, self.callback_url)
-        output_packages = self._build_output_packages(params, outputBuilder)
+        # 9) Package results
+        output_packages = self._build_output_packages(params, self.outputBuilder_client)
 
 
-        # 7) build the HTML report
-        #outputBuilder.build_html_output_for_kaiju_with_krona_wf(html_dir, expanded_input)
+        # 10) build the HTML report
+        #self.outputBuilder_client.build_html_output_for_kaiju_with_krona_wf(html_dir, expanded_input)
         #if len(expanded_input) == 1:
         #    report_html_file = expanded_input[0]['name']+'.krona.html'
         #else:
         #    report_html_file = 'report.html'
         report_html_file = expanded_input[0]['name']+'.krona.html'
-        html_zipped = outputBuilder.package_folder(html_dir, report_html_file, 'Kaiju abundance and Krona plots')
+        html_zipped = self.outputBuilder_client.package_folder(html_dir, report_html_file, 'Kaiju abundance and Krona plots')
 
 
-        # 8) save report
+        # 11) save report
         report_params = {'message': '',
                          'direct_html_link_index': 0,
                          'html_links': [html_zipped],
@@ -241,6 +278,41 @@ class KaijuUtil:
             
                 command = self._build_kaijuReport_command(single_kaijuReport_run_options)
                 self.run_proc (command, log_output_file)
+
+
+    def run_kaijuReportPlots_batch(self, options):
+        input_reads = options['input_reads']
+        per_sample_plot_files   = dict()
+        stacked_bar_plot_files  = dict()
+        stacked_area_plot_files = dict()
+        for tax_level in options['tax_levels']:
+
+#            # per sample plots
+#            per_sample_plot_files[tax_level] = dict()
+#            for input_reads_item in input_reads:
+#                single_kaijuReportPlots_options = options
+#                single_kaijuReportPlots_options['input_item'] = input_reads_item
+#                single_kaijuReportPlots_options['tax_level'] = tax_level
+#            
+#                per_sample_plot_files[tax_level][input_reads['name']] = self.outputBuilder_client.generate_kaijuReport_PerSamplePlots(single_kaijuReportPlots_options)
+
+            # stacked bar plots
+            kaijuReportPlots_options = options
+            kaijuReportPlots_options['tax_level'] = tax_level
+            stacked_bar_plot_files[tax_level] = self.outputBuilder_client.generate_kaijuReport_StackedBarPlots(kaijuReportPlots_options)
+
+#            # stacked area plots
+#            kaijuReportPlots_options = options
+#            kaijuReportPlots_options['tax_level'] = tax_level
+#            stacked_area_plot_files[tax_level] = self.outputBuilder_client.generate_kaijuReport_StackedAreaPlots(kaijuReportPlots_options)
+
+#        return {'per_sample_plot_files': per_sample_plot_files,
+#                'stacked_bar_plot_files': stacked_bar_plot_files,
+#                'stacked_area_plot_files': stacked_area_plot_files
+#            }
+        return {
+                'stacked_bar_plot_files': stacked_bar_plot_files
+            }
 
 
     def run_krona_batch(self, options, dropOutput=False):
