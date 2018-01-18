@@ -166,7 +166,7 @@ class KaijuUtil:
 
         # 6) create Summary Report plots in batch
         kaijuReportPlots_options = {'input_reads':               expanded_input,
-                                    'in_folder':                 kaiju_output_folder,
+                                    'in_folder':                 kaijuReport_output_folder,
                                     'per_sample_plots_out_folder': kaijuReport_PerSamplePlots_output_folder,
                                     'stacked_bar_plots_out_folder': kaijuReport_StackedBarPlots_output_folder,
                                     'stacked_area_plots_out_folder': kaijuReport_StackedAreaPlots_output_folder,

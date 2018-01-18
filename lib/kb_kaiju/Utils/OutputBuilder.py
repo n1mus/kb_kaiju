@@ -4,6 +4,11 @@ import ast
 import sys
 import time
 
+import numpy as np
+import matplotlib.pyplot as plt
+import random
+from random import shuffle
+
 from DataFileUtil.DataFileUtilClient import DataFileUtil
 
 
@@ -184,7 +189,7 @@ class OutputBuilder(object):
             sample_order.append(input_reads_item['name'])
 
             this_summary_file = os.path.join (options['in_folder'], input_reads_item['name']+'-'+tax_level+'.kaijuReport')
-            (this_abundance, this_lineage_order) = self._parse_kaiju_summary_file (this_summary_file)
+            (this_abundance, this_lineage_order, unclassified_perc) = self._parse_kaiju_summary_file (this_summary_file)
             for lineage_name in this_lineage_order:
                 if lineage_name not in lineage_seen:
                     lineage_seen[lineage_name] = True
@@ -298,13 +303,33 @@ class OutputBuilder(object):
         html.write('</table>\n')
 
 
-    def _create_bar_plots (self, vals, title, sample_labels, element_labels):
-        color_names = self.no_light_color_names
+    # (this_abundance, this_lineage_order) = self._parse_kaiju_summary_file (this_summary_file)
+    def _parse_kaiju_summary_file (self, summary_file):
+        abundance = dict()
+        unclassified_perc = None
+        lineage_order = []
 
-        import numpy as np
-        import matplotlib.pyplot as plt
-        import random
-        from random import shuffle
+        with open (summary_file, 'r') as summary_handle:
+            for line in summary_handle.readlines():
+                line = line.strip()
+                if line.startswith('-') or line.startswith('%'):
+                    continue
+                (perc_str, reads_cnt_str, lineage_str) = line.split("\t")
+                perc = float(perc_str.strip())
+                reads_cnt = int(reads_cnt_str.strip())
+                lineage = lineage_str.strip()
+
+                if lineage == 'unclassified':
+                    unclassified = perc
+                else:
+                    lineage_order.append(lineage)
+                    abundance[lineage] = perc
+
+        return (abundance, lineage_order, unclassified_perc)
+
+
+    def _create_bar_plots (self, out_folder, vals, title, sample_labels, element_labels):
+        color_names = self.no_light_color_names
 
         y_label = 'percent'
 
@@ -370,7 +395,18 @@ class OutputBuilder(object):
             key_colors.append(each_p[0])
         plt.legend(key_colors, reversed(element_labels), loc='upper left', bbox_to_anchor=(1, 1))
 
-        plt.show()
+
+        # save
+        img_dpi = 200
+        #plt.show()
+        self.log(console, "SAVING STACKED BAR PLOT")
+        png_file = tax_level+'-stacked_bar_plot'+'.png'
+        pdf_file = tax_level+'-stacked_bar_plot'+'.pdf'
+        output_png_file_path = os.path.join(out_folder, png_file);
+        output_pdf_file_path = os.path.join(out_folder, pdf_file);
+        fig.savefig(output_png_file_path, dpi=img_dpi)
+        fig.savefig(output_pdf_file_path, format='pdf')
+        
 
 
     def _create_area_plots (self, abundances):
