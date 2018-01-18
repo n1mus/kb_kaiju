@@ -407,6 +407,7 @@ class OutputBuilder(object):
         fig.savefig(output_png_file_path, dpi=img_dpi)
         fig.savefig(output_pdf_file_path, format='pdf')
         
+        return output_png_file_path
 
 
     def _create_area_plots (self, abundances):
