@@ -205,7 +205,7 @@ class OutputBuilder(object):
                     abundance_matrix.append(0.0)
 
         # make plots
-        return self._create_bar_plots(options['stacked_bar_plots_out_folder'], abundance_matrix, tax_level+' Lineage Proportions', sample_order, lineage_order)
+        return self._create_bar_plots(options['stacked_bar_plots_out_folder'], tax_level+'-stacked_bar_plot', abundance_matrix, tax_level+' Lineage Proportions', sample_order, lineage_order)
 
 
     def generate_kaijuReport_StackedAreaPlots(self, options):
@@ -328,7 +328,7 @@ class OutputBuilder(object):
         return (abundance, lineage_order, unclassified_perc)
 
 
-    def _create_bar_plots (self, out_folder, vals, title, sample_labels, element_labels):
+    def _create_bar_plots (self, out_folder, out_file_basename, vals, title, sample_labels, element_labels):
         color_names = self.no_light_color_names
 
         y_label = 'percent'
@@ -400,8 +400,8 @@ class OutputBuilder(object):
         img_dpi = 200
         #plt.show()
         log("SAVING STACKED BAR PLOT")
-        png_file = tax_level+'-stacked_bar_plot'+'.png'
-        pdf_file = tax_level+'-stacked_bar_plot'+'.pdf'
+        png_file = out_file_basename+'.png'
+        pdf_file = out_file_basename+'.pdf'
         output_png_file_path = os.path.join(out_folder, png_file);
         output_pdf_file_path = os.path.join(out_folder, pdf_file);
         fig.savefig(output_png_file_path, dpi=img_dpi)
