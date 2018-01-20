@@ -3,6 +3,7 @@ import shutil
 import ast
 import sys
 import time
+import re
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -101,7 +102,7 @@ class OutputBuilder(object):
             #'lightyellow',
             'lime',
             'limegreen',
-            'magenta',
+            #'magenta',   # magenta reserved for viruses
             'maroon',
             'mediumaquamarine',
             'mediumblue',
@@ -189,7 +190,7 @@ class OutputBuilder(object):
             sample_order.append(input_reads_item['name'])
 
             this_summary_file = os.path.join (options['in_folder'], input_reads_item['name']+'-'+tax_level+'.kaijuReport')
-            (this_abundance, this_lineage_order, unclassified_perc) = self._parse_kaiju_summary_file (this_summary_file)
+            (this_abundance, this_lineage_order, unclassified_perc) = self._parse_kaiju_summary_file (this_summary_file, tax_level)
             for lineage_name in this_lineage_order:
                 if lineage_name not in lineage_seen:
                     lineage_seen[lineage_name] = True
@@ -304,9 +305,13 @@ class OutputBuilder(object):
 
 
     # (this_abundance, this_lineage_order) = self._parse_kaiju_summary_file (this_summary_file)
-    def _parse_kaiju_summary_file (self, summary_file):
+    def _parse_kaiju_summary_file (self, summary_file, tax_level):
         abundance = dict()
-        unclassified_perc = None
+        unclassified_perc = 0.0
+        unassigned_perc = None
+        tail_perc = None
+        virus_perc = None
+        tail_cutoff = None
         lineage_order = []
 
         with open (summary_file, 'r') as summary_handle:
@@ -321,9 +326,30 @@ class OutputBuilder(object):
 
                 if lineage == 'unclassified':
                     unclassified = perc
+                elif lineage.startswith('cannot be assigned'):
+                    unassigned_perc = perc
+                elif lineage.startswith('belong to a'):
+                    chopped_str = re.sub(r'belong to a \S+ with less than ', '', lineage)
+                    tail_cutoff = re.sub(r'% of all reads', '', chopped_str)
+                    tail_perc = perc
+                elif lineage.startswith('Viruses'):
+                    virus_perc = perc
                 else:
                     lineage_order.append(lineage)
                     abundance[lineage] = perc
+
+        if tail_cutoff != None:
+            this_key = 'tail < '+tail_cutoff+'%'
+            lineage_order.append(this_key)
+            abundance[this_key] = tail_perc
+        if virus_perc != None:
+            this_key = 'viruses'
+            lineage_order.append(this_key)
+            abundance[this_key] = tail_perc
+        if unassigned_perc != None:
+            this_key = 'unassigned at '+tax_level
+            lineage_order.append(this_key)
+            abundance[this_key] = tail_perc
 
         return (abundance, lineage_order, unclassified_perc)
 
@@ -331,13 +357,42 @@ class OutputBuilder(object):
     def _create_bar_plots (self, out_folder, out_file_basename, vals, title, sample_labels, element_labels):
         color_names = self.no_light_color_names
 
-        y_label = 'percent'
+        y_label = 'classified percent'
 
         N = len(sample_labels)
         random.seed(a=len(element_labels))
         r = random.random()
         shuffle(color_names, lambda: r)
 
+        for label_i,label in enumerate(element_labels):
+            if label.startswith('tail <'):
+                color_names[label_i] = 'lightslategray'
+            elif label.startswith('viruses'):
+                color_names[label_i] = 'magenta'
+            elif label.startswith('unassigned at'):
+                color_names[label_i] = 'darkslategray'
+
+        # scaling based on key
+        longest_sample_label_len = 0
+        longest_element_label_len = 0
+        for label in sample_labels:
+            if len(label) > longest_sample_label_len:
+                longest_sample_label_len = len(label)
+        for label in element_labels:
+            if len(label) > longest_element_label_len:
+                longest_element_label_len = len(label)
+        max_x_shrink = 0.75
+        x_shrink_scale = 0.05
+        max_y_shrink = 0.75
+        x_shrink_scale = 0.05
+        x_shrink = x_shrink_scale * longest_element_label_len
+        y_shrink = y_shrink_scale * longest_sample_label_len
+        if x_shrink > max_x_shrink:
+            x_shrink = max_x_shrink
+        if y_shrink > max_y_shrink:
+            y_shrink = max_y_shrink
+
+        # indices
         ind = np.arange(N)    # the x locations for the groups
         bar_width = 0.5      # the width of the bars: can also be len(x) sequence
         label_ind = []
@@ -360,6 +415,11 @@ class OutputBuilder(object):
         img_in_height = 5
         if img_in_width < img_in_height:
             img_in_width = img_in_height
+        # scale up for later shrinkage
+        img_in_width /= (1.0-x_shrink)
+        img_in_height /= (1.0-y_shrink)
+
+        # instantiate fig
         fig = plt.figure()
         fig.set_size_inches(img_in_width, img_in_height)
         ax = plt.subplot(111)
@@ -391,9 +451,9 @@ class OutputBuilder(object):
         plt.xticks(label_ind, sample_labels, ha='right', rotation=45)
         plt.yticks(np.arange(0, 101, 10))
 
-        # Shrink current axis by 20%
+        # Shrink current axis
         box = ax.get_position()
-        ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])    
+        ax.set_position([box.x0, box.y0, box.width * (1.0-x_shrink), box.height*(1.0-y_shrink)])    
         key_colors = []
         for each_p in reversed(p):
             key_colors.append(each_p[0])
