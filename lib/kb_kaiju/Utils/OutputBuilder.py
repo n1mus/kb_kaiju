@@ -358,6 +358,8 @@ class OutputBuilder(object):
         else:
             img_in_width = 20
         img_in_height = 5
+        if img_in_width < img_in_height:
+            img_in_width = img_in_height
         fig = plt.figure()
         fig.set_size_inches(img_in_width, img_in_height)
         ax = plt.subplot(111)
