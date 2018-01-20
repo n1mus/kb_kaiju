@@ -347,7 +347,7 @@ class OutputBuilder(object):
             lineage_order.append(this_key)
             abundance[this_key] = virus_perc
         if unassigned_perc != None:
-            this_key = 'unassigned at '+tax_level
+            this_key = 'unassigned at '+tax_level+' level'
             lineage_order.append(this_key)
             abundance[this_key] = unassigned_perc
 
