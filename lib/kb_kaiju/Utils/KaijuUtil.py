@@ -64,6 +64,14 @@ class KaijuUtil:
                 if arg not in params or params[arg] == None or params[arg] == '':
                     raise ValueError ("Must define GREEDY MODE required param: '"+arg+"' for method: '"+str(method)+"()'")
 
+        tax_levels_all = ['phylum', 'class', 'order', 'family', 'genus', 'species']
+        for tax_level in params['tax_levels']:
+            if tax_level == 'ALL':
+                params['tax_levels'] = tax_levels_all
+                break
+            elif tax_level not in tax_levels_all:
+                raise ValueError ("Bad tax level "+tax_level)
+
 
         # 1) stage input data
         dsu = DataStagingUtils(self.config, self.ctx)

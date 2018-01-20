@@ -206,7 +206,7 @@ class OutputBuilder(object):
                     abundance_matrix.append(0.0)
 
         # make plots
-        return self._create_bar_plots(options['stacked_bar_plots_out_folder'], tax_level+'-stacked_bar_plot', abundance_matrix, tax_level+' Lineage Proportions', sample_order, lineage_order)
+        return self._create_bar_plots(options['stacked_bar_plots_out_folder'], tax_level+'-stacked_bar_plot', abundance_matrix, tax_level.title()+' Level Proportions', sample_order, lineage_order)
 
 
     def generate_kaijuReport_StackedAreaPlots(self, options):
@@ -339,7 +339,7 @@ class OutputBuilder(object):
                     abundance[lineage] = perc
 
         if tail_cutoff != None:
-            this_key = 'tail < '+tail_cutoff+'%'
+            this_key = 'tail < '+tail_cutoff+'% each taxon'
             lineage_order.append(this_key)
             abundance[this_key] = tail_perc
         if virus_perc != None:
@@ -357,7 +357,7 @@ class OutputBuilder(object):
     def _create_bar_plots (self, out_folder, out_file_basename, vals, title, sample_labels, element_labels):
         color_names = self.no_light_color_names
 
-        y_label = 'classified percent'
+        y_label = 'percent of classified reads'
 
         N = len(sample_labels)
         random.seed(a=len(element_labels))
@@ -382,7 +382,7 @@ class OutputBuilder(object):
             if len(label) > longest_element_label_len:
                 longest_element_label_len = len(label)
         max_x_shrink = 0.75
-        x_shrink_scale = 0.02
+        x_shrink_scale = 0.03
         max_y_shrink = 0.70
         y_shrink_scale = 0.0075
         x_shrink = x_shrink_scale * longest_element_label_len
@@ -454,7 +454,7 @@ class OutputBuilder(object):
         # Shrink current axis
         box = ax.get_position()
         x_shift = 0.05
-        y_shift = 0.1
+        y_shift = 0.05
         ax.set_position([box.x0+x_shift, box.y0+y_shrink, box.width * (1.0-x_shrink), box.height*(1.0-y_shrink)-y_shift])    
         key_colors = []
         for each_p in reversed(p):

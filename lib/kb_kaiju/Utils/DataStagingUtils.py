@@ -98,9 +98,9 @@ class DataStagingUtils(object):
                     reads_item_type = readsLibrary_obj['info'][TYPE_I]
                     reads_item_type = re.sub ('-[0-9]+\.[0-9]+$', "", reads_item_type)  # remove trailing version
                     if reads_item_type in PE_types:
-                        this_read_type = self.PE_flag
+                        this_reads_type = self.PE_flag
                     elif reads_item_type in SE_types:
-                        this_read_type = self.SE_flag
+                        this_reads_type = self.SE_flag
                     else:
                         raise ValueError ("Can't handle read item type '"+reads_item_type+"' obj_name: '"+this_reads_name+" in Set: '"+str(input_ref)+"'")
                     expanded_input.append({'ref':  this_reads_ref,
