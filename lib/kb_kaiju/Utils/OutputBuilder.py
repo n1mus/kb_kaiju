@@ -384,7 +384,7 @@ class OutputBuilder(object):
         max_x_shrink = 0.75
         x_shrink_scale = 0.05
         max_y_shrink = 0.75
-        x_shrink_scale = 0.05
+        y_shrink_scale = 0.05
         x_shrink = x_shrink_scale * longest_element_label_len
         y_shrink = y_shrink_scale * longest_sample_label_len
         if x_shrink > max_x_shrink:
