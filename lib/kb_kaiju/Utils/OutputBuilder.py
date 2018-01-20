@@ -382,7 +382,7 @@ class OutputBuilder(object):
             if len(label) > longest_element_label_len:
                 longest_element_label_len = len(label)
         max_x_shrink = 0.75
-        x_shrink_scale = 0.02
+        x_shrink_scale = 0.03
         max_y_shrink = 0.70
         y_shrink_scale = 0.0075
         x_shrink = x_shrink_scale * longest_element_label_len
