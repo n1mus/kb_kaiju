@@ -25,8 +25,8 @@ class OutputBuilder(object):
     modifying the Krona HTML to offer tabbed href links between html pages
     '''
 
-    def __init__(self, output_dirs, scratch_dir, callback_url):
-        self.output_dirs = output_dirs
+    def __init__(self, output_folders, scratch_dir, callback_url):
+        self.output_folders = output_folders
         self.scratch = scratch_dir
         self.callback_url = callback_url
 
@@ -358,6 +358,8 @@ class OutputBuilder(object):
         else:
             img_in_width = 20
         img_in_height = 5
+        if img_in_width < img_in_height:
+            img_in_width = img_in_height
         fig = plt.figure()
         fig.set_size_inches(img_in_width, img_in_height)
         ax = plt.subplot(111)
