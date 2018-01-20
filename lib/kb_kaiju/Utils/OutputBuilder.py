@@ -454,7 +454,7 @@ class OutputBuilder(object):
         # Shrink current axis
         box = ax.get_position()
         x_shift = 0.05
-        y_shift = 0.1
+        y_shift = 0.05
         ax.set_position([box.x0+x_shift, box.y0+y_shrink, box.width * (1.0-x_shrink), box.height*(1.0-y_shrink)-y_shift])    
         key_colors = []
         for each_p in reversed(p):
