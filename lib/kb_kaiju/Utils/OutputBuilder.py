@@ -345,11 +345,11 @@ class OutputBuilder(object):
         if virus_perc != None:
             this_key = 'viruses'
             lineage_order.append(this_key)
-            abundance[this_key] = tail_perc
+            abundance[this_key] = virus_perc
         if unassigned_perc != None:
             this_key = 'unassigned at '+tax_level
             lineage_order.append(this_key)
-            abundance[this_key] = tail_perc
+            abundance[this_key] = unassigned_perc
 
         return (abundance, lineage_order, unclassified_perc)
 
@@ -382,9 +382,9 @@ class OutputBuilder(object):
             if len(label) > longest_element_label_len:
                 longest_element_label_len = len(label)
         max_x_shrink = 0.75
-        x_shrink_scale = 0.05
+        x_shrink_scale = 0.01
         max_y_shrink = 0.75
-        y_shrink_scale = 0.05
+        y_shrink_scale = 0.01
         x_shrink = x_shrink_scale * longest_element_label_len
         y_shrink = y_shrink_scale * longest_sample_label_len
         if x_shrink > max_x_shrink:
@@ -453,7 +453,7 @@ class OutputBuilder(object):
 
         # Shrink current axis
         box = ax.get_position()
-        ax.set_position([box.x0, box.y0, box.width * (1.0-x_shrink), box.height*(1.0-y_shrink)])    
+        ax.set_position([box.x0, box.y0+y_shrink, box.width * (1.0-x_shrink), box.height*(1.0-y_shrink)])    
         key_colors = []
         for each_p in reversed(p):
             key_colors.append(each_p[0])
