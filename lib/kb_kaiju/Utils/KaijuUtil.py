@@ -108,32 +108,32 @@ class KaijuUtil:
 
 
         # 3) instantiate OutputBuilder
-        output_dirs = [ { 'name': 'kaiju_classifications',
-                          'desc': 'Kaiju Classification',
-                          'path': kaiju_output_folder
-                        },
-                        { 'name': 'kaiju_summaries',
-                          'desc': 'Kaiju Summaries',
-                          'path': kaijuReport_output_folder
-                        },
-                        { 'name': 'krona_data',
-                          'desc': 'Krona Data',
-                          'path': krona_output_folder
-                        },
-                        #{ 'name': 'per_sample_ranked_abundance_plots',
-                        #  'desc': 'Per Sample Ranked Abundance Plots',
-                        #  'path': kaijuReport_PerSamplePlots_output_folder
-                        #}, 
-                        { 'name': 'stacked_bar_abundance_plots',
-                          'desc': 'Stacked Bar Abundance Plots',
-                          'path': kaijuReport_StackedBarPlots_output_folder
-                        }
-                        #{ 'name': 'stacked_area_abundance_plots',
-                        #  'desc': 'Stacked Area Abundance Plots',
-                        #  'path': kaijuReport_StackedAreaPlots_output_folder
-                        #}
+        output_folders = [ { 'name': 'kaiju_classifications',
+                             'desc': 'Kaiju Classification',
+                             'path': kaiju_output_folder
+                         },
+                           { 'name': 'kaiju_summaries',
+                             'desc': 'Kaiju Summaries',
+                             'path': kaijuReport_output_folder
+                         },
+                           { 'name': 'krona_data',
+                             'desc': 'Krona Data',
+                             'path': krona_output_folder
+                         },
+                           #{ 'name': 'per_sample_ranked_abundance_plots_PNG+PDF',
+                           #  'desc': 'Per Sample Ranked Abundance Plots (PNG + PDF)',
+                           #  'path': kaijuReport_PerSamplePlots_output_folder
+                           #}, 
+                           { 'name': 'stacked_bar_abundance_plots_PNG+PDF',
+                             'desc': 'Stacked Bar Abundance Plots (PNG + PDF)',
+                             'path': kaijuReport_StackedBarPlots_output_folder
+                         }
+                           #{ 'name': 'stacked_area_abundance_plots_PNG+PDF',
+                           #  'desc': 'Stacked Area Abundance Plots (PNG + PDF)',
+                           #  'path': kaijuReport_StackedAreaPlots_output_folder
+                           #}
                       ]
-        self.outputBuilder_client = OutputBuilder(output_dirs, self.scratch, self.callback_url)
+        self.outputBuilder_client = OutputBuilder(output_folders, self.scratch, self.callback_url)
 
 
         # 4) run Kaiju in batch
@@ -618,7 +618,7 @@ class KaijuUtil:
     def _build_output_packages(self, params, outputBuilder):
 
         output_packages = []
-        for output_folder in outputBuilder.output_dirs:
+        for output_folder in outputBuilder.output_folders:
             if 'skip_output_dirs' in params and output_folder['name'] in params['skip_output_dirs']:
                 log('skipping output directory '+output_folder['name'])
                 continue
