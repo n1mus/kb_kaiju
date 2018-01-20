@@ -349,7 +349,9 @@ class OutputBuilder(object):
             np_vals.append(np.array(val_vec))
     
         # Build image
-        if N < 10:
+        if N < 5:
+            img_in_width = 4*N
+        elif N < 10:
             img_in_width = 2*N
         elif N < 20:
             img_in_width = N
