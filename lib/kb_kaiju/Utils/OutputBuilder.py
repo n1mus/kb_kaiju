@@ -383,7 +383,7 @@ class OutputBuilder(object):
                 longest_element_label_len = len(label)
         max_x_shrink = 0.75
         x_shrink_scale = 0.02
-        max_y_shrink = 0.75
+        max_y_shrink = 0.70
         y_shrink_scale = 0.0075
         x_shrink = x_shrink_scale * longest_element_label_len
         y_shrink = y_shrink_scale * longest_sample_label_len
@@ -453,8 +453,9 @@ class OutputBuilder(object):
 
         # Shrink current axis
         box = ax.get_position()
-        x_shift = 0.1
-        ax.set_position([box.x0+x_shift, box.y0+y_shrink, box.width * (1.0-x_shrink), box.height*(1.0-y_shrink)])    
+        x_shift = 0.05
+        y_shift = 0.1
+        ax.set_position([box.x0+x_shift, box.y0+y_shrink, box.width * (1.0-x_shrink), box.height*(1.0-y_shrink)-y_shift])    
         key_colors = []
         for each_p in reversed(p):
             key_colors.append(each_p[0])
