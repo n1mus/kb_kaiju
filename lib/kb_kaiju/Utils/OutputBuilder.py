@@ -416,7 +416,7 @@ class OutputBuilder(object):
         if img_in_width < img_in_height:
             img_in_width = img_in_height
         # scale up for later shrinkage
-        img_in_width /= (1.0-x_shrink)
+        img_in_width /= 1.5*(1.0-x_shrink)
         img_in_height /= (1.0-y_shrink)
 
         # instantiate fig
