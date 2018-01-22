@@ -207,7 +207,7 @@ class OutputBuilder(object):
 
         # make plots
         return self._create_bar_plots (out_folder = options['stacked_bar_plots_out_folder'], 
-                                       out_file_basenam = tax_level+'-stacked_bar_plot',
+                                       out_file_basename = tax_level+'-stacked_bar_plot',
                                        vals = abundance_matrix, 
                                        title = tax_level.title()+' Level Proportions',
                                        y_label = 'percent of classified reads',
