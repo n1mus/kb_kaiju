@@ -206,7 +206,14 @@ class OutputBuilder(object):
                     abundance_matrix.append(0.0)
 
         # make plots
-        return self._create_bar_plots(options['stacked_bar_plots_out_folder'], tax_level+'-stacked_bar_plot', abundance_matrix, tax_level.title()+' Level Proportions', sample_order, lineage_order)
+        return self._create_bar_plots (out_folder = options['stacked_bar_plots_out_folder'], 
+                                       out_file_basenam = tax_level+'-stacked_bar_plot',
+                                       vals = abundance_matrix, 
+                                       title = tax_level.title()+' Level Proportions',
+                                       y_label = 'percent of classified reads',
+                                       sample_labels = sample_order, 
+                                       element_labels = lineage_order, 
+                                       sort_by='totals')
 
 
     def generate_kaijuReport_StackedAreaPlots(self, options):
@@ -354,16 +361,24 @@ class OutputBuilder(object):
         return (abundance, lineage_order, unclassified_perc)
 
 
-    def _create_bar_plots (self, out_folder, out_file_basename, vals, title, sample_labels, element_labels):
-        color_names = self.no_light_color_names
+    def _create_bar_plots (self, out_folder=None, 
+                           out_file_basename=None, 
+                           vals=None, 
+                           title=None, 
+                           y_label=None, 
+                           sample_labels=None, 
+                           element_labels=None, 
+                           sort_by=None):
 
-        y_label = 'percent of classified reads'
-
+        # number of samples
         N = len(sample_labels)
+
+
+        # colors
+        color_names = no_light_color_names
         random.seed(a=len(element_labels))
         r = random.random()
         shuffle(color_names, lambda: r)
-
         for label_i,label in enumerate(element_labels):
             if label.startswith('tail <'):
                 color_names[label_i] = 'lightslategray'
@@ -371,8 +386,82 @@ class OutputBuilder(object):
                 color_names[label_i] = 'magenta'
             elif label.startswith('unassigned at'):
                 color_names[label_i] = 'darkslategray'
+                color_names = self.no_light_color_names
+                
 
-        # scaling based on key
+        # possibly sort vals
+        if sort_by != None:
+            old_index = dict()
+            new_index = dict()
+            for label_i,label in enumerate(element_labels):
+                old_index[label] = label_i
+
+            # alphabet sort
+            if sort_by == 'alpha':
+                new_label_i = 0
+                for label in sorted(element_labels, reverse=True):                
+                    if label.startswith('tail <') or label.startswith('viruses') or label.startswith('unassigned at'):
+                        new_index[label] = old_index[label]
+                    else:
+                        new_index[label] = new_label_i
+                        new_label_i += 1
+
+            # summed total sort
+            elif sort_vals_by == 'totals':
+                totals = dict()
+                for label_i,label in enumerate(element_labels):
+                    totals[label] = 0
+                    for sample_i,sample in enumerate(sample_labels):
+                        totals[label] += vals[label_i][sample_i]
+                totals_vals = []
+                labels_by_totals = dict()
+                for label in totals.keys():
+                    if totals[label] not in totals_vals:
+                        totals_vals.append(totals[label])
+                        labels_by_totals[totals[label]] = []
+                    labels_by_totals[totals[label]].append(label)
+                new_label_i = 0
+                for totals_val in sorted(totals_vals, reverse=True):
+                    for label in labels_by_totals[totals_val]:
+                        if label.startswith('tail <') or label.startswith('viruses') or label.startswith('unassigned at'):
+                            new_index[label] = old_index[label]
+                        else:
+                            new_index[label] = new_label_i
+                            new_label_i += 1       
+
+            # store new order            
+            new_vals = []
+            new_element_labels = []
+            for label_i,label in enumerate(element_labels):
+                new_vals.append([])
+                new_element_labels.append(None)
+            for label_i,label in enumerate(element_labels):
+                new_vals[new_index[label]] = vals[label_i]
+                new_element_labels[new_index[label]] = element_labels[label_i]
+            vals = new_vals
+            element_labels = new_element_labels
+
+    
+        # image dimensions
+        img_in_width = max_img_width = 20
+        img_in_height = max_img_height = 5
+        if N < 5:
+            img_in_width = (max_img_width/5)*N
+        elif N < 10:
+            img_in_width = (max_img_width/10)*N
+        elif N < 20:
+            img_in_width = (max_img_width/20)*N
+        else:
+            img_in_width = max_img_width
+            img_in_height = max_img_height
+        if img_in_width < img_in_height:
+            img_in_width = 2*img_in_height
+        # scale up for later shrinkage?  No.
+        #img_in_width /= 1.5*(1.0-x_shrink)
+        #img_in_height /= (1.0-y_shrink)       
+
+
+        # scaling based on labels                                                                                                             
         longest_sample_label_len = 0
         longest_element_label_len = 0
         for label in sample_labels:
@@ -381,10 +470,12 @@ class OutputBuilder(object):
         for label in element_labels:
             if len(label) > longest_element_label_len:
                 longest_element_label_len = len(label)
-        max_x_shrink = 0.75
-        x_shrink_scale = 0.03
-        max_y_shrink = 0.70
-        y_shrink_scale = 0.0075
+        max_x_shrink = 0.90
+        x_shrink_scale = 0.02*N/2.25
+        #x_shrink_scale = 0.1
+        max_y_shrink = 0.50
+        #y_shrink_scale = 0.0075
+        y_shrink_scale = 0.015
         x_shrink = x_shrink_scale * longest_element_label_len
         y_shrink = y_shrink_scale * longest_sample_label_len
         if x_shrink > max_x_shrink:
@@ -392,32 +483,6 @@ class OutputBuilder(object):
         if y_shrink > max_y_shrink:
             y_shrink = max_y_shrink
 
-        # indices
-        ind = np.arange(N)    # the x locations for the groups
-        bar_width = 0.5      # the width of the bars: can also be len(x) sequence
-        label_ind = []
-        for ind_i,this_ind in enumerate(ind):
-            ind[ind_i] = this_ind+bar_width/2
-            label_ind.append(this_ind + bar_width/2)
-        np_vals = []
-        for vec_i,val_vec in enumerate(vals):
-            np_vals.append(np.array(val_vec))
-    
-        # Build image
-        if N < 5:
-            img_in_width = 4*N
-        elif N < 10:
-            img_in_width = 2*N
-        elif N < 20:
-            img_in_width = N
-        else:
-            img_in_width = 20
-        img_in_height = 5
-        if img_in_width < img_in_height:
-            img_in_width = img_in_height
-        # scale up for later shrinkage
-        img_in_width /= 1.5*(1.0-x_shrink)
-        img_in_height /= (1.0-y_shrink)
 
         # instantiate fig
         fig = plt.figure()
@@ -434,7 +499,21 @@ class OutputBuilder(object):
         #    ax.spines['bottom'].set_visible(False) #  bottom axis line
         #    ax.spines['left'].set_visible(False) #  Get rid of bottom axis line
         #    ax.spines['right'].set_visible(False) #  Get rid of bottom axis line
-    
+
+
+        # indices
+        ind = np.arange(N)    # the x locations for the groups
+        bar_width = 0.5      # the width of the bars: can also be len(x) sequence
+        label_ind = []
+        for ind_i,this_ind in enumerate(ind):
+            ind[ind_i] = this_ind+bar_width/2
+            label_ind.append(this_ind + bar_width/2)
+        np_vals = []
+        for vec_i,val_vec in enumerate(vals):
+            np_vals.append(np.array(val_vec))
+        
+
+        # plot
         last_bottom = None
         p = []
         for vec_i,val_vec in enumerate(np_vals):
@@ -448,14 +527,23 @@ class OutputBuilder(object):
 
         plt.ylabel(y_label)
         plt.title(title)
-        plt.xticks(label_ind, sample_labels, ha='right', rotation=45)
+        #plt.xticks(label_ind, sample_labels, ha='right', rotation=45)
+        plt.xticks(label_ind, sample_labels, ha='center', rotation=90)
         plt.yticks(np.arange(0, 101, 10))
+
 
         # Shrink current axis
         box = ax.get_position()
-        x_shift = 0.05
+        #x_shift = 0.05
+        x_shift = 0.00
         y_shift = 0.05
-        ax.set_position([box.x0+x_shift, box.y0+y_shrink, box.width * (1.0-x_shrink), box.height*(1.0-y_shrink)-y_shift])    
+        #ax.set_position([box.x0+x_shift, box.y0+y_shrink, box.width * (1.0-x_shrink), box.height*(1.0-y_shrink)-y_shift])
+        #ax.set_position([box.x0, box.y0, box.width * (1.0-x_shrink), box.height])
+        #ax.set_position([box.x0+x_shift, box.y0, box.width * (1.0-x_shrink), box.height])
+        ax.set_position([box.x0+x_shift, box.y0+y_shrink, box.width * (1.0-x_shrink), box.height*(1.0-y_shrink)-y_shift])
+
+
+        # add key
         key_colors = []
         for each_p in reversed(p):
             key_colors.append(each_p[0])
