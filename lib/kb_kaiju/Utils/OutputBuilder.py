@@ -203,7 +203,7 @@ class OutputBuilder(object):
                 if lineage_name in abundance_by_sample[sample_i]:
                     abundance_matrix[lineage_i].append(abundance_by_sample[sample_i][lineage_name])
                 else:
-                    abundance_matrix.append(0.0)
+                    abundance_matrix[lineage_i].append(0.0)
 
         # make plots
         return self._create_bar_plots (out_folder = options['stacked_bar_plots_out_folder'], 
