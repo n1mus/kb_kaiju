@@ -184,18 +184,20 @@ class OutputBuilder(object):
         lineage_seen = dict()
         lineage_order = []
         sample_order = []
+        classified_frac = []
         
         # parse summary
         for input_reads_item in options['input_reads']:
             sample_order.append(input_reads_item['name'])
 
             this_summary_file = os.path.join (options['in_folder'], input_reads_item['name']+'-'+tax_level+'.kaijuReport')
-            (this_abundance, this_lineage_order, classified_frac) = self._parse_kaiju_summary_file (this_summary_file, tax_level)
+            (this_abundance, this_lineage_order, this_classified_frac) = self._parse_kaiju_summary_file (this_summary_file, tax_level)
             for lineage_name in this_lineage_order:
                 if lineage_name not in lineage_seen:
                     lineage_seen[lineage_name] = True
                     lineage_order.append(lineage_name)
             abundance_by_sample.append(this_abundance)
+            classified_frac.append(this_classified_frac)
 
         for lineage_i,lineage_name in enumerate(lineage_order):
             abundance_matrix.append([])
@@ -360,7 +362,8 @@ class OutputBuilder(object):
             lineage_order.append(this_key)
             abundance[this_key] = unassigned_perc
 
-        return (abundance, lineage_order, unclassified_perc)
+        classified_frac = 1.0 - unclassified_perc/100.0
+        return (abundance, lineage_order, classified_frac)
 
 
     def _create_bar_plots (self, out_folder=None, 
@@ -490,9 +493,24 @@ class OutputBuilder(object):
 
 
         # instantiate fig
-        fig, (ax_top, ax_bot) = plt.subplots(2, 1, sharex=True, gridspec_kw = {'height_ratios':[1, 3]})
+        #
+        # lose axes with below grid, and therefore sharex property, so just match x_range, etc.
+        #fig, (ax_top, ax_bot) = plt.subplots(2, 1, sharex=True)  
+
+        # gridspec_kw not in KBase docker notebook agg image (old python?)
+        #fig, (ax_top, ax_bot) = plt.subplots(2, 1, sharex=True, gridspec_kw = {'height_ratios':[1, 3]})
+        FIG_rows = 1000
+        FIG_cols = 1
+        top_frac = 0.25
+        top_rows = int(top_frac*FIG_rows)
+        bot_rows = FIG_rows-top_rows
+        fig = plt.figure()
+        # subplot2grid(shape, loc, rowspan=1, colspan=1)
+        ax_top = fig.subplot2grid((FIG_rows,FIG_cols), (0,0), rowspan=top_rows, colspan=1)
+        ax_bot = fig.subplot2grid((FIG_rows,FIG_cols), (1,0), rowspan=bot_rows, colspan=1)
         fig.set_size_inches(img_in_width, img_in_height)
         fig.tight_layout()
+
 
         #for ax in fig.axes:
         #    ax.xaxis.set_visible(False)  # remove axis labels and ticks
@@ -524,7 +542,8 @@ class OutputBuilder(object):
         ax_top.set_ylabel(frac_y_label)
         ax_top.set_yticks(np.arange(0.0, 1.01, .20))
         ax_top.set_ylim([0,1])
-
+        ax_top.xaxis.set_visible(False)  # remove axis labels and ticks
+        ax_top.set_xlim([-0.25,N-0.25])
 
         # plot stacked
         last_bottom = None
