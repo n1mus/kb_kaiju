@@ -492,9 +492,9 @@ class OutputBuilder(object):
                 longest_element_label_len = len(label)
         max_x_shrink = 0.90
         #x_shrink_scale = 0.02*N/2.25
+        #x_shrink_scale = 0.06 / N
         #x_shrink_scale = 0.01
-        #x_shrink_scale = 0.015
-        x_shrink_scale = 0.06 / N
+        x_shrink_scale = 0.015
         #x_shrink_scale = 0.1
         #max_y_shrink = 0.50
         max_y_shrink = 0.20
@@ -590,7 +590,8 @@ class OutputBuilder(object):
         x_shift = 0.05
         #x_shift = 0.00
         y_shift = 0.05
-        ax_top.set_position([box.x0+x_shift, box.y0, box.width * (1.0-x_shrink), box.height-y_shift])
+        #ax_top.set_position([box.x0+x_shift, box.y0, box.width * (1.0-x_shrink), box.height-y_shift])
+        ax_top.set_position([box.x0+x_shift, box.y0, box.width - x_shrink, box.height-y_shift])
 
 
         # Shrink stacked axis
@@ -598,7 +599,8 @@ class OutputBuilder(object):
         x_shift = 0.05
         #x_shift = 0.00
         y_shift = 0.05
-        ax_bot.set_position([box.x0+x_shift, box.y0+y_shrink, box.width * (1.0-x_shrink), box.height*(1.0-y_shrink-y_shift)])
+        #ax_bot.set_position([box.x0+x_shift, box.y0+y_shrink, box.width * (1.0-x_shrink), box.height*(1.0-y_shrink-y_shift)])
+        ax_bot.set_position([box.x0+x_shift, box.y0+y_shrink, box.width - x_shrink, box.height*(1.0-y_shrink-y_shift)])
 
 
         # add key
