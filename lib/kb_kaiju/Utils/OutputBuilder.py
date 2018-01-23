@@ -379,11 +379,12 @@ class OutputBuilder(object):
 
         # DEBUG
         N = len(sample_labels)
-        N_force = 5
+        N_force = 10
         for sample_i in range(N_force):
             if sample_i >= N:
                 sample_labels.append(sample_labels[0]+str(sample_i))
                 for element_i,element_label in enumerate(element_labels):
+                    frac_vals[element_i].append(frac_vals[element_i][0])
                     vals[element_i].append(vals[element_i][0])
         # END DEBUG
 
@@ -509,7 +510,7 @@ class OutputBuilder(object):
 
         # instantiate fig
         #
-        # lose axes with below grid, and therefore sharex property, so just match x_range, etc.
+        # lose axes with below grid, and so sharex property. instead match xlim, bar_width, hide ticks.
         #fig, (ax_top, ax_bot) = plt.subplots(2, 1, sharex=True)  
 
         # gridspec_kw not in KBase docker notebook agg image (old python?)
