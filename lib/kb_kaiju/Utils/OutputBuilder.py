@@ -407,7 +407,7 @@ class OutputBuilder(object):
                         new_label_i += 1
 
             # summed total sort
-            elif sort_vals_by == 'totals':
+            elif sort_by == 'totals':
                 totals = dict()
                 for label_i,label in enumerate(element_labels):
                     totals[label] = 0
