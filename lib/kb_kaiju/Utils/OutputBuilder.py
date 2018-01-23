@@ -379,7 +379,7 @@ class OutputBuilder(object):
 
         # DEBUG
         N = len(sample_labels)
-        N_force = 2
+        N_force = 5
         for sample_i in range(N_force):
             if sample_i >= N:
                 sample_labels.append(sample_labels[0]+str(sample_i))
