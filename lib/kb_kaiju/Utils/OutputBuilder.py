@@ -375,7 +375,7 @@ class OutputBuilder(object):
 
 
         # colors
-        color_names = no_light_color_names
+        color_names = self.no_light_color_names
         random.seed(a=len(element_labels))
         r = random.random()
         shuffle(color_names, lambda: r)
