@@ -118,6 +118,13 @@ parameters :
             Do not include unclassified reads in the summaries (default: YES)
         long-hint : |
             Do not include unclassified reads in the summaries (default: YES)
+    sort_taxa_by :
+        ui-name : |
+            Sort Plots by
+        short-hint : |
+            Show abundance plots sorted either by alphabetical of taxa or by total abundance (def: total abundance)
+        long-hint : |
+            Show abundance plots sorted either by alphabetical of taxa or by total abundance (def: total abundance)
 
 
 #

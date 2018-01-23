@@ -49,7 +49,8 @@ class KaijuUtil:
                            'greedy_run_mode',
                            'filter_percent',
                            'filter_unclassified',
-                           'full_tax_path'
+                           'full_tax_path',
+                           'sort_taxa_by'
                           ]
         for arg in required_params:
             if arg not in params or params[arg] == None or params[arg] == '':
@@ -178,7 +179,8 @@ class KaijuUtil:
                                     'per_sample_plots_out_folder': kaijuReport_PerSamplePlots_output_folder,
                                     'stacked_bar_plots_out_folder': kaijuReport_StackedBarPlots_output_folder,
                                     'stacked_area_plots_out_folder': kaijuReport_StackedAreaPlots_output_folder,
-                                    'tax_levels':                params['tax_levels']
+                                    'tax_levels':                params['tax_levels'],
+                                    'sort_taxa_by':              params['sort_taxa_by']
                                     #'filter_percent':            params['filter_percent'],
                                     #'filter_unclassified':       params['filter_unclassified'],
                                     #'full_tax_path':             params['full_tax_path']

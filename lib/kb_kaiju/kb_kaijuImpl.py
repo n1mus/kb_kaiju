@@ -48,7 +48,7 @@ You should have received a copy of the GNU General Public License along with the
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "https://github.com/dcchivian/kb_kaiju"
-    GIT_COMMIT_HASH = "77ed4e6ca157676f7b4803849045713d9ccacc23"
+    GIT_COMMIT_HASH = "f987380d073df854019c80a04e005bd01544c81d"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -88,7 +88,7 @@ You should have received a copy of the GNU General Public License along with the
            Double, parameter "filter_unclassified" of type "bool" (A boolean
            - 0 for false, 1 for true. @range (0, 1)), parameter
            "full_tax_path" of type "bool" (A boolean - 0 for false, 1 for
-           true. @range (0, 1))
+           true. @range (0, 1)), parameter "sort_taxa_by" of String
         :returns: instance of type "KaijuOutput" (Kaiju App Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"

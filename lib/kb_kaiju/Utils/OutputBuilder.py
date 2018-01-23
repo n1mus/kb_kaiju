@@ -215,7 +215,7 @@ class OutputBuilder(object):
                                        y_label = 'percent of classified reads',
                                        sample_labels = sample_order, 
                                        element_labels = lineage_order, 
-                                       sort_by='totals')
+                                       sort_by = options['sort_taxa_by'])
 
 
     def generate_kaijuReport_StackedAreaPlots(self, options):

@@ -160,6 +160,7 @@ KaijuInputParams is a reference to a hash where the following keys are defined:
 	filter_percent has a value which is a float
 	filter_unclassified has a value which is a kb_kaiju.bool
 	full_tax_path has a value which is a kb_kaiju.bool
+	sort_taxa_by has a value which is a string
 workspace_name is a string
 data_obj_ref is a string
 bool is an int
@@ -191,6 +192,7 @@ KaijuInputParams is a reference to a hash where the following keys are defined:
 	filter_percent has a value which is a float
 	filter_unclassified has a value which is a kb_kaiju.bool
 	full_tax_path has a value which is a kb_kaiju.bool
+	sort_taxa_by has a value which is a string
 workspace_name is a string
 data_obj_ref is a string
 bool is an int
@@ -497,6 +499,7 @@ greedy_max_e_value has a value which is a float
 filter_percent has a value which is a float
 filter_unclassified has a value which is a kb_kaiju.bool
 full_tax_path has a value which is a kb_kaiju.bool
+sort_taxa_by has a value which is a string
 
 </pre>
 
@@ -519,6 +522,7 @@ greedy_max_e_value has a value which is a float
 filter_percent has a value which is a float
 filter_unclassified has a value which is a kb_kaiju.bool
 full_tax_path has a value which is a kb_kaiju.bool
+sort_taxa_by has a value which is a string
 
 
 =end text
