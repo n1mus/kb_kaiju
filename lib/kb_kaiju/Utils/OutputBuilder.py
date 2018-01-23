@@ -377,6 +377,17 @@ class OutputBuilder(object):
                            element_labels=None, 
                            sort_by=None):
 
+        # DEBUG
+        N_force = 2
+        for sample_i in range(N_force):
+            if sample_labels[sample_i]:
+                continue
+            else:
+                sample_labels.append(sample_labels[0]+str(sample_i))
+                for element_i,element_label in enumerate(element_labels):
+                    vals[element_i].append(vals[element_i][0])
+        # END DEBUG
+
         # number of samples
         N = len(sample_labels)
 
@@ -450,9 +461,10 @@ class OutputBuilder(object):
 
     
         # image dimensions
-        img_in_width = max_img_width = 20
+        img_in_width = max_img_width = 60
         #img_in_height = max_img_height = 5
         img_in_height = max_img_height = 8
+        
         if N < 5:
             img_in_width = (max_img_width/5)*N
         elif N < 10:
@@ -462,7 +474,7 @@ class OutputBuilder(object):
         else:
             img_in_width = max_img_width
             img_in_height = max_img_height
-        if img_in_width < img_in_height:
+        if img_in_width < 2*img_in_height:
             img_in_width = 2*img_in_height
         # scale up for later shrinkage?  No.
         #img_in_width /= 1.5*(1.0-x_shrink)
@@ -481,7 +493,8 @@ class OutputBuilder(object):
         max_x_shrink = 0.90
         #x_shrink_scale = 0.02*N/2.25
         #x_shrink_scale = 0.01
-        x_shrink_scale = 0.015
+        #x_shrink_scale = 0.015
+        x_shrink_scale = 0.05 / N
         #x_shrink_scale = 0.1
         #max_y_shrink = 0.50
         max_y_shrink = 0.20
