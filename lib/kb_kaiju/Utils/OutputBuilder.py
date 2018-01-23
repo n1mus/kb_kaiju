@@ -483,7 +483,8 @@ class OutputBuilder(object):
         #x_shrink_scale = 0.01
         x_shrink_scale = 0.015
         #x_shrink_scale = 0.1
-        max_y_shrink = 0.60
+        #max_y_shrink = 0.50
+        max_y_shrink = 0.20
         #y_shrink_scale = 0.0075
         y_shrink_scale = 0.015
         x_shrink = x_shrink_scale * longest_element_label_len
