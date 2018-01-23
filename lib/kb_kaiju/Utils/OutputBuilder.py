@@ -508,7 +508,7 @@ class OutputBuilder(object):
         bot_rows = FIG_rows-top_rows
         fig = plt.figure()
         ax_top = plt.subplot2grid((FIG_rows,FIG_cols), (0,0), rowspan=top_rows, colspan=1)
-        ax_bot = plt.subplot2grid((FIG_rows,FIG_cols), (1,0), rowspan=bot_rows, colspan=1)
+        ax_bot = plt.subplot2grid((FIG_rows,FIG_cols), (top_rows,0), rowspan=bot_rows, colspan=1)
         fig.set_size_inches(img_in_width, img_in_height)
         fig.tight_layout()
 
@@ -571,18 +571,18 @@ class OutputBuilder(object):
 
         # Shrink frac axis
         box = ax_top.get_position()
-        #x_shift = 0.05
-        x_shift = 0.00
+        x_shift = 0.05
+        #x_shift = 0.00
         y_shift = 0.05
-        ax_top.set_position([box.x0+x_shift, box.y0-y_shift, box.width * (1.0-x_shrink), box.height-y_shift])
+        ax_top.set_position([box.x0+x_shift, box.y0-y_shift, box.width * (1.0-x_shrink), box.height)
 
 
         # Shrink stacked axis
         box = ax_bot.get_position()
-        #x_shift = 0.05
-        x_shift = 0.00
+        x_shift = 0.05
+        #x_shift = 0.00
         y_shift = 0.05
-        ax_bot.set_position([box.x0+x_shift, box.y0+y_shrink, box.width * (1.0-x_shrink), box.height*(1.0-y_shrink)-y_shift])
+        ax_bot.set_position([box.x0+x_shift, box.y0+y_shrink, box.width * (1.0-x_shrink), box.height*(1.0-y_shrink)])
 
 
         # add key
