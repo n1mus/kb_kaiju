@@ -574,7 +574,7 @@ class OutputBuilder(object):
         x_shift = 0.05
         #x_shift = 0.00
         y_shift = 0.05
-        ax_top.set_position([box.x0+x_shift, box.y0-y_shift, box.width * (1.0-x_shrink), box.height)
+        ax_top.set_position([box.x0+x_shift, box.y0-y_shift, box.width * (1.0-x_shrink), box.height])
 
 
         # Shrink stacked axis
