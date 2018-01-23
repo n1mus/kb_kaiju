@@ -48,7 +48,7 @@ You should have received a copy of the GNU General Public License along with the
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "https://github.com/dcchivian/kb_kaiju"
-    GIT_COMMIT_HASH = "f987380d073df854019c80a04e005bd01544c81d"
+    GIT_COMMIT_HASH = "d734cde9eeb71d7a55cb700c7e4caeee3b47905c"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
