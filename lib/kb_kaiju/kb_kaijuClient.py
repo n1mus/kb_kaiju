@@ -57,7 +57,7 @@ class kb_kaiju(object):
            Double, parameter "filter_unclassified" of type "bool" (A boolean
            - 0 for false, 1 for true. @range (0, 1)), parameter
            "full_tax_path" of type "bool" (A boolean - 0 for false, 1 for
-           true. @range (0, 1))
+           true. @range (0, 1)), parameter "sort_taxa_by" of String
         :returns: instance of type "KaijuOutput" (Kaiju App Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"

@@ -162,7 +162,8 @@ class kb_kaijuTest(unittest.TestCase):
             'greedy_max_e_value':        0.05,
             'filter_percent':            1,
             'filter_unclassified':       1,
-            'full_tax_path':             0
+            'full_tax_path':             0,
+            'sort_taxa_by':              'totals'
         }
         result = self.getImpl().run_kaiju(self.getContext(), params)[0]
 

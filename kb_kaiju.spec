@@ -109,6 +109,7 @@ module kb_kaiju {
 	float          filter_percent;
 	bool           filter_unclassified;
 	bool           full_tax_path;
+	string         sort_taxa_by;
     } KaijuInputParams;
 
 
