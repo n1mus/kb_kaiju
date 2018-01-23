@@ -378,11 +378,10 @@ class OutputBuilder(object):
                            sort_by=None):
 
         # DEBUG
+        N = len(sample_labels)
         N_force = 2
         for sample_i in range(N_force):
-            if sample_labels[sample_i]:
-                continue
-            else:
+            if sample_i >= N:
                 sample_labels.append(sample_labels[0]+str(sample_i))
                 for element_i,element_label in enumerate(element_labels):
                     vals[element_i].append(vals[element_i][0])
