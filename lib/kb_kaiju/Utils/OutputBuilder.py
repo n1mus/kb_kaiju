@@ -494,7 +494,7 @@ class OutputBuilder(object):
         #x_shrink_scale = 0.02*N/2.25
         #x_shrink_scale = 0.01
         #x_shrink_scale = 0.015
-        x_shrink_scale = 0.05 / N
+        x_shrink_scale = 0.06 / N
         #x_shrink_scale = 0.1
         #max_y_shrink = 0.50
         max_y_shrink = 0.20
