@@ -499,15 +499,16 @@ class OutputBuilder(object):
 
         # gridspec_kw not in KBase docker notebook agg image (old python?)
         #fig, (ax_top, ax_bot) = plt.subplots(2, 1, sharex=True, gridspec_kw = {'height_ratios':[1, 3]})
+
+        # subplot2grid(shape, loc, rowspan=1, colspan=1)
         FIG_rows = 1000
         FIG_cols = 1
         top_frac = 0.25
         top_rows = int(top_frac*FIG_rows)
         bot_rows = FIG_rows-top_rows
         fig = plt.figure()
-        # subplot2grid(shape, loc, rowspan=1, colspan=1)
-        ax_top = fig.subplot2grid((FIG_rows,FIG_cols), (0,0), rowspan=top_rows, colspan=1)
-        ax_bot = fig.subplot2grid((FIG_rows,FIG_cols), (1,0), rowspan=bot_rows, colspan=1)
+        ax_top = plt.subplot2grid((FIG_rows,FIG_cols), (0,0), rowspan=top_rows, colspan=1)
+        ax_bot = plt.subplot2grid((FIG_rows,FIG_cols), (1,0), rowspan=bot_rows, colspan=1)
         fig.set_size_inches(img_in_width, img_in_height)
         fig.tight_layout()
 
