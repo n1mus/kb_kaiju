@@ -286,18 +286,18 @@
 			"optional": false,
 			"advanced": true,
 			"allow_multiple": false,
-			"default_values": [ 'totals' ],
+			"default_values": [ "totals" ],
 			"field_type": "dropdown",
 				"dropdown_options": {
 					"options": [
 						{
-							"value": 'totals',
+							"value": "totals",
 							"display": "total abundance",
 							"id": "sort_totals",
 							"ui-name": "sort_totals"
 						},
 						{
-							"value": 'alpha',
+							"value": "alpha",
 							"display": "alphabetically by taxa names",
 							"id": "sort_alpha",
 							"ui-name": "sort_alpha"
