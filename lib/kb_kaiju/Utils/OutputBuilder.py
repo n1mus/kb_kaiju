@@ -384,7 +384,7 @@ class OutputBuilder(object):
             if sample_i >= N:
                 sample_labels.append(sample_labels[0]+str(sample_i))
                 for element_i,element_label in enumerate(element_labels):
-                    frac_vals[element_i].append(frac_vals[element_i][0])
+                    frac_vals.append(frac_vals[0])
                     vals[element_i].append(vals[element_i][0])
         # END DEBUG
 
