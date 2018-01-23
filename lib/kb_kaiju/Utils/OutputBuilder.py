@@ -190,7 +190,7 @@ class OutputBuilder(object):
             sample_order.append(input_reads_item['name'])
 
             this_summary_file = os.path.join (options['in_folder'], input_reads_item['name']+'-'+tax_level+'.kaijuReport')
-            (this_abundance, this_lineage_order, unclassified_perc) = self._parse_kaiju_summary_file (this_summary_file, tax_level)
+            (this_abundance, this_lineage_order, classified_frac) = self._parse_kaiju_summary_file (this_summary_file, tax_level)
             for lineage_name in this_lineage_order:
                 if lineage_name not in lineage_seen:
                     lineage_seen[lineage_name] = True
@@ -208,8 +208,10 @@ class OutputBuilder(object):
         # make plots
         return self._create_bar_plots (out_folder = options['stacked_bar_plots_out_folder'], 
                                        out_file_basename = tax_level+'-stacked_bar_plot',
-                                       vals = abundance_matrix, 
-                                       title = tax_level.title()+' Level Proportions',
+                                       vals = abundance_matrix,
+                                       frac_vals = classified_frac,
+                                       title = tax_level.title()+' Level Abundance',
+                                       frac_y_label = 'fraction classified',
                                        y_label = 'percent of classified reads',
                                        sample_labels = sample_order, 
                                        element_labels = lineage_order, 
@@ -364,7 +366,9 @@ class OutputBuilder(object):
     def _create_bar_plots (self, out_folder=None, 
                            out_file_basename=None, 
                            vals=None, 
+                           frac_vals=None,
                            title=None, 
+                           frac_y_label=None,
                            y_label=None, 
                            sample_labels=None, 
                            element_labels=None, 
@@ -444,7 +448,8 @@ class OutputBuilder(object):
     
         # image dimensions
         img_in_width = max_img_width = 20
-        img_in_height = max_img_height = 5
+        #img_in_height = max_img_height = 5
+        img_in_height = max_img_height = 8
         if N < 5:
             img_in_width = (max_img_width/5)*N
         elif N < 10:
@@ -461,7 +466,7 @@ class OutputBuilder(object):
         #img_in_height /= (1.0-y_shrink)       
 
 
-        # scaling based on labels                                                                                                             
+        # scaling based on labels
         longest_sample_label_len = 0
         longest_element_label_len = 0
         for label in sample_labels:
@@ -485,9 +490,9 @@ class OutputBuilder(object):
 
 
         # instantiate fig
-        fig = plt.figure()
+        fig, (ax_top, ax_bot) = plt.subplots(2, 1, sharex=True, gridspec_kw = {'height_ratios':[1, 3]})
         fig.set_size_inches(img_in_width, img_in_height)
-        ax = plt.subplot(111)
+        fig.tight_layout()
 
         #for ax in fig.axes:
         #    ax.xaxis.set_visible(False)  # remove axis labels and ticks
@@ -513,7 +518,15 @@ class OutputBuilder(object):
             np_vals.append(np.array(val_vec))
         
 
-        # plot
+        # plot fraction measured
+        frac = ax_top.bar(ind, frac_vals, bar_width, color='black', alpha=0.4, ec='none')
+        ax_top.set_title(title)
+        ax_top.set_ylabel(frac_y_label)
+        ax_top.set_yticks(np.arange(0.0, 1.01, .20))
+        ax_top.set_ylim([0,1])
+
+
+        # plot stacked
         last_bottom = None
         p = []
         for vec_i,val_vec in enumerate(np_vals):
@@ -523,31 +536,40 @@ class OutputBuilder(object):
             else:
                 this_bottom = last_bottom
                 last_bottom = this_bottom + val_vec
-            p.append (ax.bar (ind, val_vec, bar_width, bottom=this_bottom, color=color_names[vec_i], alpha=0.4, ec='none'))
+            p.append (ax_bot.bar (ind, val_vec, bar_width, bottom=this_bottom, color=color_names[vec_i], alpha=0.4, ec='none'))
 
-        plt.ylabel(y_label)
-        plt.title(title)
+        ax_bot.set_ylabel(y_label)
+        #plt.title(title)
         #plt.xticks(label_ind, sample_labels, ha='right', rotation=45)
-        plt.xticks(label_ind, sample_labels, ha='center', rotation=90)
-        plt.yticks(np.arange(0, 101, 10))
+        #ax_bot.set_xticks(label_ind, sample_labels, ha='center', rotation=90)
+        ax_bot.set_xticks(label_ind)
+        ax_bot.set_xticklabels(sample_labels, ha='center', rotation=90)
+        ax_bot.set_yticks(np.arange(0, 101, 10))
+        ax_bot.set_ylim([0,100])
+        ax_bot.set_xlim([-0.25,N-0.25])
+        
 
-
-        # Shrink current axis
-        box = ax.get_position()
+        # Shrink frac axis
+        box = ax_top.get_position()
         #x_shift = 0.05
         x_shift = 0.00
         y_shift = 0.05
-        #ax.set_position([box.x0+x_shift, box.y0+y_shrink, box.width * (1.0-x_shrink), box.height*(1.0-y_shrink)-y_shift])
-        #ax.set_position([box.x0, box.y0, box.width * (1.0-x_shrink), box.height])
-        #ax.set_position([box.x0+x_shift, box.y0, box.width * (1.0-x_shrink), box.height])
-        ax.set_position([box.x0+x_shift, box.y0+y_shrink, box.width * (1.0-x_shrink), box.height*(1.0-y_shrink)-y_shift])
+        ax_top.set_position([box.x0+x_shift, box.y0-y_shift, box.width * (1.0-x_shrink), box.height-y_shift])
+
+
+        # Shrink stacked axis
+        box = ax_bot.get_position()
+        #x_shift = 0.05
+        x_shift = 0.00
+        y_shift = 0.05
+        ax_bot.set_position([box.x0+x_shift, box.y0+y_shrink, box.width * (1.0-x_shrink), box.height*(1.0-y_shrink)-y_shift])
 
 
         # add key
         key_colors = []
         for each_p in reversed(p):
             key_colors.append(each_p[0])
-        plt.legend(key_colors, reversed(element_labels), loc='upper left', bbox_to_anchor=(1, 1))
+        ax_bot.legend(key_colors, reversed(element_labels), loc='upper left', bbox_to_anchor=(1, 1))
 
 
         # save
