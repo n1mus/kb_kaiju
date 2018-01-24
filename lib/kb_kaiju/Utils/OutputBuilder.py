@@ -484,8 +484,10 @@ class OutputBuilder(object):
                 longest_element_label_len = len(label)
         #x_label_scale_unit = 0.015
         #y_label_scale_unit = 0.015
-        x_label_scale_unit = 0.03
-        y_label_scale_unit = 0.03
+        #x_label_scale_unit = 0.03
+        #y_label_scale_unit = 0.03
+        x_label_scale_unit = 0.2
+        y_label_scale_unit = 0.2
         x_label_pad_unit = x_label_scale_unit * longest_element_label_len
         y_label_pad_unit = y_label_scale_unit * longest_sample_label_len
         x_label_pad_inch = per_unit_to_inch_scale * x_label_pad_unit
@@ -523,7 +525,7 @@ class OutputBuilder(object):
         ax_top = plt.subplot2grid((FIG_rows,FIG_cols), (0,0), rowspan=top_rows, colspan=1)
         ax_bot = plt.subplot2grid((FIG_rows,FIG_cols), (top_rows,0), rowspan=bot_rows, colspan=1)
         fig.set_size_inches(canvas_width_inch, canvas_height_inch)
-        fig.tight_layout()
+        #fig.tight_layout()
 
 
         #for ax in fig.axes:
@@ -583,21 +585,21 @@ class OutputBuilder(object):
 
         # Shrink frac axis (in inches or units?)
         box = ax_top.get_position()
-        ax_top.set_position([box.x0 + x_pad_inch, 
-                             box.y0 + y_pad_inch, 
-                             box.width - x_label_pad_inch - 2*x_pad_inch, 
-                             #box.height - y_pad_inch
-                             box.height
-                         ])
+#        ax_top.set_position([box.x0 + x_pad_inch, 
+#                             box.y0 + y_pad_inch, 
+#                             box.width - x_label_pad_inch - 2*x_pad_inch, 
+#                             #box.height - y_pad_inch
+#                             box.height
+#                         ])
 
 
         # Shrink stacked axis (in inches or units?)
         box = ax_bot.get_position()
-        ax_bot.set_position([box.x0 + x_pad_inch, 
-                             box.y0 + y_pad_inch + y_label_pad_inch, 
-                             box.width - x_label_pad_inch - 2*x_pad_inch, 
-                             box.height - y_label_pad_inch - y_pad_inch
-                         ])
+#        ax_bot.set_position([box.x0 + x_pad_inch, 
+#                             box.y0 + y_pad_inch + y_label_pad_inch, 
+#                             box.width - x_label_pad_inch - 2*x_pad_inch, 
+#                             box.height - y_label_pad_inch - y_pad_inch
+#                         ])
 
 
         # add key
