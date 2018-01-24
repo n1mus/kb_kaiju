@@ -502,7 +502,7 @@ class OutputBuilder(object):
         x_pad_inch = per_unit_to_inch_scale * x_pad_unit
         y_pad_inch = per_unit_to_inch_scale * y_pad_unit
         #canvas_width_unit = 2*x_pad_unit + plot_width_unit + x_label_pad_unit
-        canvas_width_unit = 2*x_pad_unit + plot_width_unit + 1000
+        canvas_width_unit = 2*x_pad_unit + plot_width_unit + 100
         canvas_height_unit = 2*y_pad_unit + plot_height_unit + y_label_pad_unit
         canvas_width_inch = per_unit_to_inch_scale * canvas_width_unit
         canvas_height_inch = per_unit_to_inch_scale * canvas_height_unit
