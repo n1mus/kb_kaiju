@@ -486,8 +486,8 @@ class OutputBuilder(object):
         #y_label_scale_unit = 0.015
         #x_label_scale_unit = 0.03
         #y_label_scale_unit = 0.03
-        x_label_scale_unit = 0.2
-        y_label_scale_unit = 0.2
+        x_label_scale_unit = 2
+        y_label_scale_unit = 2
         x_label_pad_unit = x_label_scale_unit * longest_element_label_len
         y_label_pad_unit = y_label_scale_unit * longest_sample_label_len
         x_label_pad_inch = per_unit_to_inch_scale * x_label_pad_unit
@@ -501,8 +501,7 @@ class OutputBuilder(object):
         y_pad_unit = 0.10
         x_pad_inch = per_unit_to_inch_scale * x_pad_unit
         y_pad_inch = per_unit_to_inch_scale * y_pad_unit
-        #canvas_width_unit = 2*x_pad_unit + plot_width_unit + x_label_pad_unit
-        canvas_width_unit = 2*x_pad_unit + plot_width_unit + 100
+        canvas_width_unit = 2*x_pad_unit + plot_width_unit + x_label_pad_unit
         canvas_height_unit = 2*y_pad_unit + plot_height_unit + y_label_pad_unit
         canvas_width_inch = per_unit_to_inch_scale * canvas_width_unit
         canvas_height_inch = per_unit_to_inch_scale * canvas_height_unit
