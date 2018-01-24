@@ -212,7 +212,7 @@ class OutputBuilder(object):
                                        out_file_basename = tax_level+'-stacked_bar_plot',
                                        vals = abundance_matrix,
                                        frac_vals = classified_frac,
-                                       title = tax_level.title()+' Level Abundance',
+                                       title = tax_level.title()+' Level',
                                        frac_y_label = 'fraction classified',
                                        y_label = 'percent of classified reads',
                                        sample_labels = sample_order, 
@@ -461,6 +461,8 @@ class OutputBuilder(object):
 
     
         # plot dimensions
+        #per_unit_to_inch_scale = 0.25
+        per_unit_to_inch_scale = 0.5
         bar_width_unit = 0.5
         plot_x_pad_unit = bar_width_unit / 2.0
         plot_width_unit = 2*plot_x_pad_unit + N
@@ -468,9 +470,7 @@ class OutputBuilder(object):
         extra_sample_scale = 0.5
         if N > downscale_above_N:
             plot_width_unit = 2*plot_x_pad_unit + downscale_above_N + extra_sample_scale*(N-downscale_above_N)
-
         plot_height_unit = 8
-        y_shift_unit = 0.05
 
         
         # label dimensions
@@ -484,19 +484,21 @@ class OutputBuilder(object):
                 longest_element_label_len = len(label)
         #x_label_scale_unit = 0.015
         #y_label_scale_unit = 0.015
-        x_label_scale_unit = 0.04
-        y_label_scale_unit = 0.04
+        x_label_scale_unit = 0.03
+        y_label_scale_unit = 0.03
         x_label_pad_unit = x_label_scale_unit * longest_element_label_len
         y_label_pad_unit = y_label_scale_unit * longest_sample_label_len
+        x_label_pad_inch = per_unit_to_inch_scale * x_label_pad_unit
+        y_label_pad_inch = per_unit_to_inch_scale * y_label_pad_unit
 
 
         # build canvas dimensions
-        #per_unit_to_inch_scale = 0.25
-        per_unit_to_inch_scale = 1.0
         #x_pad_unit = 0.05
         #y_pad_unit = 0.05
         x_pad_unit = 0.10
         y_pad_unit = 0.10
+        x_pad_inch = per_unit_to_inch_scale * x_pad_unit
+        y_pad_inch = per_unit_to_inch_scale * y_pad_unit
         canvas_width_unit = 2*x_pad_unit + plot_width_unit + x_label_pad_unit
         canvas_height_unit = 2*y_pad_unit + plot_height_unit + y_label_pad_unit
         canvas_width_inch = per_unit_to_inch_scale * canvas_width_unit
@@ -521,7 +523,7 @@ class OutputBuilder(object):
         ax_top = plt.subplot2grid((FIG_rows,FIG_cols), (0,0), rowspan=top_rows, colspan=1)
         ax_bot = plt.subplot2grid((FIG_rows,FIG_cols), (top_rows,0), rowspan=bot_rows, colspan=1)
         fig.set_size_inches(canvas_width_inch, canvas_height_inch)
-        #fig.tight_layout()
+        fig.tight_layout()
 
 
         #for ax in fig.axes:
@@ -581,12 +583,21 @@ class OutputBuilder(object):
 
         # Shrink frac axis (in inches or units?)
         box = ax_top.get_position()
-        ax_top.set_position([box.x0 + x_pad_unit, box.y0 + y_pad_unit + y_label_pad_unit, box.width - x_label_pad_unit - 2*x_pad_unit, box.height - y_label_pad_unit - 2*y_pad_unit])
+        ax_top.set_position([box.x0 + x_pad_inch, 
+                             box.y0 + y_pad_inch, 
+                             box.width - x_label_pad_inch - 2*x_pad_inch, 
+                             #box.height - y_pad_inch
+                             box.height
+                         ])
 
 
         # Shrink stacked axis (in inches or units?)
         box = ax_bot.get_position()
-        ax_bot.set_position([box.x0 + x_pad_unit, box.y0 + y_pad_unit + y_label_pad_unit, box.width - x_label_pad_unit - 2*x_pad_unit, box.height - y_label_pad_unit - 2*y_pad_unit])
+        ax_bot.set_position([box.x0 + x_pad_inch, 
+                             box.y0 + y_pad_inch + y_label_pad_inch, 
+                             box.width - x_label_pad_inch - 2*x_pad_inch, 
+                             box.height - y_label_pad_inch - y_pad_inch
+                         ])
 
 
         # add key
