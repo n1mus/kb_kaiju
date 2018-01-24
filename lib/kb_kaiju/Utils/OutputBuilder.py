@@ -489,7 +489,8 @@ class OutputBuilder(object):
 
 
         # build canvas dimensions
-        per_unit_to_inch_scale = 0.25
+        #per_unit_to_inch_scale = 0.25
+        per_unit_to_inch_scale = 1.0
         x_pad_unit = 0.05
         y_pad_unit = 0.05
         canvas_width_unit = 2*x_pad_unit + plot_width_unit + x_label_pad_unit
@@ -581,7 +582,7 @@ class OutputBuilder(object):
 
         # Shrink stacked axis
         box = ax_bot.get_position()
-        ax_top.set_position([box.x0 + x_pad_unit, box.y0 + y_pad_unit + y_label_pad_unit, box.width - x_label_pad_unit - 2*x_pad_unit, box.height - y_label_pad_unit - 2*y_pad_unit])
+        ax_bot.set_position([box.x0 + x_pad_unit, box.y0 + y_pad_unit + y_label_pad_unit, box.width - x_label_pad_unit - 2*x_pad_unit, box.height - y_label_pad_unit - 2*y_pad_unit])
 
 
         # add key
