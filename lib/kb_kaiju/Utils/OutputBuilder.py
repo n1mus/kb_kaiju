@@ -482,8 +482,10 @@ class OutputBuilder(object):
         for label in element_labels:
             if len(label) > longest_element_label_len:
                 longest_element_label_len = len(label)
-        x_label_scale_unit = 0.015
-        y_label_scale_unit = 0.015
+        #x_label_scale_unit = 0.015
+        #y_label_scale_unit = 0.015
+        x_label_scale_unit = 0.04
+        y_label_scale_unit = 0.04
         x_label_pad_unit = x_label_scale_unit * longest_element_label_len
         y_label_pad_unit = y_label_scale_unit * longest_sample_label_len
 
@@ -491,8 +493,10 @@ class OutputBuilder(object):
         # build canvas dimensions
         #per_unit_to_inch_scale = 0.25
         per_unit_to_inch_scale = 1.0
-        x_pad_unit = 0.05
-        y_pad_unit = 0.05
+        #x_pad_unit = 0.05
+        #y_pad_unit = 0.05
+        x_pad_unit = 0.10
+        y_pad_unit = 0.10
         canvas_width_unit = 2*x_pad_unit + plot_width_unit + x_label_pad_unit
         canvas_height_unit = 2*y_pad_unit + plot_height_unit + y_label_pad_unit
         canvas_width_inch = per_unit_to_inch_scale * canvas_width_unit
@@ -570,17 +574,17 @@ class OutputBuilder(object):
         #ax_bot.set_xticks(label_ind, sample_labels, ha='center', rotation=90)
         ax_bot.set_xticks(label_ind)
         ax_bot.set_xticklabels(sample_labels, ha='center', rotation=90)
-        ax_bot.set_yticks(np.arange(0, 101, 10))
+        ax_bot.set_yticks(np.arange(0, 101, 20))
         ax_bot.set_ylim([0,100])
         ax_bot.set_xlim([-plot_x_pad_unit,N-plot_x_pad_unit])
         
 
-        # Shrink frac axis
+        # Shrink frac axis (in inches or units?)
         box = ax_top.get_position()
         ax_top.set_position([box.x0 + x_pad_unit, box.y0 + y_pad_unit + y_label_pad_unit, box.width - x_label_pad_unit - 2*x_pad_unit, box.height - y_label_pad_unit - 2*y_pad_unit])
 
 
-        # Shrink stacked axis
+        # Shrink stacked axis (in inches or units?)
         box = ax_bot.get_position()
         ax_bot.set_position([box.x0 + x_pad_unit, box.y0 + y_pad_unit + y_label_pad_unit, box.width - x_label_pad_unit - 2*x_pad_unit, box.height - y_label_pad_unit - 2*y_pad_unit])
 
