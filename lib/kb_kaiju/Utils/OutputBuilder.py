@@ -518,7 +518,7 @@ class OutputBuilder(object):
         ax_top = plt.subplot2grid((FIG_rows,FIG_cols), (0,0), rowspan=top_rows, colspan=1)
         ax_bot = plt.subplot2grid((FIG_rows,FIG_cols), (top_rows,0), rowspan=bot_rows, colspan=1)
         fig.set_size_inches(canvas_width_inch, canvas_height_inch)
-        fig.tight_layout()
+        #fig.tight_layout()
 
 
         #for ax in fig.axes:
