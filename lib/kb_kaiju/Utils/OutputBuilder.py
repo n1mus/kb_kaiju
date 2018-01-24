@@ -468,11 +468,9 @@ class OutputBuilder(object):
         extra_sample_scale = 0.5
         if N > downscale_above_N:
             plot_width_unit = 2*plot_x_pad_unit + downscale_above_N + extra_sample_scale*(N-downscale_above_N)
-        #plot_width_inch = per_unit_to_inch_scale * plot_width_unit
 
         plot_height_unit = 8
         y_shift_unit = 0.05
-        #plot_height_inch = per_unit_to_inch_scale * plot_height_unit
 
         
         # label dimensions
@@ -551,7 +549,7 @@ class OutputBuilder(object):
         ax_top.set_yticks(np.arange(0.0, 1.01, .20))
         ax_top.set_ylim([0,1])
         ax_top.xaxis.set_visible(False)  # remove axis labels and ticks
-        ax_top.set_xlim([-plot_pad_x_unit,N-plot_pad_x_unit])
+        ax_top.set_xlim([-plot_x_pad_unit,N-plot_x_pad_unit])
 
         # plot stacked
         last_bottom = None
@@ -573,7 +571,7 @@ class OutputBuilder(object):
         ax_bot.set_xticklabels(sample_labels, ha='center', rotation=90)
         ax_bot.set_yticks(np.arange(0, 101, 10))
         ax_bot.set_ylim([0,100])
-        ax_bot.set_xlim([-plot_pad_x_unit,N-plot_pad_x_unit])
+        ax_bot.set_xlim([-plot_x_pad_unit,N-plot_x_pad_unit])
         
 
         # Shrink frac axis
