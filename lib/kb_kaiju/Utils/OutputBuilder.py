@@ -501,7 +501,8 @@ class OutputBuilder(object):
         y_pad_unit = 0.10
         x_pad_inch = per_unit_to_inch_scale * x_pad_unit
         y_pad_inch = per_unit_to_inch_scale * y_pad_unit
-        canvas_width_unit = 2*x_pad_unit + plot_width_unit + x_label_pad_unit
+        #canvas_width_unit = 2*x_pad_unit + plot_width_unit + x_label_pad_unit
+        canvas_width_unit = 2*x_pad_unit + plot_width_unit + 1000
         canvas_height_unit = 2*y_pad_unit + plot_height_unit + y_label_pad_unit
         canvas_width_inch = per_unit_to_inch_scale * canvas_width_unit
         canvas_height_inch = per_unit_to_inch_scale * canvas_height_unit
@@ -525,7 +526,7 @@ class OutputBuilder(object):
         ax_top = plt.subplot2grid((FIG_rows,FIG_cols), (0,0), rowspan=top_rows, colspan=1)
         ax_bot = plt.subplot2grid((FIG_rows,FIG_cols), (top_rows,0), rowspan=bot_rows, colspan=1)
         fig.set_size_inches(canvas_width_inch, canvas_height_inch)
-        #fig.tight_layout()
+        fig.tight_layout()
 
 
         #for ax in fig.axes:
