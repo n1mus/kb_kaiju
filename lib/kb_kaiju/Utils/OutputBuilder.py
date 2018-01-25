@@ -484,10 +484,8 @@ class OutputBuilder(object):
                 longest_element_label_len = len(label)
         #x_label_scale_unit = 0.015
         #y_label_scale_unit = 0.015
-        #x_label_scale_unit = 0.03
-        #y_label_scale_unit = 0.03
-        x_label_scale_unit = 2
-        y_label_scale_unit = 2
+        x_label_scale_unit = 0.03
+        y_label_scale_unit = 0.03
         x_label_pad_unit = x_label_scale_unit * longest_element_label_len
         y_label_pad_unit = y_label_scale_unit * longest_sample_label_len
         x_label_pad_inch = per_unit_to_inch_scale * x_label_pad_unit
@@ -591,15 +589,24 @@ class OutputBuilder(object):
 #                             #box.height - y_pad_inch
 #                             box.height
 #                         ])
+        ax_top.set_position([box.x0 + x_pad_inch, 
+                             #box.y0 + y_pad_inch, 
+                             box.y0, 
+                             box.width - x_label_pad_inch - 2*x_pad_inch, 
+                             #box.height - y_pad_inch
+                             box.height
+                          ])
 
 
         # Shrink stacked axis (in inches or units?)
         box = ax_bot.get_position()
-#        ax_bot.set_position([box.x0 + x_pad_inch, 
-#                             box.y0 + y_pad_inch + y_label_pad_inch, 
-#                             box.width - x_label_pad_inch - 2*x_pad_inch, 
-#                             box.height - y_label_pad_inch - y_pad_inch
-#                         ])
+        ax_bot.set_position([box.x0 + x_pad_inch, 
+                             #box.y0 + y_pad_inch + y_label_pad_inch, 
+                             box.y0,
+                             box.width - x_label_pad_inch - 2*x_pad_inch, 
+                             #box.height - y_label_pad_inch - y_pad_inch
+                             box.height
+                         ])
 
 
         # add key
