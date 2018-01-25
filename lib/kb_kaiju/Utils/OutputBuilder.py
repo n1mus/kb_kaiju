@@ -581,32 +581,75 @@ class OutputBuilder(object):
         ax_bot.set_xlim([-plot_x_pad_unit,N-plot_x_pad_unit])
         
 
-        # Shrink frac axis (in inches or units?)
+        # are positions now in units or inches?
+        #x_pad = x_pad_unit
+        #y_pad = y_pad_unit
+        #x_label_pad = x_label_pad_unit
+        #y_label_pad = y_label_pad_unit
+        x_pad = x_pad_inch
+        y_pad = y_pad_inch
+        x_label_pad = x_label_pad_inch
+        y_label_pad = y_label_pad_inch
+
+
+        # Shrink frac axis
         box = ax_top.get_position()
+
 #        ax_top.set_position([box.x0 + x_pad_inch, 
 #                             box.y0 + y_pad_inch, 
 #                             box.width - x_label_pad_inch - 2*x_pad_inch, 
 #                             #box.height - y_pad_inch
 #                             box.height
 #                         ])
-        ax_top.set_position([box.x0 + x_pad_inch, 
-                             #box.y0 + y_pad_inch, 
+#        ax_top.set_position([box.x0 + x_pad_inch, 
+#                             #box.y0 + y_pad_inch, 
+#                             box.y0, 
+#                             box.width - x_label_pad_inch - 2*x_pad_inch, 
+#                             #box.height - y_pad_inch
+#                             box.height
+#                          ])
+        [x_0, y_0, w, h] = [box.x0 + x_pad, 
+                             #box.y0 + y_pad, 
                              box.y0, 
-                             box.width - x_label_pad_inch - 2*x_pad_inch, 
-                             #box.height - y_pad_inch
+                             box.width - x_label_pad - 2*x_pad, 
+                             #box.height - y_pad
                              box.height
-                          ])
+                          ]
+        if x_0 >= w:
+            log ("new x_0 too big.  x_0:"+str(x_0)+" w:"+str(w)+" box.x0:"+str(box.x0)+" x_pad:"+str(x_pad))
+            x_0 = box.x0
+        if w <= 0:
+            log ("new w below zero.  x_0:"+str(x_0)+" w:"+str(w)+" box.width:"+str(box.width)+" x_label_pad:"+str(x_label_pad))
+            w = box.width
+        new_pos = [x_0, y_0, w, h]
+        ax_top.set_position(new_pos)
 
 
-        # Shrink stacked axis (in inches or units?)
+        # Shrink stacked axis
         box = ax_bot.get_position()
-        ax_bot.set_position([box.x0 + x_pad_inch, 
-                             #box.y0 + y_pad_inch + y_label_pad_inch, 
-                             box.y0,
-                             box.width - x_label_pad_inch - 2*x_pad_inch, 
-                             #box.height - y_label_pad_inch - y_pad_inch
+        #ax_bot.set_position([box.x0 + x_pad_inch, 
+        #                     #box.y0 + y_pad_inch + y_label_pad_inch, 
+        #                     box.y0,
+        #                     box.width - x_label_pad_inch - 2*x_pad_inch, 
+        #                     #box.height - y_label_pad_inch - y_pad_inch
+        #                     box.height
+        #                 ])
+        [x_0, y_0, w, h] = [box.x0 + x_pad, 
+                             #box.y0 + y_pad, 
+                             box.y0, 
+                             box.width - x_label_pad - 2*x_pad, 
+                             #box.height - y_pad
                              box.height
-                         ])
+                          ]
+        if x_0 >= w:
+            log ("new x_0 too big.  x_0:"+str(x_0)+" w:"+str(w)+" box.x0:"+str(box.x0)+" x_pad:"+str(x_pad))
+            x_0 = box.x0
+        if w <= 0:
+            log ("new w below zero.  x_0:"+str(x_0)+" w:"+str(w)+" box.width:"+str(box.width)+" x_label_pad:"+str(x_label_pad))
+            w = box.width
+        new_pos = [x_0, y_0, w, h]
+        ax_bot.set_position(new_pos)
+
 
 
         # add key
