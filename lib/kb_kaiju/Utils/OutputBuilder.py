@@ -484,7 +484,7 @@ class OutputBuilder(object):
                 longest_element_label_len = len(label)
         #x_label_scale_unit = 0.015
         #y_label_scale_unit = 0.015
-        x_label_scale_unit = 0.03
+        x_label_scale_unit = 0.3
         y_label_scale_unit = 0.03
         x_label_pad_unit = x_label_scale_unit * longest_element_label_len
         y_label_pad_unit = y_label_scale_unit * longest_sample_label_len
