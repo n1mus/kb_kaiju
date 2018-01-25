@@ -581,15 +581,15 @@ class OutputBuilder(object):
         ax_bot.set_xlim([-plot_x_pad_unit,N-plot_x_pad_unit])
         
 
-        # are positions now in units or inches?
-        #x_pad = x_pad_unit
-        #y_pad = y_pad_unit
-        #x_label_pad = x_label_pad_unit
-        #y_label_pad = y_label_pad_unit
-        x_pad = x_pad_inch
-        y_pad = y_pad_inch
-        x_label_pad = x_label_pad_inch
-        y_label_pad = y_label_pad_inch
+        # are positions now in units (btw. 0-1) or inches?  seems to depend on the backend Agg
+        x_pad = x_pad_unit
+        y_pad = y_pad_unit
+        x_label_pad = x_label_pad_unit
+        y_label_pad = y_label_pad_unit
+        #x_pad = x_pad_inch
+        #y_pad = y_pad_inch
+        #x_label_pad = x_label_pad_inch
+        #y_label_pad = y_label_pad_inch
 
 
         # Shrink frac axis
@@ -615,12 +615,18 @@ class OutputBuilder(object):
                              #box.height - y_pad
                              box.height
                           ]
-        if x_0 >= w:
-            log ("new x_0 too big.  x_0:"+str(x_0)+" w:"+str(w)+" box.x0:"+str(box.x0)+" x_pad:"+str(x_pad))
+        if x_0 >= box.x0+box.width or x_0 < 0:
+            log ("new x_0 impossible.  x_0:"+str(x_0)+" w:"+str(w)+" box.x0:"+str(box.x0)+" x_pad:"+str(x_pad))
             x_0 = box.x0
         if w <= 0:
-            log ("new w below zero.  x_0:"+str(x_0)+" w:"+str(w)+" box.width:"+str(box.width)+" x_label_pad:"+str(x_label_pad))
+            log ("new w <= zero.  x_0:"+str(x_0)+" w:"+str(w)+" box.width:"+str(box.width)+" x_label_pad:"+str(x_label_pad))
             w = box.width
+        if y_0 >= box.y0+box.height or y_0 < 0:
+            log ("new y_0 impossible.  y_0:"+str(y_0)+" h:"+str(h)+" box.y0:"+str(box.y0)+" y_pad:"+str(y_pad))
+            y_0 = box.y0
+        if h <= 0:
+            log ("new h <= zero.  y_0:"+str(y_0)+" h:"+str(h)+" box.height:"+str(box.height)+" y_label_pad:"+str(y_label_pad))
+            h = box.height
         new_pos = [x_0, y_0, w, h]
         ax_top.set_position(new_pos)
 
@@ -641,15 +647,20 @@ class OutputBuilder(object):
                              #box.height - y_pad
                              box.height
                           ]
-        if x_0 >= w:
-            log ("new x_0 too big.  x_0:"+str(x_0)+" w:"+str(w)+" box.x0:"+str(box.x0)+" x_pad:"+str(x_pad))
+        if x_0 >= box.x0+box.width or x_0 < 0:
+            log ("new x_0 impossible.  x_0:"+str(x_0)+" w:"+str(w)+" box.x0:"+str(box.x0)+" x_pad:"+str(x_pad))
             x_0 = box.x0
         if w <= 0:
-            log ("new w below zero.  x_0:"+str(x_0)+" w:"+str(w)+" box.width:"+str(box.width)+" x_label_pad:"+str(x_label_pad))
+            log ("new w <= zero.  x_0:"+str(x_0)+" w:"+str(w)+" box.width:"+str(box.width)+" x_label_pad:"+str(x_label_pad))
             w = box.width
+        if y_0 >= box.y0+box.height or y_0 < 0:
+            log ("new y_0 impossible.  y_0:"+str(y_0)+" h:"+str(h)+" box.y0:"+str(box.y0)+" y_pad:"+str(y_pad))
+            y_0 = box.y0
+        if h <= 0:
+            log ("new h <= zero.  y_0:"+str(y_0)+" h:"+str(h)+" box.height:"+str(box.height)+" y_label_pad:"+str(y_label_pad))
+            h = box.height
         new_pos = [x_0, y_0, w, h]
         ax_bot.set_position(new_pos)
-
 
 
         # add key
