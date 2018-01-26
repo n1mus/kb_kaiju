@@ -482,10 +482,10 @@ class OutputBuilder(object):
         for label in element_labels:
             if len(label) > longest_element_label_len:
                 longest_element_label_len = len(label)
-        x_label_scale_unit = 0.015
-        y_label_scale_unit = 0.015
-        #x_label_scale_unit = 0.3
-        #y_label_scale_unit = 0.03
+        #x_label_scale_unit = 0.015
+        #y_label_scale_unit = 0.015
+        x_label_scale_unit = 0.3
+        y_label_scale_unit = 0.3
         x_label_pad_unit = x_label_scale_unit * longest_element_label_len
         y_label_pad_unit = y_label_scale_unit * longest_sample_label_len
         x_label_pad_inch = per_unit_to_inch_scale * x_label_pad_unit
@@ -493,8 +493,8 @@ class OutputBuilder(object):
 
 
         # build canvas dimensions
-        x_pad_unit = 0.05
-        y_pad_unit = 0.05
+        x_pad_unit = 1.0
+        y_pad_unit = 0.5
         #x_pad_unit = 0.10
         #y_pad_unit = 0.10
         x_pad_inch = per_unit_to_inch_scale * x_pad_unit
@@ -553,7 +553,7 @@ class OutputBuilder(object):
         frac = ax_top.bar(ind, frac_vals, bar_width_unit, color='black', alpha=0.4, ec='none')
         ax_top.set_title(title)
         ax_top.set_ylabel(frac_y_label, fontsize=10)
-        ax_top.tick_params(axis='y', direction='out', length=4, width=2, colors='black', labelsize=9, labelcolor='black')
+        ax_top.tick_params(axis='y', direction='in', length=4, width=0.5, colors='black', labelsize=9, labelcolor='black')
         ax_top.set_yticks(np.arange(0.0, 1.01, .20))
         ax_top.set_ylim([0,1])
         ax_top.xaxis.set_visible(False)  # remove axis labels and ticks
@@ -572,6 +572,7 @@ class OutputBuilder(object):
             p.append (ax_bot.bar (ind, val_vec, bar_width_unit, bottom=this_bottom, color=color_names[vec_i], alpha=0.4, ec='none'))
 
         ax_bot.set_ylabel(y_label, fontsize=10)
+        ax_top.tick_params(axis='y', direction='in', length=4, width=0.5, colors='black', labelsize=9, labelcolor='black')
         #plt.title(title)
         #plt.xticks(label_ind, sample_labels, ha='right', rotation=45)
         #ax_bot.set_xticks(label_ind, sample_labels, ha='center', rotation=90)
@@ -604,9 +605,9 @@ class OutputBuilder(object):
 #                             box.height
 #                         ])
         top_pos = [x_0, y_0, w, h] = [0 + x_pad, 
-                                      0.75,
+                                      1.0 - top_frac + y_pad,
                                       plot_width,
-                                      0.25 - y_pad
+                                      top_frac - 2*y_pad
                                   ]
         ax_top.set_position(top_pos)
 
@@ -631,7 +632,7 @@ class OutputBuilder(object):
         bot_pos = [x_0, y_0, w, h] = [0 + x_pad, 
                                       0 + y_pad + y_label_pad,
                                       plot_width,
-                                      0.75 - y_pad - y_label_pad
+                                      1.0 - top_frac - 2*y_pad - y_label_pad
                                   ]
         ax_bot.set_position(bot_pos)
 
