@@ -519,7 +519,7 @@ class OutputBuilder(object):
         # subplot2grid(shape, loc, rowspan=1, colspan=1)
         FIG_rows = 1000
         FIG_cols = 1
-        top_frac = 0.15
+        top_frac = 0.2
         top_rows = int(top_frac*FIG_rows)
         bot_rows = FIG_rows-top_rows
         fig = plt.figure()
@@ -609,9 +609,9 @@ class OutputBuilder(object):
 #                             box.height
 #                         ])
         top_pos = [x_0, y_0, w, h] = [0 + x_pad, 
-                                      (1.0 - top_frac)*plot_height + y_pad + y_label_pad,
+                                      (1.0 - top_frac)*plot_height + y_label_pad,
                                       plot_width,
-                                      top_frac*plot_height - y_pad
+                                      top_frac*plot_height - 2*y_pad
                                   ]
         ax_top.set_position(top_pos)
 
@@ -634,9 +634,9 @@ class OutputBuilder(object):
         #                     box.height
         #                 ])
         bot_pos = [x_0, y_0, w, h] = [0 + x_pad, 
-                                      0 + y_label_pad + y_pad,
+                                      0 + y_label_pad,
                                       plot_width,
-                                      (1.0 - top_frac)*plot_height - y_pad
+                                      (1.0 - top_frac)*plot_height - 2*y_pad
                                   ]
         ax_bot.set_position(bot_pos)
 
