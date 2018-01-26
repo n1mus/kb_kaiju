@@ -484,8 +484,8 @@ class OutputBuilder(object):
                 longest_element_label_len = len(label)
         #x_label_scale_unit = 0.015
         #y_label_scale_unit = 0.015
-        x_label_scale_unit = 0.3
-        y_label_scale_unit = 0.3
+        x_label_scale_unit = 0.2
+        y_label_scale_unit = 0.15
         x_label_pad_unit = x_label_scale_unit * longest_element_label_len
         y_label_pad_unit = y_label_scale_unit * longest_sample_label_len
         x_label_pad_inch = per_unit_to_inch_scale * x_label_pad_unit
@@ -493,7 +493,7 @@ class OutputBuilder(object):
 
 
         # build canvas dimensions
-        x_pad_unit = 1.0
+        x_pad_unit = 1.5
         y_pad_unit = 0.5
         #x_pad_unit = 0.10
         #y_pad_unit = 0.10
@@ -516,7 +516,7 @@ class OutputBuilder(object):
         # subplot2grid(shape, loc, rowspan=1, colspan=1)
         FIG_rows = 1000
         FIG_cols = 1
-        top_frac = 0.25
+        top_frac = 0.15
         top_rows = int(top_frac*FIG_rows)
         bot_rows = FIG_rows-top_rows
         fig = plt.figure()
@@ -551,9 +551,9 @@ class OutputBuilder(object):
 
         # plot fraction measured
         frac = ax_top.bar(ind, frac_vals, bar_width_unit, color='black', alpha=0.4, ec='none')
-        ax_top.set_title(title)
+        ax_top.set_title(title, fontsize=11)
         ax_top.set_ylabel(frac_y_label, fontsize=10)
-        ax_top.tick_params(axis='y', direction='in', length=4, width=0.5, colors='black', labelsize=9, labelcolor='black')
+        ax_top.tick_params(axis='y', labelsize=9, labelcolor='black')
         ax_top.set_yticks(np.arange(0.0, 1.01, .20))
         ax_top.set_ylim([0,1])
         ax_top.xaxis.set_visible(False)  # remove axis labels and ticks
@@ -572,14 +572,14 @@ class OutputBuilder(object):
             p.append (ax_bot.bar (ind, val_vec, bar_width_unit, bottom=this_bottom, color=color_names[vec_i], alpha=0.4, ec='none'))
 
         ax_bot.set_ylabel(y_label, fontsize=10)
-        ax_top.tick_params(axis='y', direction='in', length=4, width=0.5, colors='black', labelsize=9, labelcolor='black')
+        ax_bot.tick_params(axis='y', direction='in', length=4, width=0.5, colors='black', labelsize=9, labelcolor='black')
         #plt.title(title)
         #plt.xticks(label_ind, sample_labels, ha='right', rotation=45)
         #ax_bot.set_xticks(label_ind, sample_labels, ha='center', rotation=90)
         ax_bot.tick_params(axis='x', direction='out', length=0, width=0, colors='black', labelsize=9, labelcolor='black')
         ax_bot.set_xticks(label_ind)
         ax_bot.set_xticklabels(sample_labels, ha='center', rotation=90)
-        ax_top.tick_params(axis='y', direction='out', length=4, width=2, colors='black', labelsize=9, labelcolor='black')
+        ax_bot.tick_params(axis='y', labelsize=9, labelcolor='black')
         ax_bot.set_yticks(np.arange(0, 101, 20))
         ax_bot.set_ylim([0,100])
         ax_bot.set_xlim([-plot_x_pad_unit,N-plot_x_pad_unit])
