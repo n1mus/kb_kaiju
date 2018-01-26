@@ -484,7 +484,7 @@ class OutputBuilder(object):
                 longest_element_label_len = len(label)
         #x_label_scale_unit = 0.015
         #y_label_scale_unit = 0.015
-        x_label_scale_unit = 0.2
+        x_label_scale_unit = 0.175
         y_label_scale_unit = 0.15
         x_label_pad_unit = x_label_scale_unit * longest_element_label_len
         y_label_pad_unit = y_label_scale_unit * longest_sample_label_len
@@ -493,8 +493,8 @@ class OutputBuilder(object):
 
 
         # build canvas dimensions
-        x_pad_unit = 1.5
-        y_pad_unit = 0.5
+        x_pad_unit = 1.0
+        y_pad_unit = 0.25
         #x_pad_unit = 0.10
         #y_pad_unit = 0.10
         x_pad_inch = per_unit_to_inch_scale * x_pad_unit
@@ -608,7 +608,7 @@ class OutputBuilder(object):
         top_pos = [x_0, y_0, w, h] = [0 + x_pad, 
                                       (1.0 - top_frac)*plot_height + y_pad + y_label_pad,
                                       plot_width,
-                                      top_frac*plot_height - 2*y_pad
+                                      top_frac*plot_height - y_pad
                                   ]
         ax_top.set_position(top_pos)
 
