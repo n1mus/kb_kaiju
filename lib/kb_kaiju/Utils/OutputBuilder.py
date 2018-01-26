@@ -552,7 +552,8 @@ class OutputBuilder(object):
         # plot fraction measured
         frac = ax_top.bar(ind, frac_vals, bar_width_unit, color='black', alpha=0.4, ec='none')
         ax_top.set_title(title)
-        ax_top.set_ylabel(frac_y_label)
+        ax_top.set_ylabel(frac_y_label, fontsize=10)
+        ax_top.tick_params(axis='y', direction='out', length=4, width=2, colors='black', labelsize=9, labelcolor='black')
         ax_top.set_yticks(np.arange(0.0, 1.01, .20))
         ax_top.set_ylim([0,1])
         ax_top.xaxis.set_visible(False)  # remove axis labels and ticks
@@ -570,12 +571,14 @@ class OutputBuilder(object):
                 last_bottom = this_bottom + val_vec
             p.append (ax_bot.bar (ind, val_vec, bar_width_unit, bottom=this_bottom, color=color_names[vec_i], alpha=0.4, ec='none'))
 
-        ax_bot.set_ylabel(y_label)
+        ax_bot.set_ylabel(y_label, fontsize=10)
         #plt.title(title)
         #plt.xticks(label_ind, sample_labels, ha='right', rotation=45)
         #ax_bot.set_xticks(label_ind, sample_labels, ha='center', rotation=90)
+        ax_bot.tick_params(axis='x', direction='out', length=0, width=0, colors='black', labelsize=9, labelcolor='black')
         ax_bot.set_xticks(label_ind)
         ax_bot.set_xticklabels(sample_labels, ha='center', rotation=90)
+        ax_top.tick_params(axis='y', direction='out', length=4, width=2, colors='black', labelsize=9, labelcolor='black')
         ax_bot.set_yticks(np.arange(0, 101, 20))
         ax_bot.set_ylim([0,100])
         ax_bot.set_xlim([-plot_x_pad_unit,N-plot_x_pad_unit])
@@ -597,7 +600,7 @@ class OutputBuilder(object):
         # Frac Plot sizing
         # don't shrink frac plot.  instead place it explictly since we built canvas for it
         #
-        #box = ax_top.get_position()
+        box = ax_top.get_position()
 #        ax_top.set_position([box.x0 + x_pad_inch, 
 #                             box.y0 + y_pad_inch, 
 #                             box.width - x_label_pad_inch - 2*x_pad_inch, 
@@ -611,6 +614,12 @@ class OutputBuilder(object):
                           ]
         new_pos = [x_0, y_0, w, h]
         ax_top.set_position(new_pos)
+
+        # DEBUG
+        print ("AX_TOP: BOX:")
+        print (box)
+        print ("AX_TOP: NEW_POS:")
+        print (new_pos)
 
 
         # Stacked Plot sizing
@@ -632,12 +641,17 @@ class OutputBuilder(object):
         new_pos = [x_0, y_0, w, h]
         ax_bot.set_position(new_pos)
 
+        print ("AX_BOT: BOX:")
+        print (box)
+        print ("AX_BOT: NEW_POS:")
+        print (new_pos)
+
 
         # add key
         key_colors = []
         for each_p in reversed(p):
             key_colors.append(each_p[0])
-        ax_bot.legend(key_colors, reversed(element_labels), loc='upper left', bbox_to_anchor=(1,1))
+        ax_bot.legend(key_colors, reversed(element_labels), loc='upper left', bbox_to_anchor=(1,1), fontsize=9)
 
 
         # save
