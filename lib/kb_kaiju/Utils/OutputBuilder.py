@@ -552,6 +552,7 @@ class OutputBuilder(object):
         # plot fraction measured
         frac = ax_top.bar(ind, frac_vals, bar_width_unit, color='black', alpha=0.4, ec='none')
         ax_top.set_title(title, fontsize=11)
+        ax_top.grid(b=True, axis='y')
         ax_top.set_ylabel(frac_y_label, fontsize=10)
         ax_top.tick_params(axis='y', labelsize=9, labelcolor='black')
         ax_top.set_yticks(np.arange(0.0, 1.01, .20))
@@ -605,9 +606,9 @@ class OutputBuilder(object):
 #                             box.height
 #                         ])
         top_pos = [x_0, y_0, w, h] = [0 + x_pad, 
-                                      1.0 - top_frac + y_pad,
+                                      (1.0 - top_frac)*plot_height + y_pad + y_label_pad,
                                       plot_width,
-                                      top_frac - 2*y_pad
+                                      top_frac*plot_height - 2*y_pad
                                   ]
         ax_top.set_position(top_pos)
 
@@ -630,9 +631,9 @@ class OutputBuilder(object):
         #                     box.height
         #                 ])
         bot_pos = [x_0, y_0, w, h] = [0 + x_pad, 
-                                      0 + y_pad + y_label_pad,
+                                      0 + y_label_pad + y_pad,
                                       plot_width,
-                                      1.0 - top_frac - 2*y_pad - y_label_pad
+                                      (1.0 - top_frac)*plot_height - y_pad
                                   ]
         ax_bot.set_position(bot_pos)
 
