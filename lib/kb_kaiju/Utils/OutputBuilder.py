@@ -488,7 +488,7 @@ class OutputBuilder(object):
         #x_label_scale_unit = 0.015
         #y_label_scale_unit = 0.015
         x_label_scale_unit = 0.175
-        y_label_scale_unit = 0.15
+        y_label_scale_unit = 0.16
         x_label_pad_unit = x_label_scale_unit * longest_element_label_len
         y_label_pad_unit = y_label_scale_unit * longest_sample_label_len
         x_label_pad_inch = per_unit_to_inch_scale * x_label_pad_unit
@@ -519,7 +519,7 @@ class OutputBuilder(object):
         # subplot2grid(shape, loc, rowspan=1, colspan=1)
         FIG_rows = 1000
         FIG_cols = 1
-        top_frac = 0.2
+        top_frac = 0.22
         top_rows = int(top_frac*FIG_rows)
         bot_rows = FIG_rows-top_rows
         fig = plt.figure()
@@ -634,9 +634,9 @@ class OutputBuilder(object):
         #                     box.height
         #                 ])
         bot_pos = [x_0, y_0, w, h] = [0 + x_pad, 
-                                      0 + y_label_pad,
+                                      0 + y_label_pad + y_pad,
                                       plot_width,
-                                      (1.0 - top_frac)*plot_height - 2*y_pad
+                                      (1.0 - top_frac)*plot_height - y_pad
                                   ]
         ax_bot.set_position(bot_pos)
 
@@ -651,264 +651,6 @@ class OutputBuilder(object):
         for each_p in reversed(p):
             key_colors.append(each_p[0])
         ax_bot.legend(key_colors, reversed(element_labels), loc='upper left', bbox_to_anchor=(1,1), fontsize=9)
-
-
-        # save
-        img_dpi = 200
-        #plt.show()
-        log("SAVING STACKED BAR PLOT")
-        png_file = out_file_basename+'.png'
-        pdf_file = out_file_basename+'.pdf'
-        output_png_file_path = os.path.join(out_folder, png_file);
-        output_pdf_file_path = os.path.join(out_folder, pdf_file);
-        fig.savefig(output_png_file_path, dpi=img_dpi)
-        fig.savefig(output_pdf_file_path, format='pdf')
-        
-        return output_png_file_path
-
-
-    def _create_bar_plots_BAD_DIMENSIONS (self, out_folder=None, 
-                           out_file_basename=None, 
-                           vals=None, 
-                           frac_vals=None,
-                           title=None, 
-                           frac_y_label=None,
-                           y_label=None, 
-                           sample_labels=None, 
-                           element_labels=None, 
-                           sort_by=None):
-
-        # DEBUG
-        N = len(sample_labels)
-        N_force = 2
-        for sample_i in range(N_force):
-            if sample_i >= N:
-                sample_labels.append(sample_labels[0]+'.'+str(sample_i))
-                frac_vals.append(frac_vals[0])
-                for element_i,element_label in enumerate(element_labels):
-                    vals[element_i].append(vals[element_i][0])
-        # END DEBUG
-
-        # number of samples
-        N = len(sample_labels)
-
-
-        # colors
-        color_names = self.no_light_color_names
-        random.seed(a=len(element_labels))
-        r = random.random()
-        shuffle(color_names, lambda: r)
-        for label_i,label in enumerate(element_labels):
-            if label.startswith('tail <'):
-                color_names[label_i] = 'lightslategray'
-            elif label.startswith('viruses'):
-                color_names[label_i] = 'magenta'
-            elif label.startswith('unassigned at'):
-                color_names[label_i] = 'darkslategray'
-                color_names = self.no_light_color_names
-                
-
-        # possibly sort vals
-        if sort_by != None:
-            old_index = dict()
-            new_index = dict()
-            for label_i,label in enumerate(element_labels):
-                old_index[label] = label_i
-
-            # alphabet sort
-            if sort_by == 'alpha':
-                new_label_i = 0
-                for label in sorted(element_labels, reverse=True):                
-                    if label.startswith('tail <') or label.startswith('viruses') or label.startswith('unassigned at'):
-                        new_index[label] = old_index[label]
-                    else:
-                        new_index[label] = new_label_i
-                        new_label_i += 1
-
-            # summed total sort
-            elif sort_by == 'totals':
-                totals = dict()
-                for label_i,label in enumerate(element_labels):
-                    totals[label] = 0
-                    for sample_i,sample in enumerate(sample_labels):
-                        totals[label] += vals[label_i][sample_i]
-                totals_vals = []
-                labels_by_totals = dict()
-                for label in totals.keys():
-                    if totals[label] not in totals_vals:
-                        totals_vals.append(totals[label])
-                        labels_by_totals[totals[label]] = []
-                    labels_by_totals[totals[label]].append(label)
-                new_label_i = 0
-                for totals_val in sorted(totals_vals, reverse=True):
-                    for label in labels_by_totals[totals_val]:
-                        if label.startswith('tail <') or label.startswith('viruses') or label.startswith('unassigned at'):
-                            new_index[label] = old_index[label]
-                        else:
-                            new_index[label] = new_label_i
-                            new_label_i += 1       
-
-            # store new order            
-            new_vals = []
-            new_element_labels = []
-            for label_i,label in enumerate(element_labels):
-                new_vals.append([])
-                new_element_labels.append(None)
-            for label_i,label in enumerate(element_labels):
-                new_vals[new_index[label]] = vals[label_i]
-                new_element_labels[new_index[label]] = element_labels[label_i]
-            vals = new_vals
-            element_labels = new_element_labels
-
-    
-        # image dimensions
-        img_in_width = max_img_width = 60
-        #img_in_height = max_img_height = 5
-        img_in_height = max_img_height = 8
-        
-        if N < 5:
-            img_in_width = (max_img_width/5)*N
-        elif N < 10:
-            img_in_width = (max_img_width/10)*N
-        elif N < 20:
-            img_in_width = (max_img_width/20)*N
-        else:
-            img_in_width = max_img_width
-            img_in_height = max_img_height
-        if img_in_width < 2*img_in_height:
-            img_in_width = 2*img_in_height
-        # scale up for later shrinkage?  No.
-        #img_in_width /= 1.5*(1.0-x_shrink)
-        #img_in_height /= (1.0-y_shrink)       
-
-
-        # scaling based on labels
-        longest_sample_label_len = 0
-        longest_element_label_len = 0
-        for label in sample_labels:
-            if len(label) > longest_sample_label_len:
-                longest_sample_label_len = len(label)
-        for label in element_labels:
-            if len(label) > longest_element_label_len:
-                longest_element_label_len = len(label)
-        max_x_shrink = 0.90
-        #x_shrink_scale = 0.02*N/2.25
-        #x_shrink_scale = 0.06 / N
-        #x_shrink_scale = 0.01
-        x_shrink_scale = 0.015
-        #x_shrink_scale = 0.1
-        #max_y_shrink = 0.50
-        max_y_shrink = 0.20
-        #y_shrink_scale = 0.0075
-        y_shrink_scale = 0.015
-        x_shrink = x_shrink_scale * longest_element_label_len
-        y_shrink = y_shrink_scale * longest_sample_label_len
-        if x_shrink > max_x_shrink:
-            x_shrink = max_x_shrink
-        if y_shrink > max_y_shrink:
-            y_shrink = max_y_shrink
-
-
-        # instantiate fig
-        #
-        # lose axes with below grid, and so sharex property. instead match xlim, bar_width, hide ticks.
-        #fig, (ax_top, ax_bot) = plt.subplots(2, 1, sharex=True)  
-
-        # gridspec_kw not in KBase docker notebook agg image (old python?)
-        #fig, (ax_top, ax_bot) = plt.subplots(2, 1, sharex=True, gridspec_kw = {'height_ratios':[1, 3]})
-
-        # subplot2grid(shape, loc, rowspan=1, colspan=1)
-        FIG_rows = 1000
-        FIG_cols = 1
-        top_frac = 0.25
-        top_rows = int(top_frac*FIG_rows)
-        bot_rows = FIG_rows-top_rows
-        fig = plt.figure()
-        ax_top = plt.subplot2grid((FIG_rows,FIG_cols), (0,0), rowspan=top_rows, colspan=1)
-        ax_bot = plt.subplot2grid((FIG_rows,FIG_cols), (top_rows,0), rowspan=bot_rows, colspan=1)
-        fig.set_size_inches(img_in_width, img_in_height)
-        fig.tight_layout()
-
-
-        #for ax in fig.axes:
-        #    ax.xaxis.set_visible(False)  # remove axis labels and ticks
-        #    ax.yaxis.set_visible(False)
-        #    for t in ax.get_xticklabels()+ax.get_yticklabels():  # remove tick labels
-        #        t.set_visible(False)
-        #for ax in fig.axes:
-        #    ax.spines['top'].set_visible(False) # Get rid of top axis line
-        #    ax.spines['bottom'].set_visible(False) #  bottom axis line
-        #    ax.spines['left'].set_visible(False) #  Get rid of bottom axis line
-        #    ax.spines['right'].set_visible(False) #  Get rid of bottom axis line
-
-
-        # indices
-        ind = np.arange(N)    # the x locations for the groups
-        bar_width = 0.5      # the width of the bars: can also be len(x) sequence
-        label_ind = []
-        for ind_i,this_ind in enumerate(ind):
-            ind[ind_i] = this_ind+bar_width/2
-            label_ind.append(this_ind + bar_width/2)
-        np_vals = []
-        for vec_i,val_vec in enumerate(vals):
-            np_vals.append(np.array(val_vec))
-        
-
-        # plot fraction measured
-        frac = ax_top.bar(ind, frac_vals, bar_width, color='black', alpha=0.4, ec='none')
-        ax_top.set_title(title)
-        ax_top.set_ylabel(frac_y_label)
-        ax_top.set_yticks(np.arange(0.0, 1.01, .20))
-        ax_top.set_ylim([0,1])
-        ax_top.xaxis.set_visible(False)  # remove axis labels and ticks
-        ax_top.set_xlim([-0.25,N-0.25])
-
-        # plot stacked
-        last_bottom = None
-        p = []
-        for vec_i,val_vec in enumerate(np_vals):
-            if vec_i == 0:
-                this_bottom = 0
-                last_bottom = val_vec
-            else:
-                this_bottom = last_bottom
-                last_bottom = this_bottom + val_vec
-            p.append (ax_bot.bar (ind, val_vec, bar_width, bottom=this_bottom, color=color_names[vec_i], alpha=0.4, ec='none'))
-
-        ax_bot.set_ylabel(y_label)
-        #plt.title(title)
-        #plt.xticks(label_ind, sample_labels, ha='right', rotation=45)
-        #ax_bot.set_xticks(label_ind, sample_labels, ha='center', rotation=90)
-        ax_bot.set_xticks(label_ind)
-        ax_bot.set_xticklabels(sample_labels, ha='center', rotation=90)
-        ax_bot.set_yticks(np.arange(0, 101, 10))
-        ax_bot.set_ylim([0,100])
-        ax_bot.set_xlim([-0.25,N-0.25])
-        
-
-        # Shrink frac axis
-        box = ax_top.get_position()
-        x_shift = 0.05
-        #x_shift = 0.00
-        y_shift = 0.05
-        #ax_top.set_position([box.x0+x_shift, box.y0, box.width * (1.0-x_shrink), box.height-y_shift])
-        ax_top.set_position([box.x0+x_shift, box.y0, box.width - x_shrink, box.height-y_shift])
-
-
-        # Shrink stacked axis
-        box = ax_bot.get_position()
-        x_shift = 0.05
-        #x_shift = 0.00
-        y_shift = 0.05
-        #ax_bot.set_position([box.x0+x_shift, box.y0+y_shrink, box.width * (1.0-x_shrink), box.height*(1.0-y_shrink-y_shift)])
-        ax_bot.set_position([box.x0+x_shift, box.y0+y_shrink, box.width - x_shrink, box.height*(1.0-y_shrink-y_shift)])
-
-
-        # add key
-        key_colors = []
-        for each_p in reversed(p):
-            key_colors.append(each_p[0])
-        ax_bot.legend(key_colors, reversed(element_labels), loc='upper left', bbox_to_anchor=(1, 1))
 
 
         # save
