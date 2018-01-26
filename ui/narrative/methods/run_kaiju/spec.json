@@ -271,12 +271,6 @@
 							"display": "remove unclassified reads from summary",
 							"id": "filter_unclassified_reads",
 							"ui-name": "filter_unclassified_reads"
-						},
-						{
-							"value": 0,
-							"display": "keep unclassified reads in summary",
-							"id": "keep_unclassified_reads",
-							"ui-name": "keep_unclassified_reads"
 						}
 					]
 				}
