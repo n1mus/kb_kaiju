@@ -378,18 +378,18 @@ class OutputBuilder(object):
                            sort_by=None):
 
         # DEBUG
-        N = len(sample_labels)
-        N_force = 40
-        for sample_i in range(N_force):
-            if sample_i >= N:
-                sample_labels.append(sample_labels[0]+'.'+str(sample_i))
-                frac_vals.append(frac_vals[0])
-                for element_i,element_label in enumerate(element_labels):
-                    vals[element_i].append(vals[element_i][0])
-        for sample_i,label in enumerate(sample_labels):
-            sample_labels[sample_i] = 'foobar.'+str(sample_i)
-
+        #N = len(sample_labels)
+        #N_force = 40
+        #for sample_i in range(N_force):
+        #    if sample_i >= N:
+        #        sample_labels.append(sample_labels[0]+'.'+str(sample_i))
+        #        frac_vals.append(frac_vals[0])
+        #        for element_i,element_label in enumerate(element_labels):
+        #            vals[element_i].append(vals[element_i][0])
+        #for sample_i,label in enumerate(sample_labels):
+        #    sample_labels[sample_i] = 'foobar.'+str(sample_i)
         # END DEBUG
+
 
         # number of samples
         N = len(sample_labels)
