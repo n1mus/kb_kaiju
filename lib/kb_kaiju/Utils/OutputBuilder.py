@@ -552,6 +552,7 @@ class OutputBuilder(object):
         # plot fraction measured
         frac = ax_top.bar(ind, frac_vals, bar_width_unit, color='black', alpha=0.4, ec='none')
         ax_top.set_title(title, fontsize=11)
+        ax_top.grid(b=True, axis='y')
         ax_top.set_ylabel(frac_y_label, fontsize=10)
         ax_top.tick_params(axis='y', labelsize=9, labelcolor='black')
         ax_top.set_yticks(np.arange(0.0, 1.01, .20))
