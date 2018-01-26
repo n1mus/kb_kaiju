@@ -585,16 +585,12 @@ class OutputBuilder(object):
         
 
         # are positions now in units (btw. 0-1) or inches?  seems to depend on the backend Agg
-        x_pad = x_pad_unit
-        y_pad = y_pad_unit
-        plot_width = plot_width_unit
-        plot_height = plot_height_unit
-        x_label_pad = x_label_pad_unit
-        y_label_pad = y_label_pad_unit
-        #x_pad = x_pad_inch
-        #y_pad = y_pad_inch
-        #x_label_pad = x_label_pad_inch
-        #y_label_pad = y_label_pad_inch
+        x_pad = x_pad_unit / canvas_width_unit
+        y_pad = y_pad_unit / canvas_height_unit
+        plot_width = plot_width_unit / canvas_width_unit
+        plot_height = plot_height_unit / canvas_height_unit
+        x_label_pad = x_label_pad_unit / canvas_width_unit
+        y_label_pad = y_label_pad_unit / canvas_height_unit
 
 
         # Frac Plot sizing
@@ -607,25 +603,24 @@ class OutputBuilder(object):
 #                             #box.height - y_pad_inch
 #                             box.height
 #                         ])
-        [x_0, y_0, w, h] = [0 + x_pad, 
-                            0, # wrt axis, not canvas 
-                            plot_width,
-                            1 - y_pad
-                          ]
-        new_pos = [x_0, y_0, w, h]
-        ax_top.set_position(new_pos)
+        top_pos = [x_0, y_0, w, h] = [0 + x_pad, 
+                                      0.75,
+                                      plot_width,
+                                      0.25 - y_pad
+                                  ]
+        ax_top.set_position(top_pos)
 
         # DEBUG
         print ("AX_TOP: BOX:")
-        print (box)
-        print ("AX_TOP: NEW_POS:")
-        print (new_pos)
+        print ([box.x0, box.y0, box.width, box.height])
+        print ("AX_TOP: TOP_POS:")
+        print (top_pos)
 
 
         # Stacked Plot sizing
         #   don't shrink plot.  instead place it explictly since we built canvas for it
         #
-        #box = ax_bot.get_position()
+        box = ax_bot.get_position()
         #ax_bot.set_position([box.x0 + x_pad_inch, 
         #                     #box.y0 + y_pad_inch + y_label_pad_inch, 
         #                     box.y0,
@@ -633,18 +628,17 @@ class OutputBuilder(object):
         #                     #box.height - y_label_pad_inch - y_pad_inch
         #                     box.height
         #                 ])
-        [x_0, y_0, w, h] = [0 + x_pad, 
-                            0 + y_pad,  # wrt axis, not canvas
-                            plot_width,
-                            1 - y_pad  # wrt axis, not canvas
-                          ]
-        new_pos = [x_0, y_0, w, h]
-        ax_bot.set_position(new_pos)
+        bot_pos = [x_0, y_0, w, h] = [0 + x_pad, 
+                                      0 + y_pad + y_label_pad,
+                                      plot_width,
+                                      0.75 - y_pad - y_label_pad
+                                  ]
+        ax_bot.set_position(bot_pos)
 
         print ("AX_BOT: BOX:")
-        print (box)
-        print ("AX_BOT: NEW_POS:")
-        print (new_pos)
+        print ([box.x0, box.y0, box.width, box.height])
+        print ("AX_BOT: BOT_POS:")
+        print (bot_pos)
 
 
         # add key
