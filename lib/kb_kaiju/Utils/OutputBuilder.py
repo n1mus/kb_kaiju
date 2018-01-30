@@ -224,6 +224,49 @@ class OutputBuilder(object):
         pass
         
 
+#output_html_files.append(self.outputBuilder_client.build_kaijuReportHTML_StackedBarPlots(kaijuReportPlotsHTML_options)
+    def build_html_for_kaijuReport_StackedPlots(self, plot_type, tax_levels, img_files):
+        img_local_path = 'img'
+        output_html_img_path = os.path.join (options['out_folder'], img_local_path)
+        if not os.path.exists(output_html_img_path):
+            os.makedirs(output_html_img_path)
+        plot_img_files = []
+        output_html_file = None
+
+        # copy over plot imgs
+        for tax_level in tax_levels:
+            src_plot_file = img_files[tax_level]
+            dst_local_path = os.path.join (img_local_path, plot_type+'-'+tax_level+'.PNG')
+            dst_plot_file = os.path.join (output_html_img_path, dst_local_path)
+            shutil.copy2 (src_plot_file, dst_plot_file)
+            plot_image_files.append(dst_local_path)
+
+
+        return output_html_file
+
+
+    def build_html_for_kaijuReport_PerSamplePlots(self, input_reads, tax_levels, img_files):
+        img_local_path = 'img'
+        output_html_img_path = os.path.join (options['out_folder'], img_local_path)
+        if not os.path.exists(output_html_img_path):
+            os.makedirs(output_html_img_path)
+        output_html_files = []
+
+        # copy over plot imgs
+        for tax_level in tax_levels:
+            plot_image_files = []
+            for input_reads_item in options['input_reads']:
+                sample_name = input_reads_item['name']            
+                src_plot_file = img_files[tax_level][sample_name]
+                dst_local_path = os.path.join (img_local_path, plot_type+'-'+tax_level+'.PNG')
+                dst_plot_file = os.path.join (output_html_img_path, dst_local_path)
+                shutil.copy2 (src_plot_file, dst_plot_file)
+                plot_image_files.append(dst_local_path)
+
+
+        return output_html_files
+
+
     def build_html_output_for_lineage_wf(self, html_dir, object_name):
         '''
         Based on the output of CheckM lineage_wf, build an HTML report

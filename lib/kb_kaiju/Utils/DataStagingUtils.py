@@ -181,7 +181,18 @@ class DataStagingUtils(object):
                 min_fasta_len = 1
                 if not self.fasta_seq_len_at_least(fwd_filename, min_fasta_len):
                     raise ValueError('Reads Library is empty in filename: '+str(fwd_filename))
-            
+
+
+        # DEBUG
+        #pad = 10
+        #for item_i in range(pad):
+        #    expanded_input.append({'fwd_file': expanded_input[0]['fwd_file'],
+        #                           'rev_file': expanded_input[0]['rev_file'],
+        #                           'type': expanded_input[0]['type'],
+        #                           'name': expanded_input[0]['name']+'.'+str(item_i),
+        #                           'ref': expanded_input[0]['ref']
+        #                       })
+        # END DEBUG
             
         return {'input_dir': input_dir, 'folder_suffix': suffix, 'expanded_input': expanded_input}
 

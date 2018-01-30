@@ -174,13 +174,13 @@ class KaijuUtil:
 
 
         # 6) create Summary Report plots in batch
-        kaijuReportPlots_options = {'input_reads':               expanded_input,
-                                    'in_folder':                 kaijuReport_output_folder,
-                                    'per_sample_plots_out_folder': kaijuReport_PerSamplePlots_output_folder,
-                                    'stacked_bar_plots_out_folder': kaijuReport_StackedBarPlots_output_folder,
-                                    'stacked_area_plots_out_folder': kaijuReport_StackedAreaPlots_output_folder,
-                                    'tax_levels':                params['tax_levels'],
-                                    'sort_taxa_by':              params['sort_taxa_by']
+        kaijuReportPlots_options = {'input_reads':                   expanded_input,
+                                    'in_folder':                     kaijuReport_output_folder,
+                                    #'per_sample_plots_out_folder':   kaijuReport_PerSamplePlots_output_folder,
+                                    'stacked_bar_plots_out_folder':  kaijuReport_StackedBarPlots_output_folder,
+                                    #'stacked_area_plots_out_folder': kaijuReport_StackedAreaPlots_output_folder,
+                                    'tax_levels':                    params['tax_levels'],
+                                    'sort_taxa_by':                  params['sort_taxa_by']
                                     #'filter_percent':            params['filter_percent'],
                                     #'filter_unclassified':       params['filter_unclassified'],
                                     #'full_tax_path':             params['full_tax_path']
@@ -189,12 +189,14 @@ class KaijuUtil:
 
 
         # 7) create HTML Summary Reports in batch
-        #kaijuReportHTML_options = {'input_reads':               expanded_input,
-        #                           'plot_files':                kaijuReport_plot_files,
-        #                           'out_folder':                html_dir,
-        #                           'tax_levels':                params['tax_levels']
-        #}
-        #self.run_kaijuReportHTML_batch (kaijuReportHTML_options)
+        kaijuReportPlotsHTML_options = {'input_reads':             expanded_input,
+                                        'per_sample_plot_files':   kaijuReport_plot_files['per_sample_plot_files'],
+                                        'stacked_bar_plot_files':  kaijuReport_plot_files['stacked_bar_plot_files'],
+                                        'stacked_area_plot_files': kaijuReport_plot_files['stacked_area_plot_files'],
+                                        'out_folder':              html_dir,
+                                        'tax_levels':              params['tax_levels']
+        }
+        self.run_kaijuReportPlotsHTML_batch (kaijuReportHTML_options)
 
 
         # 8) create Krona plots
@@ -295,34 +297,55 @@ class KaijuUtil:
         per_sample_plot_files   = dict()
         stacked_bar_plot_files  = dict()
         stacked_area_plot_files = dict()
+
         for tax_level in options['tax_levels']:
 
-#            # per sample plots
-#            per_sample_plot_files[tax_level] = dict()
-#            for input_reads_item in input_reads:
-#                single_kaijuReportPlots_options = options
-#                single_kaijuReportPlots_options['input_item'] = input_reads_item
-#                single_kaijuReportPlots_options['tax_level'] = tax_level
-#            
-#                per_sample_plot_files[tax_level][input_reads['name']] = self.outputBuilder_client.generate_kaijuReport_PerSamplePlots(single_kaijuReportPlots_options)
+            # per sample plots
+            if 'per_sample_plots_out_folder' in options:
+                per_sample_plot_files[tax_level] = dict()
+                for input_reads_item in input_reads:
+                    single_kaijuReportPlots_options = options
+                    single_kaijuReportPlots_options['input_item'] = input_reads_item
+                    single_kaijuReportPlots_options['tax_level'] = tax_level
+            
+                    per_sample_plot_files[tax_level][input_reads['name']] = self.outputBuilder_client.generate_kaijuReport_PerSamplePlots(single_kaijuReportPlots_options)
 
             # stacked bar plots
-            kaijuReportPlots_options = options
-            kaijuReportPlots_options['tax_level'] = tax_level
-            stacked_bar_plot_files[tax_level] = self.outputBuilder_client.generate_kaijuReport_StackedBarPlots(kaijuReportPlots_options)
+            if 'stacked_bar_plots_out_folder' in options:
+                kaijuReportPlots_options = options
+                kaijuReportPlots_options['tax_level'] = tax_level
+                stacked_bar_plot_files[tax_level] = self.outputBuilder_client.generate_kaijuReport_StackedBarPlots(kaijuReportPlots_options)
 
-#            # stacked area plots
-#            kaijuReportPlots_options = options
-#            kaijuReportPlots_options['tax_level'] = tax_level
-#            stacked_area_plot_files[tax_level] = self.outputBuilder_client.generate_kaijuReport_StackedAreaPlots(kaijuReportPlots_options)
+            # stacked area plots
+            if 'stacked_area_plots_out_folder' in options:
+                kaijuReportPlots_options = options
+                kaijuReportPlots_options['tax_level'] = tax_level
+                stacked_area_plot_files[tax_level] = self.outputBuilder_client.generate_kaijuReport_StackedAreaPlots(kaijuReportPlots_options)
 
-#        return {'per_sample_plot_files': per_sample_plot_files,
-#                'stacked_bar_plot_files': stacked_bar_plot_files,
-#                'stacked_area_plot_files': stacked_area_plot_files
-#            }
-        return {
-                'stacked_bar_plot_files': stacked_bar_plot_files
+        return {'per_sample_plot_files': per_sample_plot_files,
+                'stacked_bar_plot_files': stacked_bar_plot_files,
+                'stacked_area_plot_files': stacked_area_plot_files
             }
+
+
+    def run_kaijuReportPlotsHTML_batch(self, options):
+        output_html_files = []
+            
+        if 'stacked_bar_plot_files' in options:
+            output_html_files.append(self.outputBuilder_client.build_html_for_kaijuReport_StackedPlots('stacked_bar_plot', 
+                                                                                                       options['tax_levels'],
+                                                                                                       options['stacked_bar_plot_files'])
+
+        if 'stacked_area_plot_files' in options:
+            output_html_files.append(self.outputBuilder_client.build_html_for_kaijuReport_StackedPlots('stacked_area_plot', 
+                                                                                                       options['tax_levels'],
+                                                                                                       options['stacked_area_plot_files'])
+
+        if 'per_sample_plot_files' in options:
+            output_html_files.extend(self.outputBuilder_client.build_html_for_kaijuReport_StackedPlots(options['input_reads'],
+                                                                                                       options['tax_levels'],
+                                                                                                       options['per_sample_plot_files'])
+        return output_html_files
 
 
     def run_krona_batch(self, options, dropOutput=False):
