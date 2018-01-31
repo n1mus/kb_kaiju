@@ -389,11 +389,11 @@ class KaijuUtil:
             self.run_proc (command, log_output_file)
 
             # return file info
-            local_html_file = input_reads_item['name']+'.krona.html'
+            local_html_path = input_reads_item['name']+'.krona.html'
             html_path = os.path.join (options['html_folder'], local_html_path)
             out_html_files.append({'type': 'krona',
                                    'name': input_reads_item['name']+' Krona',
-                                   'local_path': local_html_file,
+                                   'local_path': local_html_path,
                                    'abs_path': html_path
                                })
 
