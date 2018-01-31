@@ -221,7 +221,8 @@ class KaijuUtil:
         html_pages.extend(html_krona_pages)
         self.outputBuilder_client.add_top_nav(html_pages)
         #report_html_file = html_pages[0]['local_path']
-        report_html_file = 'kaiju_html_plots.zip'
+        #report_html_file = 'kaiju_html_plots.zip'
+        report_html_file = 'kaiju_plots.html'
         report_html_desc = 'Kaiju abundance and Krona plots'
         html_zipped = self.outputBuilder_client.package_folder(html_dir, report_html_file, report_html_desc)
 
