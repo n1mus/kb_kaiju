@@ -224,95 +224,70 @@ class OutputBuilder(object):
         pass
         
 
-    def build_html_output_for_lineage_wf(self, html_dir, object_name):
-        '''
-        Based on the output of CheckM lineage_wf, build an HTML report
-        '''
+    def build_html_for_kaijuReport_StackedPlots(self, out_html_folder, plot_type, tax_levels, img_files):
+        img_local_path = 'img'
+        out_html_img_path = os.path.join (out_folder, img_local_path)
+        if not os.path.exists(out_html_img_path):
+            os.makedirs(out_html_img_path)
+        out_html_file = None
+        out_html_buf = []
 
-        # move plots we need into the html directory
-        plot_name = 'bin_qa_plot.png'
-        shutil.copy(os.path.join(self.plots_dir, plot_name), os.path.join(html_dir, plot_name))
-        self._copy_ref_dist_plots(self.plots_dir, html_dir)
+        # add header
+        plot_type_disp = plot_type.title()
+        out_html_buf.extend (self._build_plot_html_header('KBase Kaiju Stacked '+plot_type_disp+' Abundance Plots'))
 
-        # write the html report to file
-        html = open(os.path.join(html_dir, 'report.html'), 'w')
+        # copy plot imgs to html folder and add img to html page
+        for tax_level in tax_levels:
+            src_plot_file = img_files[tax_level]
+            dst_local_path = os.path.join (img_local_path, plot_type+'-'+tax_level+'.PNG')
+            dst_plot_file = os.path.join (out_html_img_path, dst_local_path)
+            shutil.copy2 (src_plot_file, dst_plot_file)
 
-        # header
-        self._write_html_header(html, object_name)
-        html.write('<body>\n')
+            out_html_buf.append('<img src="'+dst_local_path+'">')
 
-        # include the single main summary figure
-        html.write('<img src="' + plot_name + '" width="90%" />\n')
-        html.write('<br><br><br>\n')
-
-        # print out the info table
-        self.build_summary_table(html, html_dir)
-
-        html.write('</body>\n</html>\n')
-        html.close()
-
-        return self.package_folder(html_dir, 'report.html', 'Assembled report from CheckM')
-
-
-    def build_summary_table(self, html, html_dir):
-
-        stats_file = os.path.join(self.output_dir, 'storage', 'bin_stats_ext.tsv')
-        if not os.path.isfile(stats_file):
-            log('Warning! no stats file found (looking at: ' + stats_file + ')')
-            return
-
-        bin_stats = []
-        with open(stats_file) as lf:
-            for line in lf:
-                if not line:
-                    continue
-                if line.startswith('#'):
-                    continue
-                col = line.split('\t')
-                bin_id = col[0]
-                data = ast.literal_eval(col[1])
-                bin_stats.append({'bid': bin_id, 'data': data})
+        # add footer
+        out_html_buf.extend (self._build_plot_html_footer())
+        
+        # write file
+        out_html_file = os.path.join (out_html_folder, plot_type+'.html')
+        self._write_buf_to_file(out_html_file, out_html_buf)
+                                      
+        return out_html_file
 
 
-        fields = [{'id': 'marker lineage', 'display': 'Marker Lineage'},
-                  {'id': '# genomes', 'display': '# Genomes'},
-                  {'id': '# markers', 'display': '# Markers'},
-                  {'id': '# marker sets', 'display': '# Marker Sets'},
-                  {'id': '0', 'display': '0'},
-                  {'id': '1', 'display': '1'},
-                  {'id': '2', 'display': '2'},
-                  {'id': '3', 'display': '3'},
-                  {'id': '4', 'display': '4'},
-                  {'id': '5+', 'display': '5+'},
-                  {'id': 'Completeness', 'display': 'Completeness', 'round': 3},
-                  {'id': 'Contamination', 'display': 'Contamination', 'round': 3}]
+    def build_html_for_kaijuReport_PerSamplePlots(self, out_html_folder, img_files, input_reads, tax_levels):
+        img_local_path = 'img'
+        out_html_img_path = os.path.join (out_folder, img_local_path)
+        if not os.path.exists(out_html_img_path):
+            os.makedirs(out_html_img_path)
+        out_html_files = []
 
-        html.write('<table>\n')
-        html.write('  <tr>\n')
-        html.write('    <th><b>Bin Name</b></th>\n')
-        for f in fields:
-            html.write('    <th>' + f['display'] + '</th>\n')
-        html.write('  </tr>\n')
+        # one page per tax_level
+        for tax_level in tax_levels:
+            out_html_buf = []
 
-        for b in bin_stats:
-            html.write('  <tr>\n')
-            dist_plot_file = os.path.join(html_dir, str(b['bid']) + self.DIST_PLOT_EXT)
-            if os.path.isfile(dist_plot_file):
-                self._write_dist_html_page(html_dir, b['bid'])
-                html.write('    <td><a href="' + b['bid'] + '.html">' + b['bid'] + '</td>\n')
-            else:
-                html.write('    <td>' + b['bid'] + '</td>\n')
-            for f in fields:
-                if f['id'] in b['data']:
-                    value = str(b['data'][f['id']])
-                    if f.get('round'):
-                        value = str(round(b['data'][f['id']], f['round']))
-                    html.write('    <td>' + value + '</td>\n')
-                else:
-                    html.write('    <td></td>\n')
-            html.write('  </tr>\n')
+            # add header
+            out_html_buf.extend (self._build_plot_html_header('KBase Kaiju Per-Sample Abundance Plots'))
 
-        html.write('</table>\n')
+            # copy plot imgs to html folder and add img to html page
+            for input_reads_item in options['input_reads']:
+                sample_name = input_reads_item['name']            
+                src_plot_file = img_files[tax_level][sample_name]
+                dst_local_path = os.path.join (img_local_path, 'per_sample_abundance-'+tax_level+'-'+sample_name+'.PNG')
+                dst_plot_file = os.path.join (out_html_img_path, dst_local_path)
+                shutil.copy2 (src_plot_file, dst_plot_file)
+
+                out_html_buf.append('<img src="'+dst_local_path+'">')
+
+            # add footer
+            out_html_buf.extend (self._build_plot_html_footer())
+        
+            # write file
+            out_html_file = os.path.join (out_html_folder, 'per_sample_abundance-'+tax_level+'.html')
+            self._write_buf_to_file(out_html_file, out_html_buf)
+            out_html_files.append(out_html_file)
+                                      
+        return out_html_files
 
 
     # (this_abundance, this_lineage_order) = self._parse_kaiju_summary_file (this_summary_file)
@@ -741,11 +716,11 @@ class OutputBuilder(object):
         plt.show()
 
 
-    def _write_html_header(self, html, object_name):
-
-        html.write('<html>\n')
-        html.write('<head>\n')
-        html.write('<title>CheckM Report for ' + object_name + '</title>')
+    def _build_plot_html_header(self, title):
+        buf = []
+        buf.append('<html>')
+        buf.append('<head>')
+        buf.append('<title>'+title+'</title>')
 
         style = '''
         <style style="text/css">
@@ -775,47 +750,21 @@ class OutputBuilder(object):
             tr:hover {
                 background-color: #f5f5f5;
             }
-        </style>\n</head>\n'''
+        </style>'''
 
-        html.write(style)
-        html.write('</head>\n')
+        buf.append(style)
+        buf.append('</head>')
 
-    def _copy_file_ignore_errors(self, filename, src_folder, dest_folder):
-        src = os.path.join(src_folder, filename)
-        dest = os.path.join(dest_folder, filename)
-        log('copying ' + src + ' to ' + dest)
-        try:
-            shutil.copy(src, dest)
-        except:
-            # TODO: add error message reporting
-            log('copy failed')
+        return buf
 
 
-    def _write_dist_html_page(self, html_dir, bin_id):
-
-        # write the html report to file
-        html = open(os.path.join(html_dir, bin_id + '.html'), 'w')
-
-        html.write('<html>\n')
-        html.write('<head>\n')
-        html.write('<title>CheckM Dist Plots for Bin' + bin_id + '</title>')
-        html.write('<style style="text/css">\n a { color: #337ab7; } \n a:hover { color: #23527c; }\n</style>\n')
-        html.write('<body>\n')
-        html.write('<br><a href="report.html">Back to summary</a><br>\n')
-        html.write('<center><h2>Bin: ' + bin_id + '</h2></center>\n')
-        html.write('<img src="' + bin_id + self.DIST_PLOT_EXT + '" width="90%" />\n')
-        html.write('<br><br><br>\n')
-        html.write('</body>\n</html>\n')
-        html.close()
+    def _build_plot_html_footer(self):
+        buf = []
+        buf.append('</html>')
+        return buf
 
 
-    def _copy_ref_dist_plots(self, plots_dir, dest_folder):
-        for plotfile in os.listdir(plots_dir):
-            plot_file_path = os.path.join(plots_dir, plotfile)
-            if os.path.isfile(plot_file_path) and plotfile.endswith(self.DIST_PLOT_EXT):
-                try:
-                    shutil.copy(os.path.join(plots_dir, plotfile),
-                                os.path.join(dest_folder, plotfile))
-                except:
-                    # TODO: add error message reporting
-                    log('copy of ' + plot_file_path + ' to html directory failed')
+    def _write_buf_to_file(self, filename, buf):
+        with open (filename, 'w') as handle:
+            for line_buf in buf:
+                handle.write("\n".join(line_buf))
