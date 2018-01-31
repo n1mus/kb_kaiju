@@ -240,7 +240,7 @@ class OutputBuilder(object):
         for tax_level in tax_levels:
             src_plot_file = img_files[tax_level]
             dst_local_path = os.path.join (img_local_path, plot_type+'-'+tax_level+'.PNG')
-            dst_plot_file = os.path.join (out_html_img_path, dst_local_path)
+            dst_plot_file = os.path.join (out_html_folder, dst_local_path)
             shutil.copy2 (src_plot_file, dst_plot_file)
 
             out_html_buf.append('<img src="'+dst_local_path+'">')
@@ -281,7 +281,7 @@ class OutputBuilder(object):
                 sample_name = input_reads_item['name']            
                 src_plot_file = img_files[tax_level][sample_name]
                 dst_local_path = os.path.join (img_local_path, 'per_sample_abundance-'+tax_level+'-'+sample_name+'.PNG')
-                dst_plot_file = os.path.join (out_html_img_path, dst_local_path)
+                dst_plot_file = os.path.join (out_html_folder, dst_local_path)
                 shutil.copy2 (src_plot_file, dst_plot_file)
 
                 out_html_buf.append('<img src="'+dst_local_path+'">')
