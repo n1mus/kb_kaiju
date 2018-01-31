@@ -225,6 +225,7 @@ class OutputBuilder(object):
         
 
     def build_html_for_kaijuReport_StackedPlots(self, out_html_folder, plot_type, tax_levels, img_files):
+        img_height = 150  # in pixels
         img_local_path = 'img'
         out_html_img_path = os.path.join (out_html_folder, img_local_path)
         if not os.path.exists(out_html_img_path):
@@ -243,7 +244,7 @@ class OutputBuilder(object):
             dst_plot_file = os.path.join (out_html_folder, dst_local_path)
             shutil.copy2 (src_plot_file, dst_plot_file)
 
-            out_html_buf.append('<img src="'+dst_local_path+'">')
+            out_html_buf.append('<img src="'+dst_local_path+'" height='+str(img_height)+'>')
 
         # add footer
         out_html_buf.extend (self._build_plot_html_footer())
@@ -321,6 +322,7 @@ class OutputBuilder(object):
                 else:
                     top_nav_buf.append('<a href="'+this_local_path+'">'+this_name+'</a>')
             top_nav_str = ' | '.join(top_nav_buf)
+            top_nav_str += '<p>'
 
             # add top nav to file
             new_buf = []
@@ -659,7 +661,7 @@ class OutputBuilder(object):
         bot_pos = [x_0, y_0, w, h] = [0 + x_pad, 
                                       0 + y_label_pad + y_pad,
                                       plot_width,
-                                      (1.0 - top_frac)*plot_height - y_pad
+                                      (1.0 - top_frac)*plot_height - 2*y_pad
                                   ]
         ax_bot.set_position(bot_pos)
 
