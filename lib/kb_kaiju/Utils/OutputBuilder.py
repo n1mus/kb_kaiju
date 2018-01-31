@@ -1,4 +1,4 @@
-1;95;0cimport os
+import os
 import shutil
 import ast
 import sys
