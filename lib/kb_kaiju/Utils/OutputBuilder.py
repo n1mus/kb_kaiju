@@ -441,6 +441,7 @@ class OutputBuilder(object):
                 
 
         # possibly sort vals
+        sort_by = None  # DEBUG
         if sort_by != None:
             old_index = dict()
             new_index = dict()
@@ -488,7 +489,8 @@ class OutputBuilder(object):
                 new_element_labels.append(None)
             for label_i,label in enumerate(element_labels):
                 new_vals[new_index[label]] = vals[label_i]
-                new_element_labels[new_index[label]] = element_labels[label_i]
+                #new_element_labels[new_index[label]] = element_labels[label_i]
+                new_element_labels[new_index[label]] = label
             vals = new_vals
             element_labels = new_element_labels
 
