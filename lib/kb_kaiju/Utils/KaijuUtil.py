@@ -176,9 +176,9 @@ class KaijuUtil:
         # 6) create Summary Report plots in batch
         kaijuReportPlots_options = {'input_reads':                   expanded_input,
                                     'in_folder':                     kaijuReport_output_folder,
-                                    #'per_sample_plots_out_folder':   kaijuReport_PerSamplePlots_output_folder,
                                     'stacked_bar_plots_out_folder':  kaijuReport_StackedBarPlots_output_folder,
                                     #'stacked_area_plots_out_folder': kaijuReport_StackedAreaPlots_output_folder,
+                                    #'per_sample_plots_out_folder':   kaijuReport_PerSamplePlots_output_folder,
                                     'tax_levels':                    params['tax_levels'],
                                     'sort_taxa_by':                  params['sort_taxa_by']
                                     #'filter_percent':            params['filter_percent'],
@@ -190,9 +190,9 @@ class KaijuUtil:
 
         # 7) create HTML Summary Reports in batch
         kaijuReportPlotsHTML_options = {'input_reads':             expanded_input,
-                                        'per_sample_plot_files':   kaijuReport_plot_files['per_sample_plot_files'],
                                         'stacked_bar_plot_files':  kaijuReport_plot_files['stacked_bar_plot_files'],
-                                        'stacked_area_plot_files': kaijuReport_plot_files['stacked_area_plot_files'],
+                                        #'stacked_area_plot_files': kaijuReport_plot_files['stacked_area_plot_files'],
+                                        #'per_sample_plot_files':   kaijuReport_plot_files['per_sample_plot_files'],
                                         'out_folder':              html_dir,
                                         'tax_levels':              params['tax_levels']
         }
