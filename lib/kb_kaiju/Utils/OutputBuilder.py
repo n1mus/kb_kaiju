@@ -249,10 +249,17 @@ class OutputBuilder(object):
         out_html_buf.extend (self._build_plot_html_footer())
         
         # write file
-        out_html_file = os.path.join (out_html_folder, plot_type+'.html')
-        self._write_buf_to_file(out_html_file, out_html_buf)
-                                      
-        return out_html_file
+        out_local_path = plot_type+'.html'
+        out_html_path = os.path.join (out_html_folder, out_local_path)
+        self._write_buf_to_file(out_html_path, out_html_buf)
+
+        out_html_file = {'type': plot_type,
+                         'name': plot_type.title(),
+                         'local_path': out_local_path,
+                         'abs_path': out_html_path
+                     }
+        
+        return [out_html_file]
 
 
     def build_html_for_kaijuReport_PerSamplePlots(self, out_html_folder, img_files, input_reads, tax_levels):
@@ -283,14 +290,54 @@ class OutputBuilder(object):
             out_html_buf.extend (self._build_plot_html_footer())
         
             # write file
-            out_html_file = os.path.join (out_html_folder, 'per_sample_abundance-'+tax_level+'.html')
-            self._write_buf_to_file(out_html_file, out_html_buf)
-            out_html_files.append(out_html_file)
+            out_local_path = 'per_sample_abundance-'+tax_level+'.html'
+            out_html_path = os.path.join (out_html_folder, out_local_path)
+            self._write_buf_to_file(out_html_path, out_html_buf)
+
+            out_html_files.append({'type': 'per_sample',
+                                   'name': tax_level,
+                                   'local_path': out_local_path,
+                                   'abs_path': out_html_path})
                                       
         return out_html_files
 
 
-    # (this_abundance, this_lineage_order) = self._parse_kaiju_summary_file (this_summary_file)
+    def add_top_nav(self, html_pages):
+
+        for html_page in html_pages:
+            html_type = html_page['type']
+            name = html_page['name']
+            local_path = html_page['local_path']
+            abs_path = html_page['abs_path']
+
+            # build top nav
+            top_nav_buf = []
+            for this_html_page in html_pages:
+                this_name = this_html_page['name']
+                this_local_path = this_html_page['local_path']
+                if this_name == name:
+                    disp_name = this_name.upper()
+                    top_nav_buf.append('<b>'+disp_name+'</b>')
+                else:
+                    top_nav_buf.append('<a href="'+this_local_path+'">'+this_name+'</a>')
+            top_nav_str = ' | '.join(top_nav_buf)
+
+            # add top nav to file
+            new_buf = []
+            with open (abs_path, 'r') as html_handle:
+                for line in html_handle.readlines():
+                    line_copy = line.lstrip()
+                    if html_type == 'krona' and line_copy.startswith('options.style.top ='):
+                        downshift = '50px'
+                        new_buf.append("\t options.style.top = '"+downshift+"';")
+                        continue
+                    elif line_copy.startswith('<body'):
+                        new_buf.append(top_nav_str)
+                    new_buf.append(line)
+            with open (abs_path, 'w') as html_handle:
+                html_handle.write("\n".join(new_buf)+"\n")
+
+
     def _parse_kaiju_summary_file (self, summary_file, tax_level):
         abundance = dict()
         unclassified_perc = 0.0
