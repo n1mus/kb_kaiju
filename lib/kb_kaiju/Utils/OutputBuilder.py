@@ -214,7 +214,8 @@ class OutputBuilder(object):
                                        out_file_basename = tax_level+'-stacked_bar_plot',
                                        vals = abundance_matrix,
                                        frac_vals = classified_frac,
-                                       title = tax_level.title()+' Level',
+                                       #title = tax_level.title()+' Level',
+                                       title = tax_level.title(),
                                        frac_y_label = 'fraction classified',
                                        y_label = 'percent of classified reads',
                                        sample_labels = sample_order, 
@@ -332,7 +333,8 @@ class OutputBuilder(object):
                 for line in html_handle.readlines():
                     line_copy = line.lstrip()
                     if html_type == 'krona' and line_copy.startswith('options.style.top ='):
-                        downshift = '50px'
+                        #downshift = '50px'
+                        downshift = '25px'
                         new_buf.append("\t options.style.top = '"+downshift+"';")
                         continue
                     new_buf.append(line)
@@ -378,7 +380,7 @@ class OutputBuilder(object):
                     abundance[lineage] = perc
 
         if tail_cutoff != None:
-            this_key = 'tail < '+tail_cutoff+'% each taxon'
+            this_key = 'tail (< '+tail_cutoff+'% each taxon)'
             lineage_order.append(this_key)
             abundance[this_key] = tail_perc
         if virus_perc != None:
@@ -429,7 +431,7 @@ class OutputBuilder(object):
         r = random.random()
         shuffle(color_names, lambda: r)
         for label_i,label in enumerate(element_labels):
-            if label.startswith('tail <'):
+            if label.startswith('tail (<'):
                 color_names[label_i] = 'lightslategray'
             elif label.startswith('viruses'):
                 color_names[label_i] = 'magenta'
@@ -449,7 +451,7 @@ class OutputBuilder(object):
             if sort_by == 'alpha':
                 new_label_i = 0
                 for label in sorted(element_labels, reverse=True):                
-                    if label.startswith('tail <') or label.startswith('viruses') or label.startswith('unassigned at'):
+                    if label.startswith('tail (<') or label.startswith('viruses') or label.startswith('unassigned at'):
                         new_index[label] = old_index[label]
                     else:
                         new_index[label] = new_label_i
@@ -472,7 +474,7 @@ class OutputBuilder(object):
                 new_label_i = 0
                 for totals_val in sorted(totals_vals, reverse=True):
                     for label in labels_by_totals[totals_val]:
-                        if label.startswith('tail <') or label.startswith('viruses') or label.startswith('unassigned at'):
+                        if label.startswith('tail (<') or label.startswith('viruses') or label.startswith('unassigned at'):
                             new_index[label] = old_index[label]
                         else:
                             new_index[label] = new_label_i
