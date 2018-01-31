@@ -226,7 +226,7 @@ class OutputBuilder(object):
 
     def build_html_for_kaijuReport_StackedPlots(self, out_html_folder, plot_type, tax_levels, img_files):
         img_local_path = 'img'
-        out_html_img_path = os.path.join (out_folder, img_local_path)
+        out_html_img_path = os.path.join (out_html_folder, img_local_path)
         if not os.path.exists(out_html_img_path):
             os.makedirs(out_html_img_path)
         out_html_file = None
@@ -264,7 +264,7 @@ class OutputBuilder(object):
 
     def build_html_for_kaijuReport_PerSamplePlots(self, out_html_folder, img_files, input_reads, tax_levels):
         img_local_path = 'img'
-        out_html_img_path = os.path.join (out_folder, img_local_path)
+        out_html_img_path = os.path.join (out_html_folder, img_local_path)
         if not os.path.exists(out_html_img_path):
             os.makedirs(out_html_img_path)
         out_html_files = []
