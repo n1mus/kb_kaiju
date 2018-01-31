@@ -196,7 +196,7 @@ class KaijuUtil:
                                         'out_folder':              html_dir,
                                         'tax_levels':              params['tax_levels']
         }
-        self.run_kaijuReportPlotsHTML_batch (kaijuReportHTML_options)
+        html_plot_pages = self.run_kaijuReportPlotsHTML_batch (kaijuReportPlotsHTML_options)
 
 
         # 8) create Krona plots
@@ -206,21 +206,23 @@ class KaijuUtil:
                          'html_folder':               html_dir,
                          'db_type':                   params['db_type']
                      }
-        self.run_krona_batch (krona_options)
+        html_krona_pages = self.run_krona_batch (krona_options)
 
 
         # 9) Package results
         output_packages = self._build_output_packages(params, self.outputBuilder_client)
 
 
-        # 10) build the HTML report
-        #self.outputBuilder_client.build_html_output_for_kaiju_with_krona_wf(html_dir, expanded_input)
-        #if len(expanded_input) == 1:
-        #    report_html_file = expanded_input[0]['name']+'.krona.html'
-        #else:
-        #    report_html_file = 'report.html'
-        report_html_file = expanded_input[0]['name']+'.krona.html'
-        html_zipped = self.outputBuilder_client.package_folder(html_dir, report_html_file, 'Kaiju abundance and Krona plots')
+        # 10) add top nav to html pages and build the HTML report
+        html_pages = []
+        html_pages.extend(html_plot_pages['bar'])
+        #html_pages.extend(html_plot_pages['area'])
+        #html_pages.extend(html_plot_pages['per_sample'])
+        html_pages.extend(html_krona_pages)
+        self.outputBuilder_client.add_top_nav(html_pages)
+        report_html_file = html_pages[0]['local_path']
+        report_html_desc = 'Kaiju abundance and Krona plots'
+        html_zipped = self.outputBuilder_client.package_folder(html_dir, report_html_file, report_html_desc)
 
 
         # 11) save report
@@ -330,10 +332,10 @@ class KaijuUtil:
 
     def run_kaijuReportPlotsHTML_batch(self, options):
         out_html_folder = options['out_folder']
-        out_html_files = []
+        out_html_files = dict()
             
         if 'stacked_bar_plot_files' in options:
-            out_html_files.append(self.outputBuilder_client.build_html_for_kaijuReport_StackedPlots(
+            out_html_files['bar'] = self.outputBuilder_client.build_html_for_kaijuReport_StackedPlots(
                 out_html_folder,
                 'bar', 
                 options['tax_levels'],
@@ -341,7 +343,7 @@ class KaijuUtil:
             )
                                   
         if 'stacked_area_plot_files' in options:
-            out_html_files.append(self.outputBuilder_client.build_html_for_kaijuReport_StackedPlots(
+            out_html_files['area'] = self.outputBuilder_client.build_html_for_kaijuReport_StackedPlots(
                 out_html_folder,
                 'area', 
                 options['tax_levels'],
@@ -349,7 +351,7 @@ class KaijuUtil:
             )
 
         if 'per_sample_plot_files' in options:
-            out_html_files.extend(self.outputBuilder_client.build_html_for_kaijuReport_StackedPlots(
+            out_html_files['per_sample'] = self.outputBuilder_client.build_html_for_kaijuReport_StackedPlots(
                 out_html_folder,
                 options['input_reads'],
                 options['tax_levels'],
@@ -360,6 +362,7 @@ class KaijuUtil:
                                   
 
     def run_krona_batch(self, options, dropOutput=False):
+        out_html_files = []
         input_reads = options['input_reads']
         for input_reads_item in input_reads:
 
@@ -384,6 +387,17 @@ class KaijuUtil:
             
             command = self._build_kronaImport_command(single_kronaImport_run_options)
             self.run_proc (command, log_output_file)
+
+            # return file info
+            local_html_file = input_reads_item['name']+'.krona.html'
+            html_path = os.path.join (options['html_folder'], local_html_path)
+            out_html_files.append({'type': 'krona',
+                                   'name': input_reads_item['name']+' Krona',
+                                   'local_path': local_html_file,
+                                   'abs_path': html_path
+                               })
+
+        return out_html_files
 
 
     def _validate_kaiju_options(self, options):
