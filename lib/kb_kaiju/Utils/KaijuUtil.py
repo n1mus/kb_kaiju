@@ -329,24 +329,35 @@ class KaijuUtil:
 
 
     def run_kaijuReportPlotsHTML_batch(self, options):
-        output_html_files = []
+        out_html_folder = options['out_folder']
+        out_html_files = []
             
         if 'stacked_bar_plot_files' in options:
-            output_html_files.append(self.outputBuilder_client.build_html_for_kaijuReport_StackedPlots('stacked_bar_plot', 
-                                                                                                       options['tax_levels'],
-                                                                                                       options['stacked_bar_plot_files'])
-
+            out_html_files.append(self.outputBuilder_client.build_html_for_kaijuReport_StackedPlots(
+                out_html_folder,
+                'bar', 
+                options['tax_levels'],
+                options['stacked_bar_plot_files']
+            )
+                                  
         if 'stacked_area_plot_files' in options:
-            output_html_files.append(self.outputBuilder_client.build_html_for_kaijuReport_StackedPlots('stacked_area_plot', 
-                                                                                                       options['tax_levels'],
-                                                                                                       options['stacked_area_plot_files'])
+            out_html_files.append(self.outputBuilder_client.build_html_for_kaijuReport_StackedPlots(
+                out_html_folder,
+                'area', 
+                options['tax_levels'],
+                options['stacked_area_plot_files']
+            )
 
         if 'per_sample_plot_files' in options:
-            output_html_files.extend(self.outputBuilder_client.build_html_for_kaijuReport_StackedPlots(options['input_reads'],
-                                                                                                       options['tax_levels'],
-                                                                                                       options['per_sample_plot_files'])
-        return output_html_files
+            out_html_files.extend(self.outputBuilder_client.build_html_for_kaijuReport_StackedPlots(
+                out_html_folder,
+                options['input_reads'],
+                options['tax_levels'],
+                options['per_sample_plot_files']
+            )
 
+        return out_html_files
+                                  
 
     def run_krona_batch(self, options, dropOutput=False):
         input_reads = options['input_reads']
