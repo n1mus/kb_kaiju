@@ -332,7 +332,7 @@ class OutputBuilder(object):
                     #    new_buf.append("\t options.style.top = '"+downshift+"';")
                     #    continue
                     #elif line_copy.startswith('<body'):
-                    elif line_copy.startswith('<body'):
+                    if line_copy.startswith('<body'):
                         new_buf.append(top_nav_str)
                     new_buf.append(line)
             with open (abs_path, 'w') as html_handle:
