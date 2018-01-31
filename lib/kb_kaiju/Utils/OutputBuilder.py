@@ -327,16 +327,16 @@ class OutputBuilder(object):
             with open (abs_path, 'r') as html_handle:
                 for line in html_handle.readlines():
                     line_copy = line.lstrip()
-                    #if html_type == 'krona' and line_copy.startswith('options.style.top ='):
-                    #    downshift = '50px'
-                    #    new_buf.append("\t options.style.top = '"+downshift+"';")
-                    #    continue
-                    #elif line_copy.startswith('<body'):
-                    if line_copy.startswith('<body'):
+                    if html_type == 'krona' and line_copy.startswith('options.style.top ='):
+                        downshift = '50px'
+                        new_buf.append("\t options.style.top = '"+downshift+"';")
+                        continue
+                    elif line_copy.startswith('<body'):
                         new_buf.append(top_nav_str)
                     new_buf.append(line)
             with open (abs_path, 'w') as html_handle:
-                html_handle.write("\n".join(new_buf)+"\n")
+                for line_buf in new_buf:
+                    html_handle.write(line_buf+"\n")
 
 
     def _parse_kaiju_summary_file (self, summary_file, tax_level):
@@ -802,12 +802,14 @@ class OutputBuilder(object):
 
         buf.append(style)
         buf.append('</head>')
+        buf.append('<body>')
 
         return buf
 
 
     def _build_plot_html_footer(self):
         buf = []
+        buf.append('</body>')
         buf.append('</html>')
         return buf
 
@@ -815,4 +817,4 @@ class OutputBuilder(object):
     def _write_buf_to_file(self, filename, buf):
         with open (filename, 'w') as handle:
             for line_buf in buf:
-                handle.write("\n".join(line_buf))
+                handle.write(line_buf+"\n")
