@@ -648,10 +648,10 @@ class OutputBuilder(object):
         ax_top.set_position(top_pos)
 
         # DEBUG
-        print ("AX_TOP: BOX:")
-        print ([box.x0, box.y0, box.width, box.height])
-        print ("AX_TOP: TOP_POS:")
-        print (top_pos)
+        #print ("AX_TOP: BOX:")
+        #print ([box.x0, box.y0, box.width, box.height])
+        #print ("AX_TOP: TOP_POS:")
+        #print (top_pos)
 
 
         # Stacked Plot sizing
@@ -672,10 +672,11 @@ class OutputBuilder(object):
                                   ]
         ax_bot.set_position(bot_pos)
 
-        print ("AX_BOT: BOX:")
-        print ([box.x0, box.y0, box.width, box.height])
-        print ("AX_BOT: BOT_POS:")
-        print (bot_pos)
+        # DEBUG
+        #print ("AX_BOT: BOX:")
+        #print ([box.x0, box.y0, box.width, box.height])
+        #print ("AX_BOT: BOT_POS:")
+        #print (bot_pos)
 
 
         # add key
