@@ -327,10 +327,11 @@ class OutputBuilder(object):
             with open (abs_path, 'r') as html_handle:
                 for line in html_handle.readlines():
                     line_copy = line.lstrip()
-                    if html_type == 'krona' and line_copy.startswith('options.style.top ='):
-                        downshift = '50px'
-                        new_buf.append("\t options.style.top = '"+downshift+"';")
-                        continue
+                    #if html_type == 'krona' and line_copy.startswith('options.style.top ='):
+                    #    downshift = '50px'
+                    #    new_buf.append("\t options.style.top = '"+downshift+"';")
+                    #    continue
+                    #elif line_copy.startswith('<body'):
                     elif line_copy.startswith('<body'):
                         new_buf.append(top_nav_str)
                     new_buf.append(line)
