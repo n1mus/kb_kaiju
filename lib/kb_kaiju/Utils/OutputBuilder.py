@@ -335,12 +335,13 @@ class OutputBuilder(object):
                         downshift = '50px'
                         new_buf.append("\t options.style.top = '"+downshift+"';")
                         continue
-                    elif line_copy.startswith('<body'):
-                        new_buf.append(top_nav_str)
                     new_buf.append(line)
+                    if line_copy.startswith('<body'):
+                        new_buf.append(top_nav_str+"\n")
+
             with open (abs_path, 'w') as html_handle:
                 for line_buf in new_buf:
-                    html_handle.write(line_buf+"\n")
+                    html_handle.write(line_buf)
 
 
     def _parse_kaiju_summary_file (self, summary_file, tax_level):
