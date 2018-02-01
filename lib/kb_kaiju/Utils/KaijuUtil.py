@@ -77,7 +77,7 @@ class KaijuUtil:
                 params[arg] = default_param_vals[arg]
 
         # check math
-        total_perc = float(params['subsample_percent']) * int(params['subsample_relicates'])
+        total_perc = float(params['subsample_percent']) * int(params['subsample_replicates'])
         if total_perc > 100:
             raise ValueError ("Subsample is non-overlapping, so too many subsample replicates "+str(params['subsample_replicates'])+" at subsample percent: "+str(params['subsample_perc'])+" (replicates * percent = "+str(total_perc)+" > 100)")
 
