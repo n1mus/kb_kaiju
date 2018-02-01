@@ -100,13 +100,16 @@ module kb_kaiju {
 	list<string>   tax_levels;
 
 	string         db_type;
+	float          filter_percent;
+	int            subsample_percent;
+	int            subsample_replicates;
+	int            subsample_seed;
 	bool           seg_filter;
 	int            min_match_length;
 	bool           greedy_run_mode;
 	int            greedy_allowed_mismatches;
 	int            greedy_min_match_score;
 	float          greedy_max_e_value;
-	float          filter_percent;
 	bool           filter_unclassified;
 	bool           full_tax_path;
 	string         sort_taxa_by;

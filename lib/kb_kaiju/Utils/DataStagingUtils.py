@@ -40,34 +40,17 @@ class DataStagingUtils(object):
             raise ValueError('Unable to instantiate setAPI_Client with serviceWizardURL: '+ self.serviceWizardURL +' ERROR: ' + str(e))
 
 
-    def stage_input(self, input_refs, fasta_file_extension):
+    def expand_input(self, input_refs):
         '''
-        Stage input based on an input data reference for Kaiju
+        Expand input based on an input data reference for Kaiju
 
         input_refs can be a list of references to a PairedEndLibrary, a SingleEndLibrary, or a ReadsSet
-
-        This method creates a directory in the scratch area with the set of Fasta/Fastq files, names
-        will have the fasta_file_extension parameter tacked on.
-
-            ex:
-
-            staged_input = stage_input('124/15/1', 'fastq')
-
-            staged_input
-            {"input_dir": '...'}
         '''
         # config
         #SERVICE_VER = 'dev'
         SERVICE_VER = 'release'
 
-        # generate a folder in scratch to hold the input
-        suffix = str(int(time.time() * 1000))
-        input_dir = os.path.join(self.scratch, 'input_reads_' + suffix)
-        if not os.path.exists(input_dir):
-            os.makedirs(input_dir)
-
-
-        # 2) expand any sets and build a non-redundant list of reads input objs
+        # expand any sets and build a non-redundant list of reads input objs
         ws = Workspace(self.ws_url)
         expanded_input = []
         input_ref_seen = dict()
@@ -135,53 +118,103 @@ class DataStagingUtils(object):
                 raise ValueError ("Illegal type in input_refs: "+str(obj_name)+" ("+str(input_ref)+") is of type: '"+str(type_name)+"'")
 
 
-        # 3) Download reads
-        for input_item_i,input_item in enumerate(expanded_input):
+        return expanded_input
 
-            try:
-                readsLibrary = self.readsUtils_Client.download_reads ({'read_libraries': [input_item['ref']],
-                                                                       'interleaved': 'false'})
-            except Exception as e:
-                raise ValueError('Unable to get read library object from workspace: (' + str(input_item['ref']) +")\n" + str(e))
 
-            # PE Lib
-            if input_item['type'] == self.PE_flag:
-                input_fwd_file_path = readsLibrary['files'][input_item['ref']]['files']['fwd']
-                input_rev_file_path = readsLibrary['files'][input_item['ref']]['files']['rev']
-                fwd_filename = os.path.join(input_dir, input_item['name'] + '.fwd.' + fasta_file_extension)
-                rev_filename = os.path.join(input_dir, input_item['name'] + '.rev.' + fasta_file_extension)
-                if input_fwd_file_path != fwd_filename:
-                    shutil.move(input_fwd_file_path, fwd_filename)
-                if input_rev_file_path != rev_filename:
-                    shutil.move(input_rev_file_path, rev_filename)
-                expanded_input[input_item_i]['fwd_file'] = fwd_filename
-                expanded_input[input_item_i]['rev_file'] = rev_filename
+    def stage_input(self, 
+                    input_item=None, 
+                    subsample_percent=10, 
+                    subsample_replicates=1, 
+                    subsample_seed=1, 
+                    fasta_file_extension='fastq'):
+        '''
+        Stage input based on an input data reference for Kaiju
 
-                if not os.path.isfile(fwd_filename):
-                    raise ValueError('Error generating reads file '+fwd_filename)
-                if not os.path.isfile(rev_filename):
-                    raise ValueError('Error generating reads file '+rev_filename)
-                # make sure fasta file isn't empty
-                min_fasta_len = 1
-                if not self.fasta_seq_len_at_least(fwd_filename, min_fasta_len):
-                    raise ValueError('Reads Library is empty in filename: '+str(fwd_filename))
-                if not self.fasta_seq_len_at_least(rev_filename, min_fasta_len):
-                    raise ValueError('Reads Library is empty in filename: '+str(rev_filename))
+        input_refs can be a list of references to a PairedEndLibrary, a SingleEndLibrary, or a ReadsSet
 
-            elif input_item['type'] == self.SE_flag:
-                input_fwd_file_path = readsLibrary['files'][input_item['ref']]['files']['fwd']
-                fwd_filename = os.path.join(input_dir, input_item['name'] + '.fwd.' + fasta_file_extension)
-                if input_fwd_file_path != fwd_filename:
-                    shutil.move(input_fwd_file_path, fwd_filename)
-                expanded_input[input_item_i]['fwd_file'] = fwd_filename
+        This method creates a directory in the scratch area with the set of Fasta/Fastq files, names
+        will have the fasta_file_extension parameter tacked on.
 
-                if not os.path.isfile(fwd_filename):
-                    raise ValueError('Error generating reads file '+fwd_filename)
-                # make sure fasta file isn't empty
-                min_fasta_len = 1
-                if not self.fasta_seq_len_at_least(fwd_filename, min_fasta_len):
-                    raise ValueError('Reads Library is empty in filename: '+str(fwd_filename))
+            ex:
 
+            staged_input = stage_input({'ref':<ref>,'name':<name>,'type':<type>}, subsample_percent, subsample_replicates, subsample_seed, 'fastq')
+
+            staged_input
+            {"input_dir": '...'}
+        '''
+        # init
+        staged_input = dict()
+        replicate_input = []
+
+
+        # config
+        #SERVICE_VER = 'dev'
+        SERVICE_VER = 'release'
+
+        # generate a folder in scratch to hold the input
+        suffix = str(int(time.time() * 1000))
+        input_dir = os.path.join(self.scratch, 'input_reads_' + suffix)
+        if not os.path.exists(input_dir):
+            os.makedirs(input_dir)
+
+
+        # 1) Download reads and subsample
+        try:
+            readsLibrary = self.readsUtils_Client.download_reads ({'read_libraries': [input_item['ref']],
+                                                                   'interleaved': 'false'})
+        except Exception as e:
+            raise ValueError('Unable to get read library object from workspace: (' + str(input_item['ref']) +")\n" + str(e))
+
+        # PE Lib
+        if input_item['type'] == self.PE_flag:
+            input_fwd_file_path = readsLibrary['files'][input_item['ref']]['files']['fwd']
+            input_rev_file_path = readsLibrary['files'][input_item['ref']]['files']['rev']
+            fwd_filename = os.path.join(input_dir, input_item['name'] + '.fwd.' + fasta_file_extension)
+            rev_filename = os.path.join(input_dir, input_item['name'] + '.rev.' + fasta_file_extension)
+            if input_fwd_file_path != fwd_filename:
+                shutil.move(input_fwd_file_path, fwd_filename)
+            if input_rev_file_path != rev_filename:
+                shutil.move(input_rev_file_path, rev_filename)
+            input_item['fwd_file'] = fwd_filename
+            input_item['rev_file'] = rev_filename
+
+            if not os.path.isfile(fwd_filename):
+                raise ValueError('Error generating reads file '+fwd_filename)
+            if not os.path.isfile(rev_filename):
+                raise ValueError('Error generating reads file '+rev_filename)
+            # make sure fasta file isn't empty
+            min_fasta_len = 1
+            if not self.fasta_seq_len_at_least(fwd_filename, min_fasta_len):
+                raise ValueError('Reads Library is empty in filename: '+str(fwd_filename))
+            if not self.fasta_seq_len_at_least(rev_filename, min_fasta_len):
+                raise ValueError('Reads Library is empty in filename: '+str(rev_filename))
+
+        elif input_item['type'] == self.SE_flag:
+            input_fwd_file_path = readsLibrary['files'][input_item['ref']]['files']['fwd']
+            fwd_filename = os.path.join(input_dir, input_item['name'] + '.fwd.' + fasta_file_extension)
+            if input_fwd_file_path != fwd_filename:
+                shutil.move(input_fwd_file_path, fwd_filename)
+            input_item['fwd_file'] = fwd_filename
+
+            if not os.path.isfile(fwd_filename):
+                raise ValueError('Error generating reads file '+fwd_filename)
+            # make sure fasta file isn't empty
+            min_fasta_len = 1
+            if not self.fasta_seq_len_at_least(fwd_filename, min_fasta_len):
+                raise ValueError('Reads Library is empty in filename: '+str(fwd_filename))
+
+
+        # Subsample
+        if sample_percent == 100:
+            replicate_input = input_item
+        else:
+            replicate_input = input_item  # DEBUG
+            replicate_input = []
+            # DEBUG
+            #os.remove(input_item['fwd_file'])
+            #if input_item['type'] == self.PE_flag:
+            #    os.remove(input_item['rev_file'])
+            
 
         # DEBUG
         #pad = 10
@@ -194,7 +227,12 @@ class DataStagingUtils(object):
         #                       })
         # END DEBUG
             
-        return {'input_dir': input_dir, 'folder_suffix': suffix, 'expanded_input': expanded_input}
+
+        # return input file info
+        #staged_input['input_dir'] = input_dir
+        #staged_input['folder_suffix'] = suffix
+        staged_input['replicate_input'] = replicate_input
+        return staged_input
 
 
     def fasta_seq_len_at_least(self, fasta_path, min_fasta_len=1):

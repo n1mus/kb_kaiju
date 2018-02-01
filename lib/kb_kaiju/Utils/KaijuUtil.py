@@ -25,8 +25,10 @@ class KaijuUtil:
         self.callback_url = config['SDK_CALLBACK_URL']
         self.scratch = config['scratch']
         self.threads = config['threads']
+        self.suffix = str(int(time.time() * 1000))
         self.SE_flag = 'SE'
         self.PE_flag = 'PE'
+        self.dsu_client = DataStagingUtils(self.config, self.ctx)
 
         if not os.path.exists(self.scratch):
             os.makedirs(self.scratch)
@@ -44,10 +46,10 @@ class KaijuUtil:
                            'output_biom_name',
                            'tax_levels',
                            'db_type',
+                           'filter_percent',
                            'seg_filter',
                            'min_match_length',
                            'greedy_run_mode',
-                           'filter_percent',
                            'filter_unclassified',
                            'full_tax_path',
                            'sort_taxa_by'
@@ -65,6 +67,22 @@ class KaijuUtil:
                 if arg not in params or params[arg] == None or params[arg] == '':
                     raise ValueError ("Must define GREEDY MODE required param: '"+arg+"' for method: '"+str(method)+"()'")
 
+        # Defaults for not required params
+        default_param_vals = {'subsample_percent': 10,
+                              'subsample_replicates': 1,
+                              'subsample_seed': int(self.suffix)
+                          }
+        for arg in default_param_vals.keys():
+            if arg not in params or params[arg] == None or params[arg] == '':
+                params[arg] = default_param_vals[arg]
+
+        # check math
+        total_perc = float(params['subsample_percent']) * int(params['subsample_relicates'])
+        if total_perc > 100:
+            raise ValueError ("Subsample is non-overlapping, so too many subsample replicates "+str(params['subsample_replicates'])+" at subsample percent: "+str(params['subsample_perc'])+" (replicates * percent = "+str(total_perc)+" > 100)")
+
+
+        # adjust param values by flag
         tax_levels_all = ['phylum', 'class', 'order', 'family', 'genus', 'species']
         for tax_level in params['tax_levels']:
             if tax_level == 'ALL':
@@ -74,22 +92,18 @@ class KaijuUtil:
                 raise ValueError ("Bad tax level "+tax_level)
 
 
-        # 1) stage input data
-        dsu = DataStagingUtils(self.config, self.ctx)
-        staged_input = dsu.stage_input(params['input_refs'], 'fastq')
-        input_dir = staged_input['input_dir']
-        suffix = staged_input['folder_suffix']
-        expanded_input = staged_input['expanded_input']
-
-        log('Staged input directory: ' + input_dir)
+        # 1) expand input members that are sets
+        expanded_input = dsu_client.expand_input(params['input_refs'])
+        #staged_input = dsu_client.stage_input(params['input_refs'], 'fastq')
+        #input_dir = staged_input['input_dir']
+        #log('Staged input directory: ' + input_dir)
 
 
         # 2) establish output folders
-        output_dir = os.path.join(self.scratch, 'output_' + suffix)
+        output_dir = os.path.join(self.scratch, 'output_' + str(self.suffix))
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
-        #plots_dir = os.path.join(self.scratch, 'plot_' + suffix)
-        html_dir = os.path.join(self.scratch, 'html_' + suffix)
+        html_dir = os.path.join(self.scratch, 'html_' + str(self.suffix))
         if not os.path.exists(html_dir):
             os.makedirs(html_dir)
 
@@ -145,9 +159,12 @@ class KaijuUtil:
         self.outputBuilder_client = OutputBuilder(output_folders, self.scratch, self.callback_url)
 
 
-        # 4) run Kaiju in batch
+        # 4) run Kaiju in batch (download happens one-by-one and then deleted to save space)
         kaiju_options = {'input_reads':               expanded_input,
                          'out_folder':                kaiju_output_folder,
+                         'subsample_percent':         params['subsample_percent'],
+                         'subsample_replicates':      params['subsample_replicates'],
+                         'subsample_seed':            params['subsample_seed'],
                          'tax_levels':                params['tax_levels'],
                          'db_type':                   params['db_type'],
                          'seg_filter':                params['seg_filter'],
@@ -157,7 +174,7 @@ class KaijuUtil:
                          'greedy_min_match_score':    params['greedy_min_match_score'],
                          'threads':                   self.threads
                         }
-        self.run_kaiju_batch (kaiju_options)
+        expanded_input = self.run_kaiju_batch (kaiju_options)  # revise expanded input with subsamples
 
 
         # 5) create Summary Reports in batch
@@ -267,17 +284,39 @@ class KaijuUtil:
             
 
     def run_kaiju_batch(self, options, dropOutput=False):
+        new_expanded_input = []
+
         input_reads = options['input_reads']
         for input_reads_item in input_reads:
-            single_kaiju_run_options = options
-            single_kaiju_run_options['input_item'] = input_reads_item
 
-            log_output_file = None
-            if dropOutput:  # if output is too chatty for STDOUT
-                log_output_file = os.path.join(self.scratch, input_reads_item['name'] + '.kaiju' + '.stdout')
+            # download and subsample reads
+            staged_input = dsu_client.stage_input(input_item =           input_reads_item, 
+                                                  subsample_percent =    int(options['subsample_percent']), 
+                                                  subsample_replicates = int(options['subsample_replicates']), 
+                                                  subsample_seed =       int(options['subsample_seed']), 
+                                                  fasta_file_extension = 'fastq')
+            #input_dir = staged_input['input_dir']
+            replicate_input = staged_input['replicate_input']
+            new_expanded_input.extend(replicate_input)  # revise expanded input to replicates
+
+            # run for each replicate
+            for input_reads_item_replicate in replicate_input:
+                single_kaiju_run_options = options
+                single_kaiju_run_options['input_item'] = input_reads_item_replicate
+
+                log_output_file = None
+                if dropOutput:  # if output is too chatty for STDOUT
+                    log_output_file = os.path.join(self.scratch, input_reads_item['name'] + '.kaiju' + '.stdout')
             
-            command = self._build_kaiju_command(single_kaiju_run_options)
-            self.run_proc (command, log_output_file)
+                command = self._build_kaiju_command(single_kaiju_run_options)
+                self.run_proc (command, log_output_file)
+
+                # remove input file to free up disk
+                os.remove(input_reads_item_replicate['fwd_file'])
+                if input_reads_item_replicate['type'] = self.PE_flag:
+                    os.remove(input_reads_item_replicate['rev_file'])
+
+        return new_expanded_input
 
 
     def run_kaijuReport_batch(self, options, dropOutput=False):
