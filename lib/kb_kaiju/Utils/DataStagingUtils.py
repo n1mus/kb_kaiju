@@ -205,7 +205,7 @@ class DataStagingUtils(object):
 
 
         # Subsample
-        if sample_percent == 100:
+        if subsample_percent == 100:
             replicate_input = input_item
         else:
             replicate_input = input_item  # DEBUG
