@@ -313,7 +313,7 @@ class KaijuUtil:
 
                 # remove input file to free up disk
                 os.remove(input_reads_item_replicate['fwd_file'])
-                if input_reads_item_replicate['type'] = self.PE_flag:
+                if input_reads_item_replicate['type'] == self.PE_flag:
                     os.remove(input_reads_item_replicate['rev_file'])
 
         return new_expanded_input
