@@ -93,8 +93,8 @@ class KaijuUtil:
 
 
         # 1) expand input members that are sets
-        expanded_input = dsu_client.expand_input(params['input_refs'])
-        #staged_input = dsu_client.stage_input(params['input_refs'], 'fastq')
+        expanded_input = self.dsu_client.expand_input(params['input_refs'])
+        #staged_input = self.dsu_client.stage_input(params['input_refs'], 'fastq')
         #input_dir = staged_input['input_dir']
         #log('Staged input directory: ' + input_dir)
 
@@ -290,11 +290,11 @@ class KaijuUtil:
         for input_reads_item in input_reads:
 
             # download and subsample reads
-            staged_input = dsu_client.stage_input(input_item =           input_reads_item, 
-                                                  subsample_percent =    int(options['subsample_percent']), 
-                                                  subsample_replicates = int(options['subsample_replicates']), 
-                                                  subsample_seed =       int(options['subsample_seed']), 
-                                                  fasta_file_extension = 'fastq')
+            staged_input = self.dsu_client.stage_input(input_item =           input_reads_item, 
+                                                       subsample_percent =    int(options['subsample_percent']), 
+                                                       subsample_replicates = int(options['subsample_replicates']), 
+                                                       subsample_seed =       int(options['subsample_seed']), 
+                                                       fasta_file_extension = 'fastq')
             #input_dir = staged_input['input_dir']
             replicate_input = staged_input['replicate_input']
             new_expanded_input.extend(replicate_input)  # revise expanded input to replicates
