@@ -146,7 +146,6 @@ class DataStagingUtils(object):
         staged_input = dict()
         replicate_input = []
 
-
         # config
         #SERVICE_VER = 'dev'
         SERVICE_VER = 'release'
@@ -184,9 +183,9 @@ class DataStagingUtils(object):
                 raise ValueError('Error generating reads file '+rev_filename)
             # make sure fasta file isn't empty
             min_fasta_len = 1
-            if not self.fasta_seq_len_at_least(fwd_filename, min_fasta_len):
+            if not self._fasta_seq_len_at_least(fwd_filename, min_fasta_len):
                 raise ValueError('Reads Library is empty in filename: '+str(fwd_filename))
-            if not self.fasta_seq_len_at_least(rev_filename, min_fasta_len):
+            if not self._fasta_seq_len_at_least(rev_filename, min_fasta_len):
                 raise ValueError('Reads Library is empty in filename: '+str(rev_filename))
 
         elif input_item['type'] == self.SE_flag:
@@ -200,20 +199,32 @@ class DataStagingUtils(object):
                 raise ValueError('Error generating reads file '+fwd_filename)
             # make sure fasta file isn't empty
             min_fasta_len = 1
-            if not self.fasta_seq_len_at_least(fwd_filename, min_fasta_len):
+            if not self._fasta_seq_len_at_least(fwd_filename, min_fasta_len):
                 raise ValueError('Reads Library is empty in filename: '+str(fwd_filename))
 
 
         # Subsample
         if subsample_percent == 100:
-            replicate_input = input_item
+            replicate_input = [input_item]
         else:
-            replicate_input = input_item  # DEBUG
             replicate_input = []
-            # DEBUG
-            #os.remove(input_item['fwd_file'])
-            #if input_item['type'] == self.PE_flag:
-            #    os.remove(input_item['rev_file'])
+            replicate_files = self._randomly_subsample_reads(input_item, 
+                                                             subsample_percent    = subsample_percent,
+                                                             subsample_replicates = subsample_replicates,
+                                                             subsample_seed       = subsample_seed)
+
+            for replicate_i,replicate_item in enumerate(replicate_files):
+                replicate_input.append({'fwd_file': replicate_item['fwd_file'],
+                                        'type': input_item['type'],
+                                        'name': input_item['name']+"-"+str(replicate_i)
+                                    })
+                if input_item['type'] == self.PE_flag:
+                    replicate_input[replicate_i]['rev_file'] = replicate_item['rev_file']
+
+            # free up disk
+            os.remove(input_item['fwd_file'])
+            if input_item['type'] == self.PE_flag:
+                os.remove(input_item['rev_file'])
             
 
         # DEBUG
@@ -235,7 +246,22 @@ class DataStagingUtils(object):
         return staged_input
 
 
-    def fasta_seq_len_at_least(self, fasta_path, min_fasta_len=1):
+    def _randomly_subsample_reads(self,
+                                  input_item=None,
+                                  subsample_percent=100,
+                                  subsample_replicates=1,
+                                  subsample_seed=1):
+
+        replicate_files = []
+
+
+        # HERE
+
+
+        return replicate_files
+
+
+    def _fasta_seq_len_at_least(self, fasta_path, min_fasta_len=1):
         '''
         counts the number of non-header, non-whitespace characters in a FASTA file
         '''

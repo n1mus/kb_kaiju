@@ -142,15 +142,15 @@ class KaijuUtil:
                            { 'name': 'krona_data',
                              'desc': 'Krona Data',
                              'path': krona_output_folder
-                         },
+                         }
                            #{ 'name': 'per_sample_ranked_abundance_plots_PNG+PDF',
                            #  'desc': 'Per Sample Ranked Abundance Plots (PNG + PDF)',
                            #  'path': kaijuReport_PerSamplePlots_output_folder
                            #}, 
-                           { 'name': 'stacked_bar_abundance_plots_PNG+PDF',
-                             'desc': 'Stacked Bar Abundance Plots (PNG + PDF)',
-                             'path': kaijuReport_StackedBarPlots_output_folder
-                         }
+#                           { 'name': 'stacked_bar_abundance_plots_PNG+PDF',
+#                             'desc': 'Stacked Bar Abundance Plots (PNG + PDF)',
+#                             'path': kaijuReport_StackedBarPlots_output_folder
+#                         }
                            #{ 'name': 'stacked_area_abundance_plots_PNG+PDF',
                            #  'desc': 'Stacked Area Abundance Plots (PNG + PDF)',
                            #  'path': kaijuReport_StackedAreaPlots_output_folder
@@ -191,6 +191,7 @@ class KaijuUtil:
 
 
         # 6) create Summary Report plots in batch
+        """
         kaijuReportPlots_options = {'input_reads':                   expanded_input,
                                     'in_folder':                     kaijuReport_output_folder,
                                     'stacked_bar_plots_out_folder':  kaijuReport_StackedBarPlots_output_folder,
@@ -214,7 +215,7 @@ class KaijuUtil:
                                         'tax_levels':              params['tax_levels']
         }
         html_plot_pages = self.run_kaijuReportPlotsHTML_batch (kaijuReportPlotsHTML_options)
-
+        """
 
         # 8) create Krona plots
         krona_options = {'input_reads':               expanded_input,
@@ -232,7 +233,7 @@ class KaijuUtil:
 
         # 10) add top nav to html pages and build the HTML report
         html_pages = []
-        html_pages.extend(html_plot_pages['bar'])
+        #html_pages.extend(html_plot_pages['bar'])
         #html_pages.extend(html_plot_pages['area'])
         #html_pages.extend(html_plot_pages['per_sample'])
         html_pages.extend(html_krona_pages)
@@ -303,6 +304,8 @@ class KaijuUtil:
             for input_reads_item_replicate in replicate_input:
                 single_kaiju_run_options = options
                 single_kaiju_run_options['input_item'] = input_reads_item_replicate
+
+                print ("REPLICATE: "+str(input_reads_item_replicate))
 
                 log_output_file = None
                 if dropOutput:  # if output is too chatty for STDOUT
