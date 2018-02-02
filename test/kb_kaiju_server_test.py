@@ -145,7 +145,7 @@ class kb_kaijuTest(unittest.TestCase):
         print ("RUNNING "+method_name+"()")
         print (('='*(10+len(method_name)))+"\n")
 
-        # run checkM lineage_wf app on a single assembly
+        # run kaiju
         input_ref = self.reads_ref1
         output_biom_name = 'test_kb_kaiju_test1.BIOM'
         params = {
@@ -153,10 +153,13 @@ class kb_kaijuTest(unittest.TestCase):
             'input_refs':                [input_ref],
             'output_biom_name':          output_biom_name,
             'tax_levels':                ['phylum','genus'],
-            'db_type':                   'kaiju_index',
-            'filter_percent':            1,
-            'subsample_percent':         10,
-            'subsample_replicates':      3,
+            'db_type':                   'kaiju_index',  
+            #'filter_percent':            1,
+            'filter_percent':            0.1,
+            #'subsample_percent':         10,
+            'subsample_percent':         100,
+            #'subsample_replicates':      3,
+            'subsample_replicates':      1,
             'subsample_seed':            1,
             'seg_filter':                1,
             'min_match_length':          11,
