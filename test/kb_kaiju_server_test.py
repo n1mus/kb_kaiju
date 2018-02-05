@@ -106,30 +106,32 @@ class kb_kaijuTest(unittest.TestCase):
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
 
         # upload sequences
-        basename = 'seven_species_nonuniform_10K.PE_reads_'
-        fwd_filename = basename+'fwd-0.FASTQ'
-        rev_filename = basename+'rev-0.FASTQ'
-        reads_objname = 'seven_species_nonuniform_test1.PElib'
-        #shutil.copy(os.path.join("data", fwd_filename), fwd_fastq_file_path)
-        #shutil.copy(os.path.join("data", rev_filename), rev_fastq_file_path)
+        cls.reads_refs = []
+        for basename in ['seven_species_nonuniform_10K.PE_reads_', 'seven_species_nonuniform_05K.PE_reads_']:
+            fwd_filename = basename+'fwd-0.FASTQ'
+            rev_filename = basename+'rev-0.FASTQ'
+            reads_objname = basename+'.PElib'
+            #shutil.copy(os.path.join("data", fwd_filename), fwd_fastq_file_path)
+            #shutil.copy(os.path.join("data", rev_filename), rev_fastq_file_path)
 
-        # unzip and put where ReadsUtils can see them (only sees shared scratch)
-        fwd_fastq_file_path = os.path.join(cls.scratch, fwd_filename)
-        rev_fastq_file_path = os.path.join(cls.scratch, rev_filename)
-        with gzip.open(os.path.join("data", fwd_filename+'.gz'), 'rb') as f_in, open(fwd_fastq_file_path, 'wb') as f_out:
-            shutil.copyfileobj(f_in, f_out)
-        with gzip.open(os.path.join("data", rev_filename+'.gz'), 'rb') as f_in, open(rev_fastq_file_path, 'wb') as f_out:
-            shutil.copyfileobj(f_in, f_out)
+            # unzip and put where ReadsUtils can see them (only sees shared scratch)
+            fwd_fastq_file_path = os.path.join(cls.scratch, fwd_filename)
+            rev_fastq_file_path = os.path.join(cls.scratch, rev_filename)
+            with gzip.open(os.path.join("data", fwd_filename+'.gz'), 'rb') as f_in, open(fwd_fastq_file_path, 'wb') as f_out:
+                shutil.copyfileobj(f_in, f_out)
+            with gzip.open(os.path.join("data", rev_filename+'.gz'), 'rb') as f_in, open(rev_fastq_file_path, 'wb') as f_out:
+                shutil.copyfileobj(f_in, f_out)
 
-        read_upload_params = {'fwd_file': fwd_fastq_file_path,
-                              'rev_file': rev_fastq_file_path,
-                              'sequencing_tech': 'artificial reads',
-                              'interleaved': 0,
-                              'wsname': cls.ws_info[1],
-                              'name': reads_objname
-                          }
-        cls.reads_ref1 = cls.ru.upload_reads(read_upload_params)['obj_ref']
-        pprint('Saved PE Lib Reads: ' + cls.reads_ref1)
+            read_upload_params = {'fwd_file': fwd_fastq_file_path,
+                                  'rev_file': rev_fastq_file_path,
+                                  'sequencing_tech': 'artificial reads',
+                                  'interleaved': 0,
+                                  'wsname': cls.ws_info[1],
+                                  'name': reads_objname
+                              }
+            reads_ref = cls.ru.upload_reads(read_upload_params)['obj_ref']
+            cls.reads_refs.append(reads_ref)
+            pprint('Saved PE Lib Reads: ' + reads_ref)
 
 
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
@@ -146,13 +148,15 @@ class kb_kaijuTest(unittest.TestCase):
         print (('='*(10+len(method_name)))+"\n")
 
         # run kaiju
-        input_ref = self.reads_ref1
+        #input_refs = [self.reads_refs[0]]
+        input_refs = [self.reads_refs[0], self.reads_refs[1]]
         output_biom_name = 'test_kb_kaiju_test1.BIOM'
         params = {
             'workspace_name':            self.ws_info[1],
-            'input_refs':                [input_ref],
+            'input_refs':                input_refs,
             'output_biom_name':          output_biom_name,
-            'tax_levels':                ['phylum','genus'],
+            #'tax_levels':                ['phylum','genus'],
+            'tax_levels':                ['phylum'],
             'db_type':                   'kaiju_index',  
             #'filter_percent':            1,
             'filter_percent':            0.1,

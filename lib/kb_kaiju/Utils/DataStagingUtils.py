@@ -227,18 +227,6 @@ class DataStagingUtils(object):
                 os.remove(input_item['rev_file'])
             
 
-        # DEBUG
-        #pad = 10
-        #for item_i in range(pad):
-        #    expanded_input.append({'fwd_file': expanded_input[0]['fwd_file'],
-        #                           'rev_file': expanded_input[0]['rev_file'],
-        #                           'type': expanded_input[0]['type'],
-        #                           'name': expanded_input[0]['name']+'.'+str(item_i),
-        #                           'ref': expanded_input[0]['ref']
-        #                       })
-        # END DEBUG
-            
-
         # return input file info
         #staged_input['input_dir'] = input_dir
         #staged_input['folder_suffix'] = suffix
