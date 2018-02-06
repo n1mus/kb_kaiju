@@ -343,8 +343,10 @@ class OutputBuilder(object):
                     line_copy = line.lstrip()
                     if html_type == 'krona' and line_copy.startswith('options.style.top ='):
                         #downshift = '50px'
-                        downshift = '25px'
-                        new_buf.append("\t options.style.top = '"+downshift+"';")
+                        #downshift = '25px'
+                        downshift_scale_per_char = 0.15
+                        downshift = int(downshift_scale_per_char*len(top_nav_str))
+                        new_buf.append("\t options.style.top = '"+str(downshift)+"px';")
                         continue
                     new_buf.append(line)
                     if line_copy.startswith('<body'):
@@ -451,10 +453,7 @@ class OutputBuilder(object):
                 color_names[label_i] = 'darkslategray'
                 
 
-        # possibly sort vals
-        #sort_by = None  # DEBUG
-        #sort_by = 'alpha'  # DEBUG
-        sort_by = 'totals'  # DEBUG
+        # Sort vals
         if sort_by != None:
             print ("SORTING ELEMENTS by "+str(sort_by))
             old_index = dict()
@@ -462,7 +461,6 @@ class OutputBuilder(object):
             for label_i,label in enumerate(element_labels):
                 old_index[label] = label_i
                 #print ("LABEL: "+str(label)+" OLD_INDEX: "+str(label_i))  # DEBUG
-            
 
             # alphabet sort
             if sort_by == 'alpha':
@@ -534,6 +532,7 @@ class OutputBuilder(object):
         # label dimensions
         longest_sample_label_len = 0
         longest_element_label_len = 0
+        len_elements_list = len(element_labels)
         for label in sample_labels:
             if len(label) > longest_sample_label_len:
                 longest_sample_label_len = len(label)
@@ -544,8 +543,11 @@ class OutputBuilder(object):
         #y_label_scale_unit = 0.015
         x_label_scale_unit = 0.175
         y_label_scale_unit = 0.16
+        key_label_scale = y_label_scale_unit * 50 / 35.0
         x_label_pad_unit = x_label_scale_unit * longest_element_label_len
         y_label_pad_unit = y_label_scale_unit * longest_sample_label_len
+        if key_label_scale * len_elements_list > y_label_pad_unit:
+            y_label_pad_unit = key_label_scale * len_elements_list
         x_label_pad_inch = per_unit_to_inch_scale * x_label_pad_unit
         y_label_pad_inch = per_unit_to_inch_scale * y_label_pad_unit
 
