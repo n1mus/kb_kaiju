@@ -446,7 +446,6 @@ class OutputBuilder(object):
                 color_names[label_i] = 'magenta'
             elif label.startswith('unassigned at'):
                 color_names[label_i] = 'darkslategray'
-                color_names = self.no_light_color_names
                 
 
         # possibly sort vals
