@@ -436,10 +436,13 @@ class OutputBuilder(object):
 
         # colors
         color_names = self.no_light_color_names
+        len_color_names = len(color_names)
         random.seed(a=len(element_labels))
         r = random.random()
         shuffle(color_names, lambda: r)
         for label_i,label in enumerate(element_labels):
+            if label_i >= len_color_names:
+                color_names.append(color_names[label_i % len_color_names])
             if label.startswith('tail (<'):
                 color_names[label_i] = 'lightslategray'
             elif label.startswith('viruses'):
