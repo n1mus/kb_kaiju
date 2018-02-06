@@ -151,13 +151,16 @@ KaijuInputParams is a reference to a hash where the following keys are defined:
 	output_biom_name has a value which is a kb_kaiju.data_obj_ref
 	tax_levels has a value which is a reference to a list where each element is a string
 	db_type has a value which is a string
+	filter_percent has a value which is a float
+	subsample_percent has a value which is an int
+	subsample_replicates has a value which is an int
+	subsample_seed has a value which is an int
 	seg_filter has a value which is a kb_kaiju.bool
 	min_match_length has a value which is an int
 	greedy_run_mode has a value which is a kb_kaiju.bool
 	greedy_allowed_mismatches has a value which is an int
 	greedy_min_match_score has a value which is an int
 	greedy_max_e_value has a value which is a float
-	filter_percent has a value which is a float
 	filter_unclassified has a value which is a kb_kaiju.bool
 	full_tax_path has a value which is a kb_kaiju.bool
 	sort_taxa_by has a value which is a string
@@ -183,13 +186,16 @@ KaijuInputParams is a reference to a hash where the following keys are defined:
 	output_biom_name has a value which is a kb_kaiju.data_obj_ref
 	tax_levels has a value which is a reference to a list where each element is a string
 	db_type has a value which is a string
+	filter_percent has a value which is a float
+	subsample_percent has a value which is an int
+	subsample_replicates has a value which is an int
+	subsample_seed has a value which is an int
 	seg_filter has a value which is a kb_kaiju.bool
 	min_match_length has a value which is an int
 	greedy_run_mode has a value which is a kb_kaiju.bool
 	greedy_allowed_mismatches has a value which is an int
 	greedy_min_match_score has a value which is an int
 	greedy_max_e_value has a value which is a float
-	filter_percent has a value which is a float
 	filter_unclassified has a value which is a kb_kaiju.bool
 	full_tax_path has a value which is a kb_kaiju.bool
 	sort_taxa_by has a value which is a string
@@ -490,13 +496,16 @@ input_refs has a value which is a kb_kaiju.data_obj_ref
 output_biom_name has a value which is a kb_kaiju.data_obj_ref
 tax_levels has a value which is a reference to a list where each element is a string
 db_type has a value which is a string
+filter_percent has a value which is a float
+subsample_percent has a value which is an int
+subsample_replicates has a value which is an int
+subsample_seed has a value which is an int
 seg_filter has a value which is a kb_kaiju.bool
 min_match_length has a value which is an int
 greedy_run_mode has a value which is a kb_kaiju.bool
 greedy_allowed_mismatches has a value which is an int
 greedy_min_match_score has a value which is an int
 greedy_max_e_value has a value which is a float
-filter_percent has a value which is a float
 filter_unclassified has a value which is a kb_kaiju.bool
 full_tax_path has a value which is a kb_kaiju.bool
 sort_taxa_by has a value which is a string
@@ -513,13 +522,16 @@ input_refs has a value which is a kb_kaiju.data_obj_ref
 output_biom_name has a value which is a kb_kaiju.data_obj_ref
 tax_levels has a value which is a reference to a list where each element is a string
 db_type has a value which is a string
+filter_percent has a value which is a float
+subsample_percent has a value which is an int
+subsample_replicates has a value which is an int
+subsample_seed has a value which is an int
 seg_filter has a value which is a kb_kaiju.bool
 min_match_length has a value which is an int
 greedy_run_mode has a value which is a kb_kaiju.bool
 greedy_allowed_mismatches has a value which is an int
 greedy_min_match_score has a value which is an int
 greedy_max_e_value has a value which is a float
-filter_percent has a value which is a float
 filter_unclassified has a value which is a kb_kaiju.bool
 full_tax_path has a value which is a kb_kaiju.bool
 sort_taxa_by has a value which is a string

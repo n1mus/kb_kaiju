@@ -126,6 +126,55 @@
 				}
 		},
 		{
+			"id": "filter_percent",
+			"optional": false,
+			"advanced": true,
+			"allow_multiple": false,
+			"default_values": [ "0.1" ],
+			"field_type": "text",
+			"text_options": {
+				"validate_as": "float",
+			        "min_float": 0.0,
+			        "max_float": 10.0
+			}
+		},
+		{
+			"id": "subsample_percent",
+			"optional": true,
+			"advanced": false,
+			"allow_multiple": false,
+			"default_values": [ "10" ],
+			"field_type": "text",
+			"text_options": {
+				"validate_as": "int",
+			        "min_int": 1,
+			        "max_int": 100
+			}
+		},
+		{
+			"id": "subsample_replicates",
+			"optional": true,
+			"advanced": false,
+			"allow_multiple": false,
+			"default_values": [ "1" ],
+			"field_type": "text",
+			"text_options": {
+				"validate_as": "int",
+			        "min_int": 1
+			}
+		},
+		{
+			"id": "subsample_seed",
+			"optional": true,
+			"advanced": false,
+			"allow_multiple": false,
+			"default_values": [ "1" ],
+			"field_type": "text",
+			"text_options": {
+				"validate_as": "int"
+			}
+		},
+		{
 			"id": "seg_filter",
 			"optional": false,
 			"advanced": true,
@@ -202,7 +251,7 @@
 			"optional": false,
 			"advanced": true,
 			"allow_multiple": false,
-			"default_values": [ "75.0" ],
+			"default_values": [ "75" ],
 			"field_type": "text",
 			"text_options": {
 				"validate_as": "int",
@@ -244,18 +293,6 @@
 						}
 					]
 				}
-		},
-		{
-			"id": "filter_percent",
-			"optional": false,
-			"advanced": true,
-			"allow_multiple": false,
-			"default_values": [ "1" ],
-			"field_type": "text",
-			"text_options": {
-				"validate_as": "int",
-			        "min_int": 0
-			}
 		},
 		{
 			"id": "filter_unclassified",
@@ -331,6 +368,22 @@
 					"target_property": "db_type"
 				},
 				{
+					"input_parameter": "filter_percent",
+					"target_property": "filter_percent"
+				},
+				{
+					"input_parameter": "subsample_percent",
+					"target_property": "subsample_percent"
+				},
+				{
+					"input_parameter": "subsample_replicates",
+					"target_property": "subsample_replicates"
+				},
+				{
+					"input_parameter": "subsample_seed",
+					"target_property": "subsample_seed"
+				},
+				{
 					"input_parameter": "seg_filter",
 					"target_property": "seg_filter"
 				},
@@ -357,10 +410,6 @@
 				{
 					"input_parameter": "full_tax_path",
 					"target_property": "full_tax_path"
-				},
-				{
-					"input_parameter": "filter_percent",
-					"target_property": "filter_percent"
 				},
 				{
 					"input_parameter": "filter_unclassified",

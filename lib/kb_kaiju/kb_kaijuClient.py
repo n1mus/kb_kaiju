@@ -48,14 +48,16 @@ class kb_kaiju(object):
            parameter "input_refs" of type "data_obj_ref", parameter
            "output_biom_name" of type "data_obj_ref", parameter "tax_levels"
            of list of String, parameter "db_type" of String, parameter
-           "seg_filter" of type "bool" (A boolean - 0 for false, 1 for true.
-           @range (0, 1)), parameter "min_match_length" of Long, parameter
-           "greedy_run_mode" of type "bool" (A boolean - 0 for false, 1 for
-           true. @range (0, 1)), parameter "greedy_allowed_mismatches" of
-           Long, parameter "greedy_min_match_score" of Long, parameter
-           "greedy_max_e_value" of Double, parameter "filter_percent" of
-           Double, parameter "filter_unclassified" of type "bool" (A boolean
-           - 0 for false, 1 for true. @range (0, 1)), parameter
+           "filter_percent" of Double, parameter "subsample_percent" of Long,
+           parameter "subsample_replicates" of Long, parameter
+           "subsample_seed" of Long, parameter "seg_filter" of type "bool" (A
+           boolean - 0 for false, 1 for true. @range (0, 1)), parameter
+           "min_match_length" of Long, parameter "greedy_run_mode" of type
+           "bool" (A boolean - 0 for false, 1 for true. @range (0, 1)),
+           parameter "greedy_allowed_mismatches" of Long, parameter
+           "greedy_min_match_score" of Long, parameter "greedy_max_e_value"
+           of Double, parameter "filter_unclassified" of type "bool" (A
+           boolean - 0 for false, 1 for true. @range (0, 1)), parameter
            "full_tax_path" of type "bool" (A boolean - 0 for false, 1 for
            true. @range (0, 1)), parameter "sort_taxa_by" of String
         :returns: instance of type "KaijuOutput" (Kaiju App Output) ->

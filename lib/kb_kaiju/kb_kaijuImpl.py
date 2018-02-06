@@ -48,7 +48,7 @@ You should have received a copy of the GNU General Public License along with the
     ######################################### noqa
     VERSION = "0.0.1"
     GIT_URL = "https://github.com/dcchivian/kb_kaiju"
-    GIT_COMMIT_HASH = "d734cde9eeb71d7a55cb700c7e4caeee3b47905c"
+    GIT_COMMIT_HASH = "444ccef436a540131d19756ec4f5c57211cbe54c"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -79,14 +79,16 @@ You should have received a copy of the GNU General Public License along with the
            parameter "input_refs" of type "data_obj_ref", parameter
            "output_biom_name" of type "data_obj_ref", parameter "tax_levels"
            of list of String, parameter "db_type" of String, parameter
-           "seg_filter" of type "bool" (A boolean - 0 for false, 1 for true.
-           @range (0, 1)), parameter "min_match_length" of Long, parameter
-           "greedy_run_mode" of type "bool" (A boolean - 0 for false, 1 for
-           true. @range (0, 1)), parameter "greedy_allowed_mismatches" of
-           Long, parameter "greedy_min_match_score" of Long, parameter
-           "greedy_max_e_value" of Double, parameter "filter_percent" of
-           Double, parameter "filter_unclassified" of type "bool" (A boolean
-           - 0 for false, 1 for true. @range (0, 1)), parameter
+           "filter_percent" of Double, parameter "subsample_percent" of Long,
+           parameter "subsample_replicates" of Long, parameter
+           "subsample_seed" of Long, parameter "seg_filter" of type "bool" (A
+           boolean - 0 for false, 1 for true. @range (0, 1)), parameter
+           "min_match_length" of Long, parameter "greedy_run_mode" of type
+           "bool" (A boolean - 0 for false, 1 for true. @range (0, 1)),
+           parameter "greedy_allowed_mismatches" of Long, parameter
+           "greedy_min_match_score" of Long, parameter "greedy_max_e_value"
+           of Double, parameter "filter_unclassified" of type "bool" (A
+           boolean - 0 for false, 1 for true. @range (0, 1)), parameter
            "full_tax_path" of type "bool" (A boolean - 0 for false, 1 for
            true. @range (0, 1)), parameter "sort_taxa_by" of String
         :returns: instance of type "KaijuOutput" (Kaiju App Output) ->

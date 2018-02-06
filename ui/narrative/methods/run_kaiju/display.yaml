@@ -55,6 +55,34 @@ parameters :
             Database to search against for classification
         long-hint : |
             Database to search against for classification
+    filter_percent :
+        ui-name : |
+            Tail member percent
+        short-hint : |
+            Dont include below this percentage of the reads in the summaries (default: 1%, note: must be integer)
+        long-hint : |
+            Dont include below this percentage of the reads in the summaries (default: 1%, note: must be integer)
+    subsample_percent : 
+        ui-name : |
+            Subsample Percent
+        short-hint : |
+            Subsample each data set to run faster
+        long-hint : |
+            Subsample each data set to run faster
+    subsample_replicates : 
+        ui-name : |
+            Subsample Replicates
+        short-hint : |
+            Add replicates to determine robustness of measurement
+        long-hint : |
+            Add replicates to determine robustness of measurement
+    subsample_seed : 
+        ui-name : |
+            Subsample Seed
+        short-hint : |
+            Set seed for random subsample
+        long-hint : |
+            Set seed for random subsample
     seg_filter : 
         ui-name : |
             Filter low-complexity
@@ -104,13 +132,6 @@ parameters :
             Place the full taxonomic lineage into the summary? (default: NO)
         long-hint : |
             Place the full taxonomic lineage into the summary? (default: NO)
-    filter_percent :
-        ui-name : |
-            Summary minimum percent
-        short-hint : |
-            Dont include below this percentage of the reads in the summaries (default: 1%, note: must be integer)
-        long-hint : |
-            Dont include below this percentage of the reads in the summaries (default: 1%, note: must be integer)
     filter_unclassified :
         ui-name : |
             Summary classified

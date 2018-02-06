@@ -185,6 +185,7 @@ class OutputBuilder(object):
         abundance_by_sample = []
         lineage_seen = dict()
         lineage_order = []
+        extra_bucket_order = []
         sample_order = []
         classified_frac = []
         
@@ -197,9 +198,17 @@ class OutputBuilder(object):
             for lineage_name in this_lineage_order:
                 if lineage_name not in lineage_seen:
                     lineage_seen[lineage_name] = True
-                    lineage_order.append(lineage_name)
+                    if lineage_name.startswith('tail (<') \
+                       or lineage_name.startswith('viruses') \
+                       or lineage_name.startswith('unassigned at'):
+                        extra_bucket_order.append(lineage_name)
+                    else:
+                        lineage_order.append(lineage_name)
             abundance_by_sample.append(this_abundance)
             classified_frac.append(this_classified_frac)
+
+        for bucket_name in extra_bucket_order:  # put extra buckets at end.  necessary for sorting later.
+            lineage_order.append(bucket_name)
 
         for lineage_i,lineage_name in enumerate(lineage_order):
             abundance_matrix.append([])
@@ -441,12 +450,17 @@ class OutputBuilder(object):
                 
 
         # possibly sort vals
-        sort_by = None  # DEBUG
+        #sort_by = None  # DEBUG
+        #sort_by = 'alpha'  # DEBUG
+        sort_by = 'totals'  # DEBUG
         if sort_by != None:
+            print ("SORTING ELEMENTS by "+str(sort_by))
             old_index = dict()
             new_index = dict()
             for label_i,label in enumerate(element_labels):
                 old_index[label] = label_i
+                #print ("LABEL: "+str(label)+" OLD_INDEX: "+str(label_i))  # DEBUG
+            
 
             # alphabet sort
             if sort_by == 'alpha':
@@ -457,6 +471,7 @@ class OutputBuilder(object):
                     else:
                         new_index[label] = new_label_i
                         new_label_i += 1
+                    #print ("LABEL: "+str(label)+" NEW_INDEX: "+str(new_index[label]))  # DEBUG
 
             # summed total sort
             elif sort_by == 'totals':
@@ -480,6 +495,7 @@ class OutputBuilder(object):
                         else:
                             new_index[label] = new_label_i
                             new_label_i += 1       
+                        #print ("LABEL: "+str(label)+" NEW_INDEX: "+str(new_index[label]))  # DEBUG
 
             # store new order            
             new_vals = []
@@ -488,9 +504,14 @@ class OutputBuilder(object):
                 new_vals.append([])
                 new_element_labels.append(None)
             for label_i,label in enumerate(element_labels):
-                new_vals[new_index[label]] = vals[label_i]
-                #new_element_labels[new_index[label]] = element_labels[label_i]
-                new_element_labels[new_index[label]] = label
+                new_element_i = new_index[label]
+                #print ("NEW_ELEMENT_I: "+str(new_element_i))  # DEBUG
+                new_vals[new_element_i] = vals[label_i]
+                new_element_labels[new_element_i] = label
+                # DEBUG
+                #print ("NEW LABEL: "+str(label)+" NEW_INDEX: "+str(new_element_i)+" OLD_INDEX: "+str(label_i))  # DEBUG
+                #for sample_i,val in enumerate(new_vals[new_element_i]):
+                #    print ("\t"+"SAMPLE_I: "+str(sample_i)+" NEW_VAL: "+str(new_vals[new_element_i][sample_i]))
             vals = new_vals
             element_labels = new_element_labels
 
@@ -648,10 +669,10 @@ class OutputBuilder(object):
         ax_top.set_position(top_pos)
 
         # DEBUG
-        print ("AX_TOP: BOX:")
-        print ([box.x0, box.y0, box.width, box.height])
-        print ("AX_TOP: TOP_POS:")
-        print (top_pos)
+        #print ("AX_TOP: BOX:")
+        #print ([box.x0, box.y0, box.width, box.height])
+        #print ("AX_TOP: TOP_POS:")
+        #print (top_pos)
 
 
         # Stacked Plot sizing
@@ -672,10 +693,11 @@ class OutputBuilder(object):
                                   ]
         ax_bot.set_position(bot_pos)
 
-        print ("AX_BOT: BOX:")
-        print ([box.x0, box.y0, box.width, box.height])
-        print ("AX_BOT: BOT_POS:")
-        print (bot_pos)
+        # DEBUG
+        #print ("AX_BOT: BOX:")
+        #print ([box.x0, box.y0, box.width, box.height])
+        #print ("AX_BOT: BOT_POS:")
+        #print (bot_pos)
 
 
         # add key
