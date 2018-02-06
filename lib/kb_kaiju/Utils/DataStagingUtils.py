@@ -2,6 +2,7 @@ import os
 import time
 import shutil
 import re
+import random
 #import subprocess
 #import glob
 
@@ -207,20 +208,10 @@ class DataStagingUtils(object):
         if subsample_percent == 100:
             replicate_input = [input_item]
         else:
-            replicate_input = []
-            replicate_files = self._randomly_subsample_reads(input_item, 
+            replicate_input = self._randomly_subsample_reads(input_item, 
                                                              subsample_percent    = subsample_percent,
                                                              subsample_replicates = subsample_replicates,
                                                              subsample_seed       = subsample_seed)
-
-            for replicate_i,replicate_item in enumerate(replicate_files):
-                replicate_input.append({'fwd_file': replicate_item['fwd_file'],
-                                        'type': input_item['type'],
-                                        'name': input_item['name']+"-"+str(replicate_i)
-                                    })
-                if input_item['type'] == self.PE_flag:
-                    replicate_input[replicate_i]['rev_file'] = replicate_item['rev_file']
-
             # free up disk
             os.remove(input_item['fwd_file'])
             if input_item['type'] == self.PE_flag:
@@ -241,7 +232,415 @@ class DataStagingUtils(object):
                                   subsample_seed=1):
 
         replicate_files = []
+        split_num = subsample_replicates
 
+        # for now can only do percentage instead of raw cnt of reads per subsample
+        use_reads_num  = False
+        use_reads_perc = True        
+        reads_num = 0  # not used.  subsample_percent used instead
+
+        # init randomizer
+        random.seed(subsample_seed)
+
+
+        # Paired End
+        #
+        if input_item['type'] == self.PE_flag:
+            print ("SUBSAMPLING PE library "+input_item['name'])  # DEBUG
+
+            # file paths         
+            input_fwd_path = re.sub ("\.fastq$", "", input_item['fwd_file'])
+            input_fwd_path = re.sub ("\.FASTQ$", "", input_fwd_path)
+            input_rev_path = re.sub ("\.fastq$", "", input_item['rev_file'])
+            input_rev_path = re.sub ("\.FASTQ$", "", input_rev_path)
+            output_fwd_paired_file_path_base   = input_fwd_path+"_fwd_paired"
+            output_rev_paired_file_path_base   = input_rev_path+"_rev_paired"
+
+            # set up for file io
+            total_paired_reads = 0
+            total_unpaired_fwd_reads = 0
+            total_unpaired_rev_reads = 0
+            total_paired_reads_by_set = []
+            fwd_ids = dict()
+            paired_ids = dict()
+            paired_ids_list = []
+            paired_lib_i = dict()
+            paired_buf_size = 100000
+            recs_beep_n = 100000
+
+
+            # read fwd file to get fwd ids
+#            rec_cnt = 0  # DEBUG
+            print ("GETTING IDS")  # DEBUG
+            with open (input_item['fwd_file'], 'r', 0) as input_reads_file_handle:
+                rec_line_i = -1
+                for line in input_reads_file_handle:
+                    rec_line_i += 1
+                    if rec_line_i == 3:
+                        rec_line_i = -1
+                    elif rec_line_i == 0:
+                        if not line.startswith('@'):
+                            raise ValueError ("badly formatted rec line: '"+line+"'")
+                        read_id = line.rstrip('\n')
+                        read_id = re.sub ("[ \t]+.*$", "", read_id)
+                        read_id = re.sub ("[\/\.\_\-\:\;][012lrLRfrFR53]\'*$", "", read_id)
+                        fwd_ids[read_id] = True
+
+                        # DEBUG
+#                        if rec_cnt % 100 == 0:
+#                            print ("read_id: '"+str(read_id)+"'")
+#                        rec_cnt += 1
+
+
+            # read reverse to determine paired
+            print ("DETERMINING PAIRED IDS")  # DEBUG                                                       
+            with open (input_item['rev_file'], 'r', 0) as input_reads_file_handle:
+                rec_line_i = -1
+                for line in input_reads_file_handle:
+                    rec_line_i += 1
+                    if rec_line_i == 3:
+                        rec_line_i = -1
+                    elif rec_line_i == 0:
+                        if not line.startswith('@'):
+                            raise ValueError ("badly formatted rec line: '"+line+"'")
+                        read_id = line.rstrip('\n')
+                        read_id = re.sub ("[ \t]+.*$", "", read_id)
+                        read_id = re.sub ("[\/\.\_\-\:\;][012lrLRfrFR53]\'*$", "", read_id)
+                        if fwd_ids[read_id]:
+                            paired_ids[read_id] = True
+                            paired_ids_list.append(read_id)
+
+                        # DEBUG
+#                        if rec_cnt % 100 == 0:
+#                            print ("read_id: '"+str(read_id)+"'")
+#                        rec_cnt += 1
+            total_paired_reads = len(paired_ids_list)
+            print ("TOTAL PAIRED READS CNT: "+str(total_paired_reads))  # DEBUG     
+
+
+            # Determine sublibrary sizes
+            if use_reads_num:
+                reads_per_lib = reads_num
+                if reads_per_lib > total_paired_reads // split_num:
+                    raise ValueError ("must specify reads_num <= total_paired_reads_cnt / split_num.  You have reads_num:"+str(reads_num)+" > total_paired_reads_cnt:"+str(total_paired_reads)+" / split_num:"+str(split_num)+".  Instead try reads_num <= "+str(total_paired_reads // split_num))
+            elif use_reads_perc:
+                reads_per_lib = int ((subsample_percent/100.0) * total_paired_reads)
+                if reads_per_lib > total_paired_reads // split_num:
+                    raise ValueError ("must specify reads_perc <= 1 / split_num.  You have reads_perc:"+str(subsample_percent)+" > 1 / split_num:"+str(split_num)+".  Instead try reads_perc <= "+ str(int(100 * 1/split_num)))
+            else:
+                raise ValueError ("error in logic reads_num vs. reads_perc logic")
+
+
+            # Determine random membership in each sublibrary
+            print ("GETTING RANDOM SUBSAMPLES")  # DEBUG
+            for i,read_id in enumerate(random.sample (paired_ids_list, reads_per_lib * split_num)):
+                lib_i = i % split_num
+                paired_lib_i[read_id] = lib_i
+
+
+            # split fwd paired
+            print ("WRITING FWD SPLIT PAIRED")  # DEBUG
+            paired_output_reads_file_handles = []
+            for lib_i in range(split_num):
+                paired_output_reads_file_handles.append(open (output_fwd_paired_file_path_base+"-"+str(lib_i)+".fastq", 'w', paired_buf_size))
+                total_paired_reads_by_set.append(0)
+
+            rec_buf = []
+            last_read_id = None
+            paired_cnt = 0
+            capture_type_paired = False
+
+            with open (input_item['fwd_file'], 'r', 0) as input_reads_file_handle:
+                rec_line_i = -1
+                for line in input_reads_file_handle:
+                    rec_line_i += 1
+                    if rec_line_i == 3:
+                        rec_line_i = -1
+                    elif rec_line_i == 0:
+                        if not line.startswith('@'):
+                            raise ValueError ("badly formatted rec line: '"+line+"'")
+                        if last_read_id != None:
+                            if capture_type_paired:
+                                lib_i = paired_lib_i[last_read_id]
+                                paired_output_reads_file_handles[lib_i].writelines(rec_buf)
+                                paired_cnt += 1
+                                total_paired_reads_by_set[lib_i] += 1
+                                if paired_cnt % recs_beep_n == 0:
+                                    print ("\t"+str(paired_cnt)+" recs processed")
+                            else:
+                                #unpaired_fwd_buf.extend(rec_buf)
+                                pass
+                            rec_buf = []
+                        read_id = line.rstrip('\n')
+                        read_id = re.sub ("[ \t]+.*$", "", read_id)
+                        read_id = re.sub ("[\/\.\_\-\:\;][012lrLRfrFR53]\'*$", "", read_id)
+                        last_read_id = read_id
+                        try:
+                            found = paired_lib_i[read_id]
+                            capture_type_paired = True
+                        except:
+                            total_unpaired_fwd_reads += 1
+                            capture_type_paired = False
+                    rec_buf.append(line)
+                # last rec
+                if len(rec_buf) > 0:
+                    if capture_type_paired:
+                        lib_i = paired_lib_i[last_read_id]
+                        paired_output_reads_file_handles[lib_i].writelines(rec_buf)
+                        paired_cnt += 1
+                        if paired_cnt % recs_beep_n == 0:
+                            print ("\t"+str(paired_cnt)+" recs processed")
+                    else:
+                        #unpaired_fwd_buf.extend(rec_buf)
+                        pass
+                    rec_buf = []
+
+            for output_handle in paired_output_reads_file_handles:
+                output_handle.close()
+
+            print ("\t"+str(paired_cnt)+" FWD recs processed")
+
+
+            # split rev paired
+            print ("WRITING REV SPLIT PAIRED")  # DEBUG                                                     
+            paired_output_reads_file_handles = []
+            for lib_i in range(split_num):
+                paired_output_reads_file_handles.append(open (output_rev_paired_file_path_base+"-"+str(lib_i)+".fastq", 'w', paired_buf_size))
+
+            rec_buf = []
+            last_read_id = None
+            paired_cnt = 0
+            capture_type_paired = False
+
+            with open (input_item['rev_file'], 'r', 0) as input_reads_file_handle:
+                rec_line_i = -1
+                for line in input_reads_file_handle:
+                    rec_line_i += 1
+                    if rec_line_i == 3:
+                        rec_line_i = -1
+                    elif rec_line_i == 0:
+                        if not line.startswith('@'):
+                            raise ValueError ("badly formatted rec line: '"+line+"'")
+                        if last_read_id != None:
+                            if capture_type_paired:
+                                lib_i = paired_lib_i[last_read_id]
+                                paired_output_reads_file_handles[lib_i].writelines(rec_buf)
+                                paired_cnt += 1
+                                if paired_cnt % recs_beep_n == 0:
+                                    print ("\t"+str(paired_cnt)+" recs processed")
+                            else:
+                                #unpaired_fwd_buf.extend(rec_buf)
+                                pass
+                            rec_buf = []
+                        read_id = line.rstrip('\n')
+                        read_id = re.sub ("[ \t]+.*$", "", read_id)
+                        read_id = re.sub ("[\/\.\_\-\:\;][012lrLRfrFR53]\'*$", "", read_id)
+                        last_read_id = read_id
+                        try:
+                            found = paired_lib_i[read_id]
+                            capture_type_paired = True
+                        except:
+                            total_unpaired_rev_reads += 1
+                            capture_type_paired = False
+                    rec_buf.append(line)
+                # last rec
+                if len(rec_buf) > 0:
+                    if capture_type_paired:
+                        lib_i = paired_lib_i[last_read_id]
+                        paired_output_reads_file_handles[lib_i].writelines(rec_buf)
+                        paired_cnt += 1
+                        if paired_cnt % recs_beep_n == 0:
+                            print ("\t"+str(paired_cnt)+" recs processed")
+                    else:
+                        #unpaired_fwd_buf.extend(rec_buf)
+                        pass
+                    rec_buf = []
+
+            for output_handle in paired_output_reads_file_handles:
+                output_handle.close()
+
+            print ("\t"+str(paired_cnt)+" REV recs processed")
+
+
+            # summary
+            report = 'SUMMARY FOR SUBSAMPLE OF READ LIBRARY: '+input_item['name']+"\n"
+            report += "TOTAL PAIRED READS: "+str(total_paired_reads)+"\n"
+            report += "TOTAL UNPAIRED FWD READS (discarded): "+str(total_unpaired_fwd_reads)+"\n"
+            report += "TOTAL UNPAIRED REV READS (discarded): "+str(total_unpaired_rev_reads)+"\n"
+            report += "\n"
+            for lib_i in range(split_num):
+                report += "PAIRED READS IN SET "+str(lib_i)+": "+str(total_paired_reads_by_set[lib_i])+"\n"
+            print (report)
+
+
+            # make replicate objects to return
+#        for replicate_i,replicate_item in enumerate(replicate_files):
+#            replicate_input.append({'fwd_file': replicate_item['fwd_file'],
+#                                    'type': input_item['type'],
+#                                    'name': input_item['name']+"-"+str(replicate_i)
+#                                })
+#            if input_item['type'] == self.PE_flag:
+#                replicate_input[replicate_i]['rev_file'] = replicate_item['rev_file']
+
+            print ("MAKING REPLICATE OBJECT")  # DEBUG
+            paired_obj_refs = []
+            for lib_i in range(split_num):
+                output_fwd_paired_file_path = output_fwd_paired_file_path_base+"-"+str(lib_i)+".fastq"
+                output_rev_paired_file_path = output_rev_paired_file_path_base+"-"+str(lib_i)+".fastq"
+                if not os.path.isfile (output_fwd_paired_file_path) \
+                     or os.path.getsize (output_fwd_paired_file_path) == 0 \
+                   or not os.path.isfile (output_rev_paired_file_path) \
+                     or os.path.getsize (output_rev_paired_file_path) == 0:
+
+                    raise ValueError ("failed to create paired output")
+                else:
+                    zero_pad = '0'*(len(str(split_num))-len(str(lib_i+1)))
+                    replicate_files.append({'fwd_file': output_fwd_paired_file_path,
+                                            'rev_file': output_rev_paired_file_path,
+                                            'type': input_item['type'],
+                                            'name': input_item['name']+'-'+zero_pad+str(lib_i+1)
+                                        })
+
+        # SingleEndLibrary
+        #
+        elif input_item['type'] == self.SE_flag:
+            print ("SUBSAMPLING SE library "+input_item['name'])
+
+            # file paths
+            input_fwd_path = re.sub ("\.fastq$", "", input_item['fwd_file'])
+            input_fwd_path = re.sub ("\.FASTQ$", "", input_fwd_path)
+            output_fwd_paired_file_path_base   = input_fwd_path+"_fwd_paired"
+
+            # get "paired" ids
+            print ("DETERMINING IDS")  # DEBUG
+            with open (input_item['fwd_file'], 'r', 0) as input_reads_file_handle:
+                rec_line_i = -1
+                for line in input_reads_file_handle:
+                    rec_line_i += 1
+                    if rec_line_i == 3:
+                        rec_line_i = -1
+                    elif rec_line_i == 0:
+                        if not line.startswith('@'):
+                            raise ValueError ("badly formatted rec line: '"+line+"'")
+                        read_id = line.rstrip('\n')
+                        read_id = re.sub ("[ \t]+.*$", "", read_id)
+                        read_id = re.sub ("[\/\.\_\-\:\;][012lrLRfrFR53]\'*$", "", read_id)
+                        paired_ids[read_id] = True
+                        paired_ids_list.append(read_id)
+                        # DEBUG
+#                        if rec_cnt % 100 == 0:
+#                            print ("read_id: '"+str(read_id)+"'")
+#                        rec_cnt += 1
+            total_paired_reads = len(paired_ids_list)
+            print ("TOTAL READS CNT: "+str(total_paired_reads))  # DEBUG                                    
+
+
+            # Determine sublibrary sizes
+            if use_reads_num:
+                reads_per_lib = reads_num
+                if reads_per_lib > total_paired_reads // split_num:
+                    raise ValueError ("must specify reads_num <= total_paired_reads_cnt / split_num.  You have reads_num:"+str(reads_num)+" > total_paired_reads_cnt:"+str(total_paired_reads)+" / split_num:"+str(split_num)+".  Instead try reads_num <= "+str(total_paired_reads // split_num))
+            elif use_reads_perc:
+                reads_per_lib = int ((subsample_percent/100.0) * total_paired_reads)
+                if reads_per_lib > total_paired_reads // split_num:
+                    raise ValueError ("must specify reads_perc <= 1 / split_num.  You have reads_perc:"+str(subsample_percent)+" > 1 / split_num:"+str(split_num)+".  Instead try reads_perc <= "+ str(int(100 * 1/split_num)))
+            else:
+                raise ValueError ("error in logic reads_num vs. reads_perc logic")
+
+
+            # Determine random membership in each sublibrary
+            print ("GETTING RANDOM SUBSAMPLES")  # DEBUG
+            for i,read_id in enumerate(random.sample (paired_ids_list, reads_per_lib * split_num)):
+                lib_i = i % split_num
+                paired_lib_i[read_id] = lib_i
+
+
+            # set up for file io
+            total_paired_reads = 0
+            total_paired_reads_by_set = []
+            paired_buf_size = 1000000
+
+
+            # split reads
+            print ("WRITING SPLIT SINGLE END READS")  # DEBUG
+            paired_output_reads_file_handles = []
+            for lib_i in range(split_num):
+                paired_output_reads_file_handles.append(open (output_fwd_paired_file_path_base+"-"+str(lib_i)+".fastq", 'w', paired_buf_size))
+                total_paired_reads_by_set.append(0)
+
+            rec_buf = []
+            last_read_id = None
+            paired_cnt = 0
+            recs_beep_n = 100000
+            with open (input_item['fwd_file'], 'r', 0) as input_reads_file_handle:
+                rec_line_i = -1
+                for line in input_reads_file_handle:
+                    rec_line_i += 1
+                    if rec_line_i == 3:
+                        rec_line_i = -1
+                    elif rec_line_i == 0:
+                        if not line.startswith('@'):
+                            raise ValueError ("badly formatted rec line: '"+line+"'")
+                        total_paired_reads += 1
+                        if last_read_id != None:
+                            try:
+                                lib_i = paired_lib_i[last_read_id]
+                                total_paired_reads_by_set[lib_i] += 1
+                                paired_output_reads_file_handles[lib_i].writelines(rec_buf)
+                                paired_cnt += 1
+                            except:
+                                pass
+                            if paired_cnt % recs_beep_n == 0:
+                                print ("\t"+str(paired_cnt)+" recs processed")
+                            rec_buf = []
+                        read_id = line.rstrip('\n')
+                        read_id = re.sub ("[ \t]+.*$", "", read_id)
+                        #read_id = re.sub ("[\/\.\_\-\:\;][012lrLRfrFR53]\'*$", "", read_id)                            
+                        last_read_id = read_id
+                    rec_buf.append(line)
+                # last rec
+                if len(rec_buf) > 0:
+                    if last_read_id != None:
+                        try:
+                            lib_i = paired_lib_i[last_read_id]
+                            total_paired_reads_by_set[lib_i] += 1
+                            paired_output_reads_file_handles[lib_i].writelines(rec_buf)
+                            paired_cnt += 1
+                        except:
+                            pass
+                    if paired_cnt % recs_beep_n == 0:
+                        print ("\t"+str(paired_cnt)+" recs processed")
+                    rec_buf = []
+
+            for output_handle in paired_output_reads_file_handles:
+                output_handle.close()
+
+            # summary
+            report = 'SUMMARY FOR SUBSAMPLE OF READ LIBRARY: '+input_item['name']+"\n"
+            report += "TOTAL READS: "+str(total_paired_reads)+"\n"
+            for lib_i in range(split_num):
+                report += "PAIRED READS IN SET "+str(lib_i)+": "+str(total_paired_reads_by_set[lib_i])+"\n"
+            print (report)
+
+
+            # make replicate objects to return
+            print ("MAKING REPLICATE OBJECTS")  # DEBUG
+            paired_obj_refs = []
+            for lib_i in range(split_num):
+                output_fwd_paired_file_path = output_fwd_paired_file_path_base+"-"+str(lib_i)+".fastq"
+                if not os.path.isfile (output_fwd_paired_file_path) \
+                     or os.path.getsize (output_fwd_paired_file_path) == 0:
+
+                    raise ValueError ("failed to create paired output")
+                else:
+                    replicate_files.append({'fwd_file': output_fwd_paired_file_path,
+                                            'type': input_item['type'],
+                                            'name': input_item['name']+'-'+zero_pad+str(lib_i+1)
+                                        })
+
+
+        else:
+            raise ValueError ("unknown ReadLibrary type:"+str(input_item['type'])+" for readslibrary: "+input_item['name'])
 
         # HERE
 

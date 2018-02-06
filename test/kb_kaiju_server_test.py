@@ -150,20 +150,20 @@ class kb_kaijuTest(unittest.TestCase):
         # run kaiju
         #input_refs = [self.reads_refs[0]]
         input_refs = [self.reads_refs[0], self.reads_refs[1]]
-        output_biom_name = 'test_kb_kaiju_test1.BIOM'
+        output_biom_name = 'test_kb_kaiju_test1.BIOM'        
         params = {
             'workspace_name':            self.ws_info[1],
             'input_refs':                input_refs,
             'output_biom_name':          output_biom_name,
-            #'tax_levels':                ['phylum','genus'],
-            'tax_levels':                ['phylum'],
+            'tax_levels':                ['phylum','genus'],
+            #'tax_levels':                ['phylum'],
             'db_type':                   'kaiju_index',  
             #'filter_percent':            1,
             'filter_percent':            0.1,
-            #'subsample_percent':         10,
-            'subsample_percent':         100,
-            #'subsample_replicates':      3,
-            'subsample_replicates':      1,
+            'subsample_percent':         10,
+            #'subsample_percent':         100,
+            'subsample_replicates':      3,
+            #'subsample_replicates':      1,
             'subsample_seed':            1,
             'seg_filter':                1,
             'min_match_length':          11,
