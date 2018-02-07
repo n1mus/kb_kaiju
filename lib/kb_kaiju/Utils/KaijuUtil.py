@@ -207,6 +207,7 @@ class KaijuUtil:
 
         # 7) create HTML Summary Reports in batch
         kaijuReportPlotsHTML_options = {'input_reads':             expanded_input,
+                                        'summary_folder':          kaijuReport_output_folder,
                                         'stacked_bar_plot_files':  kaijuReport_plot_files['stacked_bar_plot_files'],
                                         #'stacked_area_plot_files': kaijuReport_plot_files['stacked_area_plot_files'],
                                         #'per_sample_plot_files':   kaijuReport_plot_files['per_sample_plot_files'],
@@ -379,6 +380,8 @@ class KaijuUtil:
             
         if 'stacked_bar_plot_files' in options:
             out_html_files['bar'] = self.outputBuilder_client.build_html_for_kaijuReport_StackedPlots(
+                options['input_reads'],
+                options['summary_folder'],
                 out_html_folder,
                 'bar', 
                 options['tax_levels'],
@@ -387,6 +390,8 @@ class KaijuUtil:
                                   
         if 'stacked_area_plot_files' in options:
             out_html_files['area'] = self.outputBuilder_client.build_html_for_kaijuReport_StackedPlots(
+                options['input_reads'],
+                options['summary_folder'],
                 out_html_folder,
                 'area', 
                 options['tax_levels'],
@@ -395,8 +400,9 @@ class KaijuUtil:
 
         if 'per_sample_plot_files' in options:
             out_html_files['per_sample'] = self.outputBuilder_client.build_html_for_kaijuReport_StackedPlots(
-                out_html_folder,
                 options['input_reads'],
+                options['summary_folder'],
+                out_html_folder,
                 options['tax_levels'],
                 options['per_sample_plot_files']
             )

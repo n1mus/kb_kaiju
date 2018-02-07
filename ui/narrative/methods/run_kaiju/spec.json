@@ -130,7 +130,7 @@
 			"optional": false,
 			"advanced": true,
 			"allow_multiple": false,
-			"default_values": [ "0.1" ],
+			"default_values": [ "0.5" ],
 			"field_type": "text",
 			"text_options": {
 				"validate_as": "float",
