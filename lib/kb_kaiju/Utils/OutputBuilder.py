@@ -342,7 +342,9 @@ class OutputBuilder(object):
             abs_path = html_page['abs_path']
 
             # build top nav
+            sp = '&nbsp;'
             top_nav_buf = []
+            top_nav_buf.append(sp * 2)
             for this_html_page in html_pages:
                 this_name = this_html_page['name']
                 this_local_path = this_html_page['local_path']
@@ -359,6 +361,8 @@ class OutputBuilder(object):
             with open (abs_path, 'r') as html_handle:
                 for line in html_handle.readlines():
                     line_copy = line.lstrip()
+
+                    # pad top of krona plot
                     if html_type == 'krona' and line_copy.startswith('options.style.top ='):
                         #downshift = '50px'
                         #downshift = '25px'
@@ -368,7 +372,11 @@ class OutputBuilder(object):
                             downshift = min_downshift
                         new_buf.append("\t options.style.top = '"+str(downshift)+"px';")
                         continue
+
+                    # capture original html
                     new_buf.append(line)
+
+                    # add top nav str
                     if line_copy.startswith('<body'):
                         new_buf.append(top_nav_str+"\n")
 
