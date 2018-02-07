@@ -238,7 +238,7 @@ class OutputBuilder(object):
 
     def build_html_for_kaijuReport_StackedPlots(self, input_reads, summary_folder, out_html_folder, plot_type, tax_levels, img_files):
         img_height = 750  # in pixels
-        key_scale = 10 # in fontsize
+        key_scale = 25
         img_local_path = 'img'
         out_html_img_path = os.path.join (out_html_folder, img_local_path)
         if not os.path.exists(out_html_img_path):
