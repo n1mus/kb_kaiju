@@ -147,15 +147,16 @@ class KaijuUtil:
                              'desc': 'Stacked Bar Abundance Plots (PNG + PDF)',
                              'path': kaijuReport_StackedBarPlots_output_folder
                          }
-                           { 'name': 'stacked_area_abundance_plots_PNG+PDF',
-                             'desc': 'Stacked Area Abundance Plots (PNG + PDF)',
-                             'path': kaijuReport_StackedAreaPlots_output_folder
-                         }
                            #{ 'name': 'per_sample_ranked_abundance_plots_PNG+PDF',
                            #  'desc': 'Per Sample Ranked Abundance Plots (PNG + PDF)',
                            #  'path': kaijuReport_PerSamplePlots_output_folder
                            #}
                       ]
+        if len(expanded_input) > 1:
+            output_folders.append ({ 'name': 'stacked_area_abundance_plots_PNG+PDF',
+                                      'desc': 'Stacked Area Abundance Plots (PNG + PDF)',
+                                      'path': kaijuReport_StackedAreaPlots_output_folder
+                                   })
         self.outputBuilder_client = OutputBuilder(output_folders, self.scratch, self.callback_url)
 
 
