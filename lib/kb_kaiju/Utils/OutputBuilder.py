@@ -260,7 +260,7 @@ class OutputBuilder(object):
     def build_html_for_kaijuReport_StackedPlots(self, input_reads, summary_folder, out_html_folder, plot_type, tax_levels, img_files):
         img_height = 750  # in pixels
         #key_scale = 25
-        key_scale = img_height / 40
+        key_scale = img_height / 36
         img_local_path = 'img'
         out_html_img_path = os.path.join (out_html_folder, img_local_path)
         if not os.path.exists(out_html_img_path):
@@ -1104,11 +1104,14 @@ class OutputBuilder(object):
         """
 
         # create the legend manually
+        w_scale = 0.8
         key_colors = []
         for color_i in reversed(np.arange(N-1)):
             key_colors.append(mpatches.Patch(color=color_names[color_i], alpha=0.4, ec='black'))
+        box = ax_top.get_position()
+        ax_top.set_position([box.x0, box.y0, box.width * w_scale, box.height])   
         box = ax_bot.get_position()
-        ax_bot.set_position([box.x0, box.y0, box.width * 0.8, box.height])   
+        ax_bot.set_position([box.x0, box.y0, box.width * w_scale, box.height])   
         ax_bot.legend(key_colors, reversed(element_labels), loc='upper left', bbox_to_anchor=(1, 1))
 
 

@@ -153,12 +153,13 @@ class KaijuUtil:
                            #}
                       ]
         build_area_plots_flag = False
-        if len(expanded_input) > 1:
-            build_area_plots_flag = True
-            output_folders.append ({ 'name': 'stacked_area_abundance_plots_PNG+PDF',
-                                     'desc': 'Stacked Area Abundance Plots (PNG + PDF)',
-                                     'path': kaijuReport_StackedAreaPlots_output_folder
-                                   })
+        # DEBUG
+        #if len(expanded_input) > 1:
+        #    build_area_plots_flag = True
+        #    output_folders.append ({ 'name': 'stacked_area_abundance_plots_PNG+PDF',
+        #                             'desc': 'Stacked Area Abundance Plots (PNG + PDF)',
+        #                             'path': kaijuReport_StackedAreaPlots_output_folder
+        #                           })
         self.outputBuilder_client = OutputBuilder(output_folders, self.scratch, self.callback_url)
 
 
