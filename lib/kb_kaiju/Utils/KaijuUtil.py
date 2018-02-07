@@ -218,7 +218,7 @@ class KaijuUtil:
                                         'tax_levels':              params['tax_levels']
         }
         if build_area_plots_flag:
-            kaijuReportPlots_options['stacked_area_plot_files'] = kaijuReport_plot_files['stacked_area_plot_files']
+            kaijuReportPlotsHTML_options['stacked_area_plot_files'] = kaijuReport_plot_files['stacked_area_plot_files']
         html_plot_pages = self.run_kaijuReportPlotsHTML_batch (kaijuReportPlotsHTML_options)
 
 

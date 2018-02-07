@@ -364,18 +364,24 @@ class OutputBuilder(object):
 
             # build top nav
             sp = '&nbsp;'
+            sp_cnt = 2
             top_nav_buf = []
-            top_nav_buf.append(sp * 2)
-            for this_html_page in html_pages:
+            for page_i,this_html_page in enumerate(html_pages):
                 this_name = this_html_page['name']
+                no_link = False
+                if this_name == name:
+                    no_link = True
                 if this_name == 'Bar' or this_name == 'Area':
                     this_name = 'Stacked '+this_name+' Plots'
                 this_local_path = this_html_page['local_path']
-                if this_name == name:
+                if no_link:
                     disp_name = this_name.upper()
-                    top_nav_buf.append('<b>'+disp_name+'</b>')
+                    top_nav_item = '<b>'+disp_name+'</b>'
                 else:
-                    top_nav_buf.append('<a href="'+this_local_path+'">'+this_name+'</a>')
+                    top_nav_item = '<a href="'+this_local_path+'">'+this_name+'</a>'
+                if page_i == 0:
+                    top_nav_item = (sp * sp_cnt) + top_nav_item
+                top_nav_buf.append(top_nav_item)
             top_nav_str = ' | '.join(top_nav_buf)
             top_nav_str += '<p>'
 
