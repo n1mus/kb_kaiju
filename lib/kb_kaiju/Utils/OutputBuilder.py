@@ -238,7 +238,8 @@ class OutputBuilder(object):
 
     def build_html_for_kaijuReport_StackedPlots(self, input_reads, summary_folder, out_html_folder, plot_type, tax_levels, img_files):
         img_height = 750  # in pixels
-        key_scale = 25
+        #key_scale = 25
+        key_scale = img_height / 35
         img_local_path = 'img'
         out_html_img_path = os.path.join (out_html_folder, img_local_path)
         if not os.path.exists(out_html_img_path):
@@ -272,7 +273,7 @@ class OutputBuilder(object):
                 this_img_height = img_height
 
             # add img to html buf
-            out_html_buf.append('<img src="'+dst_local_path+'" height='+str(this_img_height)+'>')
+            out_html_buf.append('<img src="'+dst_local_path+'" valign="top" height='+str(this_img_height)+'>')
 
         # add footer
         out_html_buf.extend (self._build_plot_html_footer())
@@ -530,6 +531,15 @@ class OutputBuilder(object):
                 #    print ("\t"+"SAMPLE_I: "+str(sample_i)+" NEW_VAL: "+str(new_vals[new_element_i][sample_i]))
             vals = new_vals
             element_labels = new_element_labels
+
+
+        # reverse so that most important plots near top (below special 3 categories)
+        element_tail = element_labels[-3:]
+        element_labels = reversed(element_labels[0:-3])
+        element_labels.extend(element_tail)
+        vals_tail = vals[-3:]
+        vals = reversed(vals[0:-3])
+        vals.extend(vals_tail)
 
     
         # plot dimensions
