@@ -367,6 +367,8 @@ class OutputBuilder(object):
             top_nav_buf.append(sp * 2)
             for this_html_page in html_pages:
                 this_name = this_html_page['name']
+                if this_name == 'Bar' or this_name == 'Area':
+                    this_name = 'Stacked '+this_name+' Plots'
                 this_local_path = this_html_page['local_path']
                 if this_name == name:
                     disp_name = this_name.upper()
