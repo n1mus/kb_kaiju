@@ -7,6 +7,7 @@ import re
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 import random
 from random import shuffle
 
@@ -1108,7 +1109,7 @@ class OutputBuilder(object):
         # save
         img_dpi = 200
         #plt.show()
-        log("SAVING STACKED BAR PLOT")
+        log("SAVING STACKED AREA PLOT")
         png_file = out_file_basename+'.png'
         pdf_file = out_file_basename+'.pdf'
         output_png_file_path = os.path.join(out_folder, png_file);
