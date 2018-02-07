@@ -23,6 +23,7 @@ class KaijuUtil:
         self.config = config
         self.ctx = ctx
         self.callback_url = config['SDK_CALLBACK_URL']
+        self.workspace_url = config['workspace-url']
         self.scratch = config['scratch']
         self.threads = config['threads']
         self.suffix = str(int(time.time() * 1000))
@@ -160,7 +161,7 @@ class KaijuUtil:
         #                             'desc': 'Stacked Area Abundance Plots (PNG + PDF)',
         #                             'path': kaijuReport_StackedAreaPlots_output_folder
         #                           })
-        self.outputBuilder_client = OutputBuilder(output_folders, self.scratch, self.callback_url)
+        self.outputBuilder_client = OutputBuilder(output_folders, self.scratch, self.callback_url, self.workspace_url)
 
 
         # 4) run Kaiju in batch (download happens one-by-one and then deleted to save space)
@@ -194,6 +195,7 @@ class KaijuUtil:
         self.run_kaijuReport_batch (kaijuReport_options)
 
 
+        """
         # 6) create Summary Report plots in batch
         kaijuReportPlots_options = {'input_reads':                   expanded_input,
                                     'in_folder':                     kaijuReport_output_folder,
@@ -221,6 +223,7 @@ class KaijuUtil:
         if build_area_plots_flag:
             kaijuReportPlotsHTML_options['stacked_area_plot_files'] = kaijuReport_plot_files['stacked_area_plot_files']
         html_plot_pages = self.run_kaijuReportPlotsHTML_batch (kaijuReportPlotsHTML_options)
+        """
 
 
         # 8) create Krona plots
@@ -239,7 +242,7 @@ class KaijuUtil:
 
         # 10) add top nav to html pages and build the HTML report
         html_pages = []
-        html_pages.extend(html_plot_pages['bar'])
+#        html_pages.extend(html_plot_pages['bar'])
         if build_area_plots_flag:
             html_pages.extend(html_plot_pages['area'])
         #html_pages.extend(html_plot_pages['per_sample'])
@@ -252,8 +255,27 @@ class KaijuUtil:
         html_zipped = self.outputBuilder_client.package_folder(html_dir, report_html_file, report_html_desc)
 
 
-        # 11) save report
+        # 11) save biom output for each tax level
+        generated_biom_objs = []
+        for tax_level in params['tax_levels']:
+            obj_name = params['output_biom_name']
+            if len(params['tax_levels']) != 1:
+                obj_name += '-'+tax_level
+
+            generate_biom_options = {'tax_level':       tax_level,
+                                     'input_reads':     expanded_input,
+                                     'in_folder':       kaijuReport_output_folder,
+                                     'workspace_name':  params['workspace_name'],
+                                     'output_obj_name': obj_name
+                                 }
+            biom_obj_ref = self.outputBuilder_client.generate_biom_object(self.ctx, generate_biom_options)
+            generated_biom_objs.append({'ref': biom_obj_ref,
+                                        'description': 'Kaiju Taxonomic Classification at '+tax_level+' Level.  BIOM format'})
+
+
+        # 12) save report
         report_params = {'message': '',
+                         'objects_created': generated_biom_objs,
                          'direct_html_link_index': 0,
                          'html_links': [html_zipped],
                          'file_links': output_packages,

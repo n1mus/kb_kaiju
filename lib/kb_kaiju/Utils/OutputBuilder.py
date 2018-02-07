@@ -5,12 +5,15 @@ import sys
 import time
 import re
 
+import datetime
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import random
 from random import shuffle
 
+from biokbase.workspace.client import Workspace as workspaceService
+#from Workspace.WorkspaceClient import Workspace as workspaceService
 from DataFileUtil.DataFileUtilClient import DataFileUtil
 
 
@@ -27,10 +30,12 @@ class OutputBuilder(object):
     modifying the Krona HTML to offer tabbed href links between html pages
     '''
 
-    def __init__(self, output_folders, scratch_dir, callback_url):
+    def __init__(self, output_folders, scratch_dir, callback_url, workspace_url):
         self.output_folders = output_folders
         self.scratch = scratch_dir
         self.callback_url = callback_url
+        self.workspace_url = workspace_url
+        self.wsClient = None
 
         # store parsed info
         self.parsed_summary = dict()
@@ -162,6 +167,107 @@ class OutputBuilder(object):
             #'yellow',
             #'yellowgreen'
         ]
+
+
+    def generate_sparse_biom1_0_matrix(self, ctx, options): 
+        tax_level       = options['tax_level']
+        input_reads     = options['input_reads']
+        in_folder       = options['in_folder']
+        workspace_name  = options['workspace_name']
+        output_obj_name = options['output_obj_name']
+
+        abundance_matrix = []
+        abundance_by_sample = []
+        lineage_seen = dict()
+        lineage_order = []
+        #extra_bucket_order = []
+        sample_order = []
+        #classified_frac = []
+        biom_obj = dict()
+
+        # parse summary
+        for input_reads_item in input_reads:
+            sample_order.append(input_reads_item['name'])
+
+            this_summary_file = os.path.join (in_folder, input_reads_item['name']+'-'+tax_level+'.kaijuReport')
+            (this_abundance, this_lineage_order, this_classified_frac) = self._parse_kaiju_summary_file (this_summary_file, tax_level)
+            for lineage_name in this_lineage_order:
+                if lineage_name not in lineage_seen:
+                    lineage_seen[lineage_name] = True
+                    if lineage_name.startswith('tail (<') \
+                       or lineage_name.startswith('viruses') \
+                       or lineage_name.startswith('unassigned at'):
+                        #extra_bucket_order.append(lineage_name)
+                        continue
+                    else:
+                        lineage_order.append(lineage_name)
+            abundance_by_sample.append(this_abundance)
+            #classified_frac.append(this_classified_frac)
+
+        # create sparse matrix (note: vals in each sample do not sum to 100% because we're dumping buckets)
+        biom_data = []
+        for lineage_i,lineage_name in enumerate(lineage_order):
+            for sample_i,sample_name in enumerate(sample_order):
+                if lineage_name in abundance_by_sample[sample_i]:
+                    biom_data.append([lineage_i, sample_i, abundance_by_sample[sample_i][lineage_name]])
+
+        # build biom obj
+        shape = [len(lineage_order), len(sample_order)],
+        rows_struct = []
+        cols_struct = []
+        now = datetime.now()
+        now.microsecond = 0
+        date_str = str(now.isoformat())
+        for lineage_name in lineage_order:
+            rows_struct.append({'id': lineage_name, 'metadata': None})  # could add metadata full tax path if parsed from KaijuReport
+        for sample_name in sample_order:
+            cols_struct.append({'id': sample_name, 'metadata': None})  # sample metadata not provided to App
+
+        biom_obj = { 'id':           output_obj_name,
+                     'format':       'Biological Observation Matrix 1.0',
+                     'format_url':   'http://biom-format.org/documentation/format_versions/biom-1.0.html',
+                     'type':         'Taxon table',
+                     'generated_by': 'KBase Kaiju App (Kaiju v1.5.0, KBase App v1.0.0)',
+                     'date':         date_str,
+                     'rows':         rows_struct,
+                     'columns':      cols_struct,
+                     'matrix_type':  'sparse',
+                     'matrix_element_type': 'float',
+                     'shape':        shape,
+                     'data':         biom_data
+                 }
+
+        # save the biom obj to workspace
+        provenance = [{}]
+        if 'provenance' in ctx:
+            provenance = ctx['provenance']
+        # add additional info to provenance here, in this case the input data object reference
+        provenance[0]['input_ws_objects'] = []
+        for input_reads_item in input_reads:
+            provenance[0]['input_ws_objects'].append(input_reads_item['ref'])
+        provenance[0]['service'] = 'kb_kaiju'
+        provenance[0]['method'] = 'run_kaiju'
+
+        if self.wsClient == None:
+            try:
+                self.wsClient = workspaceService(self.workspace_url, token=token)
+            except:
+                raise ValueError ("Unable to connect to workspace service at workspace_url: "+self.workspace_url)
+        new_obj_info = wsClient.save_objects({
+            'workspace':workspace_name,
+            'objects':[
+                { 'type': 'Communities.Biom',
+                  'data': biom_obj,
+                  'name': output_obj_name,
+                  'meta': {},
+                  'provenance': provenance
+              }]
+        })[0]        
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
+        biom_obj_ref = str(new_obj_info[WSID_I])+'/'+str(new_obj_info[OBJID_I])+'/'+str(new_obj_info[VERSION_I])
+
+        return biom_obj_ref
+
 
     def package_folder(self, folder_path, zip_file_name, zip_file_description):
         ''' Simple utility for packaging a folder and saving to shock '''
