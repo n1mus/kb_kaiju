@@ -333,6 +333,7 @@ class OutputBuilder(object):
 
 
     def add_top_nav(self, html_pages):
+        min_downshift = 25
 
         for html_page in html_pages:
             html_type = html_page['type']
@@ -363,6 +364,8 @@ class OutputBuilder(object):
                         #downshift = '25px'
                         downshift_scale_per_char = 0.15
                         downshift = int(downshift_scale_per_char*len(top_nav_str))
+                        if downshift < min_downshift:
+                            downshift = min_downshift
                         new_buf.append("\t options.style.top = '"+str(downshift)+"px';")
                         continue
                     new_buf.append(line)
