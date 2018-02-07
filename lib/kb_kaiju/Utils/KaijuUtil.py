@@ -147,10 +147,10 @@ class KaijuUtil:
                              'desc': 'Stacked Bar Abundance Plots (PNG + PDF)',
                              'path': kaijuReport_StackedBarPlots_output_folder
                          }
-                           #{ 'name': 'stacked_area_abundance_plots_PNG+PDF',
-                           #  'desc': 'Stacked Area Abundance Plots (PNG + PDF)',
-                           #  'path': kaijuReport_StackedAreaPlots_output_folder
-                           #},
+                           { 'name': 'stacked_area_abundance_plots_PNG+PDF',
+                             'desc': 'Stacked Area Abundance Plots (PNG + PDF)',
+                             'path': kaijuReport_StackedAreaPlots_output_folder
+                         }
                            #{ 'name': 'per_sample_ranked_abundance_plots_PNG+PDF',
                            #  'desc': 'Per Sample Ranked Abundance Plots (PNG + PDF)',
                            #  'path': kaijuReport_PerSamplePlots_output_folder
@@ -194,7 +194,7 @@ class KaijuUtil:
         kaijuReportPlots_options = {'input_reads':                   expanded_input,
                                     'in_folder':                     kaijuReport_output_folder,
                                     'stacked_bar_plots_out_folder':  kaijuReport_StackedBarPlots_output_folder,
-                                    #'stacked_area_plots_out_folder': kaijuReport_StackedAreaPlots_output_folder,
+                                    'stacked_area_plots_out_folder': kaijuReport_StackedAreaPlots_output_folder,
                                     #'per_sample_plots_out_folder':   kaijuReport_PerSamplePlots_output_folder,
                                     'tax_levels':                    params['tax_levels'],
                                     'sort_taxa_by':                  params['sort_taxa_by']
@@ -209,7 +209,7 @@ class KaijuUtil:
         kaijuReportPlotsHTML_options = {'input_reads':             expanded_input,
                                         'summary_folder':          kaijuReport_output_folder,
                                         'stacked_bar_plot_files':  kaijuReport_plot_files['stacked_bar_plot_files'],
-                                        #'stacked_area_plot_files': kaijuReport_plot_files['stacked_area_plot_files'],
+                                        'stacked_area_plot_files': kaijuReport_plot_files['stacked_area_plot_files'],
                                         #'per_sample_plot_files':   kaijuReport_plot_files['per_sample_plot_files'],
                                         'out_folder':              html_dir,
                                         'tax_levels':              params['tax_levels']
@@ -234,7 +234,7 @@ class KaijuUtil:
         # 10) add top nav to html pages and build the HTML report
         html_pages = []
         html_pages.extend(html_plot_pages['bar'])
-        #html_pages.extend(html_plot_pages['area'])
+        html_pages.extend(html_plot_pages['area'])
         #html_pages.extend(html_plot_pages['per_sample'])
         html_pages.extend(html_krona_pages)
         self.outputBuilder_client.add_top_nav(html_pages)
@@ -359,14 +359,18 @@ class KaijuUtil:
             # stacked bar plots
             if 'stacked_bar_plots_out_folder' in options:
                 kaijuReportPlots_options = options
+                kaijuReportPlots_options['stacked_plots_out_folder'] = options['stacked_bar_plots_out_folder']
                 kaijuReportPlots_options['tax_level'] = tax_level
-                stacked_bar_plot_files[tax_level] = self.outputBuilder_client.generate_kaijuReport_StackedBarPlots(kaijuReportPlots_options)
+                kaijuReportPlots_options['plot_type'] = 'bar'
+                stacked_bar_plot_files[tax_level] = self.outputBuilder_client.generate_kaijuReport_StackedPlots(kaijuReportPlots_options)
 
             # stacked area plots
             if 'stacked_area_plots_out_folder' in options:
                 kaijuReportPlots_options = options
+                kaijuReportPlots_options['stacked_plots_out_folder'] = options['stacked_area_plots_out_folder']
                 kaijuReportPlots_options['tax_level'] = tax_level
-                stacked_area_plot_files[tax_level] = self.outputBuilder_client.generate_kaijuReport_StackedAreaPlots(kaijuReportPlots_options)
+                kaijuReportPlots_options['plot_type'] = 'area'
+                stacked_area_plot_files[tax_level] = self.outputBuilder_client.generate_kaijuReport_StackedPlots(kaijuReportPlots_options)
 
         return {'per_sample_plot_files': per_sample_plot_files,
                 'stacked_bar_plot_files': stacked_bar_plot_files,

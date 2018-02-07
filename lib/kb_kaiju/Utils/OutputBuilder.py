@@ -31,6 +31,9 @@ class OutputBuilder(object):
         self.scratch = scratch_dir
         self.callback_url = callback_url
 
+        # store parsed info
+        self.parsed_summary = dict()
+
         # leave out light colors
         self.no_light_color_names = [
             #'aliceblue',
@@ -179,7 +182,7 @@ class OutputBuilder(object):
     def generate_kaijuReport_PerSamplePlots(self, options):
         pass
 
-    def generate_kaijuReport_StackedBarPlots(self, options):
+    def generate_kaijuReport_StackedPlots(self, options):
         tax_level = options['tax_level']
         abundance_matrix = []
         abundance_by_sample = []
@@ -219,17 +222,34 @@ class OutputBuilder(object):
                     abundance_matrix[lineage_i].append(0.0)
 
         # make plots
-        return self._create_bar_plots (out_folder = options['stacked_bar_plots_out_folder'], 
-                                       out_file_basename = tax_level+'-stacked_bar_plot',
-                                       vals = abundance_matrix,
-                                       frac_vals = classified_frac,
-                                       #title = tax_level.title()+' Level',
-                                       title = tax_level.title(),
-                                       frac_y_label = 'fraction classified',
-                                       y_label = 'percent of classified reads',
-                                       sample_labels = sample_order, 
-                                       element_labels = lineage_order, 
-                                       sort_by = options['sort_taxa_by'])
+        if options['plot_type'] == 'bar':
+            basename_ext = '-stacked_bar_plot'
+            return self._create_bar_plots (out_folder = options['stacked_plots_out_folder'], 
+                                           out_file_basename = tax_level+basename_ext,
+                                           vals = abundance_matrix,
+                                           frac_vals = classified_frac,
+                                           #title = tax_level.title()+' Level',
+                                           title = tax_level.title(),
+                                           frac_y_label = 'fraction classified',
+                                           y_label = 'percent of classified reads',
+                                           sample_labels = sample_order, 
+                                           element_labels = lineage_order, 
+                                           sort_by = options['sort_taxa_by'])
+        elif options['plot_type'] == 'area'::
+            basename_ext = '-stacked_area_plot'
+            return self._create_area_plots (out_folder = options['stacked_plots_out_folder'], 
+                                           out_file_basename = tax_level+basename_ext,
+                                           vals = abundance_matrix,
+                                           frac_vals = classified_frac,
+                                           #title = tax_level.title()+' Level',
+                                           title = tax_level.title(),
+                                           frac_y_label = 'fraction classified',
+                                           y_label = 'percent of classified reads',
+                                           sample_labels = sample_order, 
+                                           element_labels = lineage_order, 
+                                           sort_by = options['sort_taxa_by'])
+        else:
+            raise ValueError ("Unknown plot type "+options['plot_type'])
 
 
     def generate_kaijuReport_StackedAreaPlots(self, options):
@@ -386,6 +406,11 @@ class OutputBuilder(object):
 
 
     def _parse_kaiju_summary_file (self, summary_file, tax_level):
+        if summary_file in self.parsed_summary:
+            return (self.parsed_summary[summary_file]['abundance'],
+                    self.parsed_summary[summary_file]['lineage_order'],
+                    self.parsed_summary[summary_file]['classified_frac'])
+
         abundance = dict()
         unclassified_perc = 0.0
         unassigned_perc = None
@@ -431,7 +456,13 @@ class OutputBuilder(object):
             lineage_order.append(this_key)
             abundance[this_key] = unassigned_perc
 
+        # store to avoid repeat parse
         classified_frac = 1.0 - unclassified_perc/100.0
+        self.parsed_summary[summary_file] = dict()
+        self.parsed_summary[summary_file]['abundance']       = abundance
+        self.parsed_summary[summary_file]['lineage_order']   = lineage_order
+        self.parsed_summary[summary_file]['classified_frac'] = classified_frac
+
         return (abundance, lineage_order, classified_frac)
 
 
@@ -758,7 +789,337 @@ class OutputBuilder(object):
         return output_png_file_path
 
 
-    def _create_area_plots (self, abundances):
+    def _create_area_plots (self, out_folder=None, 
+                           out_file_basename=None, 
+                           vals=None, 
+                           frac_vals=None,
+                           title=None, 
+                           frac_y_label=None,
+                           y_label=None, 
+                           sample_labels=None, 
+                           element_labels=None, 
+                           sort_by=None):
+
+        # number of samples
+        N = len(sample_labels)
+
+
+        # colors
+        color_names = self.no_light_color_names
+        len_color_names = len(color_names)
+        random.seed(a=len(element_labels))
+        r = random.random()
+        shuffle(color_names, lambda: r)
+        for label_i,label in enumerate(element_labels):
+            if label_i >= len_color_names:
+                color_names.append(color_names[label_i % len_color_names])
+            if label.startswith('tail (<'):
+                color_names[label_i] = 'lightslategray'
+            elif label.startswith('viruses'):
+                color_names[label_i] = 'magenta'
+            elif label.startswith('unassigned at'):
+                color_names[label_i] = 'darkslategray'
+                
+
+        # Sort vals
+        if sort_by != None:
+            print ("SORTING ELEMENTS by "+str(sort_by))
+            old_index = dict()
+            new_index = dict()
+            for label_i,label in enumerate(element_labels):
+                old_index[label] = label_i
+                #print ("LABEL: "+str(label)+" OLD_INDEX: "+str(label_i))  # DEBUG
+
+            # alphabet sort
+            if sort_by == 'alpha':
+                new_label_i = 0
+                for label in sorted(element_labels, reverse=True):                
+                    if label.startswith('tail (<') or label.startswith('viruses') or label.startswith('unassigned at'):
+                        new_index[label] = old_index[label]
+                    else:
+                        new_index[label] = new_label_i
+                        new_label_i += 1
+                    #print ("LABEL: "+str(label)+" NEW_INDEX: "+str(new_index[label]))  # DEBUG
+
+            # summed total sort
+            elif sort_by == 'totals':
+                totals = dict()
+                for label_i,label in enumerate(element_labels):
+                    totals[label] = 0
+                    for sample_i,sample in enumerate(sample_labels):
+                        totals[label] += vals[label_i][sample_i]
+                totals_vals = []
+                labels_by_totals = dict()
+                for label in totals.keys():
+                    if totals[label] not in totals_vals:
+                        totals_vals.append(totals[label])
+                        labels_by_totals[totals[label]] = []
+                    labels_by_totals[totals[label]].append(label)
+                new_label_i = 0
+                for totals_val in sorted(totals_vals, reverse=True):
+                    for label in labels_by_totals[totals_val]:
+                        if label.startswith('tail (<') or label.startswith('viruses') or label.startswith('unassigned at'):
+                            new_index[label] = old_index[label]
+                        else:
+                            new_index[label] = new_label_i
+                            new_label_i += 1       
+                        #print ("LABEL: "+str(label)+" NEW_INDEX: "+str(new_index[label]))  # DEBUG
+
+            # store new order            
+            new_vals = []
+            new_element_labels = []
+            for label_i,label in enumerate(element_labels):
+                new_vals.append([])
+                new_element_labels.append(None)
+            for label_i,label in enumerate(element_labels):
+                new_element_i = new_index[label]
+                #print ("NEW_ELEMENT_I: "+str(new_element_i))  # DEBUG
+                new_vals[new_element_i] = vals[label_i]
+                new_element_labels[new_element_i] = label
+                # DEBUG
+                #print ("NEW LABEL: "+str(label)+" NEW_INDEX: "+str(new_element_i)+" OLD_INDEX: "+str(label_i))  # DEBUG
+                #for sample_i,val in enumerate(new_vals[new_element_i]):
+                #    print ("\t"+"SAMPLE_I: "+str(sample_i)+" NEW_VAL: "+str(new_vals[new_element_i][sample_i]))
+            vals = new_vals
+            element_labels = new_element_labels
+
+
+        # reverse so that most important plots near top (below special 3 categories)
+        element_labels = element_labels[-4::-1] + element_labels[-3:]
+        vals = vals[-4::-1] + vals[-3:]
+
+    
+        # plot dimensions
+        #per_unit_to_inch_scale = 0.25
+        per_unit_to_inch_scale = 0.5
+        bar_width_unit = 0.5
+        plot_x_pad_unit = bar_width_unit / 2.0
+        plot_width_unit = 2*plot_x_pad_unit + N
+        downscale_above_N = 20
+        extra_sample_scale = 0.5
+        if N > downscale_above_N:
+            plot_width_unit = 2*plot_x_pad_unit + downscale_above_N + extra_sample_scale*(N-downscale_above_N)
+        plot_height_unit = 8
+
+        
+        # label dimensions
+        longest_sample_label_len = 0
+        longest_element_label_len = 0
+        len_elements_list = len(element_labels)
+        for label in sample_labels:
+            if len(label) > longest_sample_label_len:
+                longest_sample_label_len = len(label)
+        for label in element_labels:
+            if len(label) > longest_element_label_len:
+                longest_element_label_len = len(label)
+        #x_label_scale_unit = 0.015
+        #y_label_scale_unit = 0.015
+        x_label_scale_unit = 0.175
+        y_label_scale_unit = 0.16
+        key_label_scale = y_label_scale_unit * 50 / 30.0
+        x_label_pad_unit = x_label_scale_unit * longest_element_label_len
+        y_label_pad_unit = y_label_scale_unit * longest_sample_label_len
+        if key_label_scale * len_elements_list > y_label_pad_unit:
+            y_label_pad_unit = key_label_scale * len_elements_list
+        x_label_pad_inch = per_unit_to_inch_scale * x_label_pad_unit
+        y_label_pad_inch = per_unit_to_inch_scale * y_label_pad_unit
+
+
+        # build canvas dimensions
+        x_pad_unit = 1.0
+        y_pad_unit = 0.25
+        #x_pad_unit = 0.10
+        #y_pad_unit = 0.10
+        x_pad_inch = per_unit_to_inch_scale * x_pad_unit
+        y_pad_inch = per_unit_to_inch_scale * y_pad_unit
+        canvas_width_unit = 2*x_pad_unit + plot_width_unit + x_label_pad_unit
+        canvas_height_unit = 2*y_pad_unit + plot_height_unit + y_label_pad_unit
+        canvas_width_inch = per_unit_to_inch_scale * canvas_width_unit
+        canvas_height_inch = per_unit_to_inch_scale * canvas_height_unit
+
+
+        # instantiate fig
+        #
+        # lose axes with below grid, and so sharex property. instead match xlim, bar_width, hide ticks.
+        #fig, (ax_top, ax_bot) = plt.subplots(2, 1, sharex=True)  
+
+        # gridspec_kw not in KBase docker notebook agg image (old python?)
+        #fig, (ax_top, ax_bot) = plt.subplots(2, 1, sharex=True, gridspec_kw = {'height_ratios':[1, 3]})
+
+        # subplot2grid(shape, loc, rowspan=1, colspan=1)
+        FIG_rows = 1000
+        FIG_cols = 1
+        top_frac = 0.22
+        top_rows = int(top_frac*FIG_rows)
+        bot_rows = FIG_rows-top_rows
+        fig = plt.figure()
+        ax_top = plt.subplot2grid((FIG_rows,FIG_cols), (0,0), rowspan=top_rows, colspan=1)
+        ax_bot = plt.subplot2grid((FIG_rows,FIG_cols), (top_rows,0), rowspan=bot_rows, colspan=1)
+        fig.set_size_inches(canvas_width_inch, canvas_height_inch)
+        fig.tight_layout()
+
+
+        #for ax in fig.axes:
+        #    ax.xaxis.set_visible(False)  # remove axis labels and ticks
+        #    ax.yaxis.set_visible(False)
+        #    for t in ax.get_xticklabels()+ax.get_yticklabels():  # remove tick labels
+        #        t.set_visible(False)
+        #for ax in fig.axes:
+        #    ax.spines['top'].set_visible(False) # Get rid of top axis line
+        #    ax.spines['bottom'].set_visible(False) #  bottom axis line
+        #    ax.spines['left'].set_visible(False) #  Get rid of bottom axis line
+        #    ax.spines['right'].set_visible(False) #  Get rid of bottom axis line
+
+
+        # indices
+        ind = np.arange(N)    # the x locations for the groups
+        label_ind = []
+        for ind_i,this_ind in enumerate(ind):
+            ind[ind_i] = this_ind+bar_width_unit/2
+            label_ind.append(this_ind + bar_width_unit/2)
+        np_vals = []
+        for vec_i,val_vec in enumerate(vals):
+            np_vals.append(np.array(val_vec))
+        
+
+        # plot fraction measured
+        frac = ax_top.bar(ind, frac_vals, bar_width_unit, color='black', alpha=0.4, ec='none')
+        ax_top.set_title(title, fontsize=11)
+        ax_top.grid(b=True, axis='y')
+        ax_top.set_ylabel(frac_y_label, fontsize=10)
+        ax_top.tick_params(axis='y', labelsize=9, labelcolor='black')
+        ax_top.set_yticks(np.arange(0.0, 1.01, .20))
+        ax_top.set_ylim([0,1])
+        ax_top.xaxis.set_visible(False)  # remove axis labels and ticks
+        ax_top.set_xlim([-plot_x_pad_unit,N-plot_x_pad_unit])
+
+        """
+        ax.stackplot (ind, np_vals, colors=color_names, alpha=0.4, edgecolor='none')
+
+        plt.ylabel(y_label)
+        plt.title(title)
+        plt.xticks(label_ind, sample_labels, ha='right', rotation=45)
+        plt.yticks(np.arange(0, 101, 10))
+
+        # creating the legend manually
+        key_colors = []
+        for color_i in reversed(np.arange(N-1)):
+            key_colors.append(mpatches.Patch(color=color_names[color_i], alpha=0.4, ec='black'))
+        box = ax.get_position()
+        ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])   
+        plt.legend(key_colors, reversed(element_labels), loc='upper left', bbox_to_anchor=(1, 1))
+        """
+
+
+        # plot stacked
+        ax_bot.stackplot (ind, np_vals, colors=color_names, alpha=0.4, edgecolor='none'))
+
+        ax_bot.set_ylabel(y_label, fontsize=10)
+        ax_bot.tick_params(axis='y', direction='in', length=4, width=0.5, colors='black', labelsize=9, labelcolor='black')
+        #plt.title(title)
+        #plt.xticks(label_ind, sample_labels, ha='right', rotation=45)
+        #ax_bot.set_xticks(label_ind, sample_labels, ha='center', rotation=90)
+        ax_bot.tick_params(axis='x', direction='out', length=0, width=0, colors='black', labelsize=9, labelcolor='black')
+        ax_bot.set_xticks(label_ind)
+        ax_bot.set_xticklabels(sample_labels, ha='center', rotation=90)
+        ax_bot.tick_params(axis='y', labelsize=9, labelcolor='black')
+        ax_bot.set_yticks(np.arange(0, 101, 20))
+        ax_bot.set_ylim([0,100])
+        ax_bot.set_xlim([-plot_x_pad_unit,N-plot_x_pad_unit])
+        
+
+        # are positions now in units (btw. 0-1) or inches?  seems to depend on the backend Agg
+        x_pad = x_pad_unit / canvas_width_unit
+        y_pad = y_pad_unit / canvas_height_unit
+        plot_width = plot_width_unit / canvas_width_unit
+        plot_height = plot_height_unit / canvas_height_unit
+        x_label_pad = x_label_pad_unit / canvas_width_unit
+        y_label_pad = y_label_pad_unit / canvas_height_unit
+
+
+        # Frac Plot sizing
+        # don't shrink frac plot.  instead place it explictly since we built canvas for it
+        #
+        box = ax_top.get_position()
+#        ax_top.set_position([box.x0 + x_pad_inch, 
+#                             box.y0 + y_pad_inch, 
+#                             box.width - x_label_pad_inch - 2*x_pad_inch, 
+#                             #box.height - y_pad_inch
+#                             box.height
+#                         ])
+        top_pos = [x_0, y_0, w, h] = [0 + x_pad, 
+                                      (1.0 - top_frac)*plot_height + y_label_pad,
+                                      plot_width,
+                                      top_frac*plot_height - 2*y_pad
+                                  ]
+        ax_top.set_position(top_pos)
+
+        # DEBUG
+        #print ("AX_TOP: BOX:")
+        #print ([box.x0, box.y0, box.width, box.height])
+        #print ("AX_TOP: TOP_POS:")
+        #print (top_pos)
+
+
+        # Stacked Plot sizing
+        #   don't shrink plot.  instead place it explictly since we built canvas for it
+        #
+        box = ax_bot.get_position()
+        #ax_bot.set_position([box.x0 + x_pad_inch, 
+        #                     #box.y0 + y_pad_inch + y_label_pad_inch, 
+        #                     box.y0,
+        #                     box.width - x_label_pad_inch - 2*x_pad_inch, 
+        #                     #box.height - y_label_pad_inch - y_pad_inch
+        #                     box.height
+        #                 ])
+        bot_pos = [x_0, y_0, w, h] = [0 + x_pad, 
+                                      0 + y_label_pad + y_pad,
+                                      plot_width,
+                                      (1.0 - top_frac)*plot_height - 2*y_pad
+                                  ]
+        ax_bot.set_position(bot_pos)
+
+        # DEBUG
+        #print ("AX_BOT: BOX:")
+        #print ([box.x0, box.y0, box.width, box.height])
+        #print ("AX_BOT: BOT_POS:")
+        #print (bot_pos)
+
+
+        """
+        # add key
+        key_colors = []
+        for each_p in reversed(p):
+            key_colors.append(each_p[0])
+        ax_bot.legend(key_colors, reversed(element_labels), loc='upper left', bbox_to_anchor=(1,1), fontsize=9)
+        """
+
+        # create the legend manually
+        key_colors = []
+        for color_i in reversed(np.arange(N-1)):
+            key_colors.append(mpatches.Patch(color=color_names[color_i], alpha=0.4, ec='black'))
+        box = ax_bot.get_position()
+        ax_bot.set_position([box.x0, box.y0, box.width * 0.8, box.height])   
+        ax_bot.legend(key_colors, reversed(element_labels), loc='upper left', bbox_to_anchor=(1, 1))
+
+
+        # save
+        img_dpi = 200
+        #plt.show()
+        log("SAVING STACKED BAR PLOT")
+        png_file = out_file_basename+'.png'
+        pdf_file = out_file_basename+'.pdf'
+        output_png_file_path = os.path.join(out_folder, png_file);
+        output_pdf_file_path = os.path.join(out_folder, pdf_file);
+        fig.savefig(output_png_file_path, dpi=img_dpi)
+        fig.savefig(output_pdf_file_path, format='pdf')
+        
+        return output_png_file_path
+
+
+
+
+    def _create_area_plots_OLD (self, abundances):
         color_names = self.no_light_color_names
         
         import numpy as np
