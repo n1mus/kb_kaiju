@@ -235,7 +235,7 @@ class OutputBuilder(object):
                                            sample_labels = sample_order, 
                                            element_labels = lineage_order, 
                                            sort_by = options['sort_taxa_by'])
-        elif options['plot_type'] == 'area'::
+        elif options['plot_type'] == 'area':
             basename_ext = '-stacked_area_plot'
             return self._create_area_plots (out_folder = options['stacked_plots_out_folder'], 
                                            out_file_basename = tax_level+basename_ext,
@@ -1012,7 +1012,7 @@ class OutputBuilder(object):
 
 
         # plot stacked
-        ax_bot.stackplot (ind, np_vals, colors=color_names, alpha=0.4, edgecolor='none'))
+        ax_bot.stackplot (ind, np_vals, colors=color_names, alpha=0.4, edgecolor='none')
 
         ax_bot.set_ylabel(y_label, fontsize=10)
         ax_bot.tick_params(axis='y', direction='in', length=4, width=0.5, colors='black', labelsize=9, labelcolor='black')
