@@ -236,14 +236,15 @@ class OutputBuilder(object):
         pass
         
 
-    def build_html_for_kaijuReport_StackedPlots(self, out_html_folder, plot_type, tax_levels, img_files):
+    def build_html_for_kaijuReport_StackedPlots(self, input_reads, summary_folder, out_html_folder, plot_type, tax_levels, img_files):
         img_height = 750  # in pixels
+        key_scale = 10 # in fontsize
         img_local_path = 'img'
         out_html_img_path = os.path.join (out_html_folder, img_local_path)
         if not os.path.exists(out_html_img_path):
             os.makedirs(out_html_img_path)
         out_html_file = None
-        out_html_buf = []
+        out_html_buf = []        
 
         # add header
         plot_type_disp = plot_type.title()
@@ -255,8 +256,23 @@ class OutputBuilder(object):
             dst_local_path = os.path.join (img_local_path, plot_type+'-'+tax_level+'.PNG')
             dst_plot_file = os.path.join (out_html_folder, dst_local_path)
             shutil.copy2 (src_plot_file, dst_plot_file)
+            
+            # increase height if key is long
+            lineage_seen = dict()
+            for input_reads_item in input_reads:
+                this_summary_file = os.path.join (summary_folder, input_reads_item['name']+'-'+tax_level+'.kaijuReport')
+                (this_abundance, this_lineage_order, this_classified_frac) = self._parse_kaiju_summary_file (this_summary_file, tax_level)
+                for lineage_name in this_lineage_order:
+                    lineage_seen[lineage_name] = True
+            
+            len_key = len(lineage_seen.keys())
+            if key_scale * len_key > img_height:
+                this_img_height = key_scale * len_key
+            else:
+                this_img_height = img_height
 
-            out_html_buf.append('<img src="'+dst_local_path+'" height='+str(img_height)+'>')
+            # add img to html buf
+            out_html_buf.append('<img src="'+dst_local_path+'" height='+str(this_img_height)+'>')
 
         # add footer
         out_html_buf.extend (self._build_plot_html_footer())
@@ -543,7 +559,7 @@ class OutputBuilder(object):
         #y_label_scale_unit = 0.015
         x_label_scale_unit = 0.175
         y_label_scale_unit = 0.16
-        key_label_scale = y_label_scale_unit * 50 / 35.0
+        key_label_scale = y_label_scale_unit * 50 / 30.0
         x_label_pad_unit = x_label_scale_unit * longest_element_label_len
         y_label_pad_unit = y_label_scale_unit * longest_sample_label_len
         if key_label_scale * len_elements_list > y_label_pad_unit:
