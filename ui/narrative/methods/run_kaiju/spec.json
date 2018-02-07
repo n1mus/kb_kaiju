@@ -128,7 +128,7 @@
 		{
 			"id": "filter_percent",
 			"optional": false,
-			"advanced": true,
+			"advanced": false,
 			"allow_multiple": false,
 			"default_values": [ "0.5" ],
 			"field_type": "text",
@@ -154,7 +154,7 @@
 		{
 			"id": "subsample_replicates",
 			"optional": true,
-			"advanced": false,
+			"advanced": true,
 			"allow_multiple": false,
 			"default_values": [ "1" ],
 			"field_type": "text",
@@ -166,7 +166,7 @@
 		{
 			"id": "subsample_seed",
 			"optional": true,
-			"advanced": false,
+			"advanced": true,
 			"allow_multiple": false,
 			"default_values": [ "1" ],
 			"field_type": "text",

@@ -534,8 +534,8 @@ class OutputBuilder(object):
 
 
         # reverse so that most important plots near top (below special 3 categories)
-        element_labels = element_labels[-3:0:-1] + element_labels[-3:]
-        vals = vals[-3:0:-1] + vals[-3:]
+        element_labels = element_labels[-4::-1] + element_labels[-3:]
+        vals = vals[-4::-1] + vals[-3:]
 
     
         # plot dimensions
