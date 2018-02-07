@@ -1104,11 +1104,14 @@ class OutputBuilder(object):
         """
 
         # create the legend manually
+        w_scale = 0.8
         key_colors = []
         for color_i in reversed(np.arange(N-1)):
             key_colors.append(mpatches.Patch(color=color_names[color_i], alpha=0.4, ec='black'))
+        box = ax_top.get_position()
+        ax_top.set_position([box.x0, box.y0, box.width * w_scale, box.height])   
         box = ax_bot.get_position()
-        ax_bot.set_position([box.x0, box.y0, box.width * 0.8, box.height])   
+        ax_bot.set_position([box.x0, box.y0, box.width * w_scale, box.height])   
         ax_bot.legend(key_colors, reversed(element_labels), loc='upper left', bbox_to_anchor=(1, 1))
 
 
