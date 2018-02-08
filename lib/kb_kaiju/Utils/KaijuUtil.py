@@ -237,7 +237,7 @@ class KaijuUtil:
 
 
         # 9) Package results
-        output_packages = self._build_output_packages(params, self.outputBuilder_client)
+#        output_packages = self._build_output_packages(params, self.outputBuilder_client)
 
 
         # 10) add top nav to html pages and build the HTML report
@@ -268,7 +268,7 @@ class KaijuUtil:
                                      'workspace_name':  params['workspace_name'],
                                      'output_obj_name': obj_name
                                  }
-            biom_obj_ref = self.outputBuilder_client.generate_biom_object(self.ctx, generate_biom_options)
+            biom_obj_ref = self.outputBuilder_client.generate_sparse_biom1_0_matrix(self.ctx, generate_biom_options)
             generated_biom_objs.append({'ref': biom_obj_ref,
                                         'description': 'Kaiju Taxonomic Classification at '+tax_level+' Level.  BIOM format'})
 
@@ -278,7 +278,8 @@ class KaijuUtil:
                          'objects_created': generated_biom_objs,
                          'direct_html_link_index': 0,
                          'html_links': [html_zipped],
-                         'file_links': output_packages,
+#                         'file_links': output_packages,
+                         'file_links': [],
                          'report_object_name': 'kb_kaiju_report_' + str(uuid.uuid4()),
                          'workspace_name': params['workspace_name']
                          }

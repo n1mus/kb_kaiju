@@ -254,15 +254,15 @@ class OutputBuilder(object):
             except:
                 raise ValueError ("Unable to connect to workspace service at workspace_url: "+self.workspace_url)
         new_obj_info = wsClient.save_objects({
-            'workspace':workspace_name,
-            'objects':[
-                { 'type': 'Communities.Biom',
-                  'data': biom_obj,
-                  'name': output_obj_name,
-                  'meta': {},
-                  'provenance': provenance
-              }]
-        })[0]        
+                                              'workspace':workspace_name,
+                                              'objects':[
+                                                  { 'type': 'Communities.Biom',
+                                                    'data': biom_obj,
+                                                    'name': output_obj_name,
+                                                    'meta': {},
+                                                    'provenance': provenance
+                                                }]
+                                              })[0]        
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
         biom_obj_ref = str(new_obj_info[WSID_I])+'/'+str(new_obj_info[OBJID_I])+'/'+str(new_obj_info[VERSION_I])
 
