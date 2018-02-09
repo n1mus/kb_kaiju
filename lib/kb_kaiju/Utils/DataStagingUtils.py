@@ -497,6 +497,7 @@ class DataStagingUtils(object):
                     zero_pad = '0'*(len(str(split_num))-len(str(lib_i+1)))
                     replicate_files.append({'fwd_file': output_fwd_paired_file_path,
                                             'rev_file': output_rev_paired_file_path,
+                                            'ref':  input_item['ref'],  # note: this is for the src, not the subsample which is not saved
                                             'type': input_item['type'],
                                             'name': input_item['name']+'-'+zero_pad+str(lib_i+1)
                                         })
@@ -634,6 +635,7 @@ class DataStagingUtils(object):
                     raise ValueError ("failed to create paired output")
                 else:
                     replicate_files.append({'fwd_file': output_fwd_paired_file_path,
+                                            'ref':  input_item['ref'],  # note: this is for the src, not the subsample which is not saved
                                             'type': input_item['type'],
                                             'name': input_item['name']+'-'+zero_pad+str(lib_i+1)
                                         })
@@ -641,8 +643,6 @@ class DataStagingUtils(object):
 
         else:
             raise ValueError ("unknown ReadLibrary type:"+str(input_item['type'])+" for readslibrary: "+input_item['name'])
-
-        # HERE
 
 
         return replicate_files

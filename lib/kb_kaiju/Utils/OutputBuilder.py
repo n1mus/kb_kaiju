@@ -195,26 +195,6 @@ class OutputBuilder(object):
         #classified_frac = []
         biom_obj = dict()
 
-        """ # we want the raw counts for the biom object, not percs (so SparCC can use it)
-        # parse summary
-        for input_reads_item in input_reads:
-            sample_order.append(input_reads_item['name'])
-
-            this_summary_file = os.path.join (in_folder, input_reads_item['name']+'-'+tax_level+'.kaijuReport')
-            (this_abundance, this_lineage_order, this_classified_frac) = self._parse_kaiju_summary_file (this_summary_file, tax_level)
-            for lineage_name in this_lineage_order:
-                if lineage_name not in lineage_seen:
-                    lineage_seen[lineage_name] = True
-                    if lineage_name.startswith('tail (<') \
-                       or lineage_name.startswith('viruses') \
-                       or lineage_name.startswith('unassigned at'):
-                        #extra_bucket_order.append(lineage_name)
-                        continue
-                    else:
-                        lineage_order.append(lineage_name)
-            abundance_by_sample.append(this_abundance)
-            #classified_frac.append(this_classified_frac)
-        """
 
         # parse kaiju classification files and tally raw count abundance
         for input_reads_item in input_reads:
@@ -284,7 +264,8 @@ class OutputBuilder(object):
         # add additional info to provenance here, in this case the input data object reference
         provenance[0]['input_ws_objects'] = []
         for input_reads_item in input_reads:
-            provenance[0]['input_ws_objects'].append(input_reads_item['ref'])
+            if input_reads_item['ref'] not in provenance[0]['input_ws_objects']:
+                provenance[0]['input_ws_objects'].append(input_reads_item['ref'])
         provenance[0]['service'] = 'kb_kaiju'
         provenance[0]['method'] = 'run_kaiju'
 
