@@ -257,16 +257,19 @@ class KaijuUtil:
 
         # 11) save biom output for each tax level
         generated_biom_objs = []
+        timestamp_epoch = time.time()
         for tax_level in params['tax_levels']:
             obj_name = params['output_biom_name']
             if len(params['tax_levels']) != 1:
                 obj_name += '-'+tax_level
 
             generate_biom_options = {'tax_level':       tax_level,
+                                     'db_type':         params['db_type'],
                                      'input_reads':     expanded_input,
-                                     'in_folder':       kaijuReport_output_folder,
+                                     'in_folder':       kaiju_output_folder,
                                      'workspace_name':  params['workspace_name'],
-                                     'output_obj_name': obj_name
+                                     'output_obj_name': obj_name,
+                                     'timestamp_epoch': timestamp_epoch
                                  }
             biom_obj_ref = self.outputBuilder_client.generate_sparse_biom1_0_matrix(self.ctx, generate_biom_options)
             generated_biom_objs.append({'ref': biom_obj_ref,
