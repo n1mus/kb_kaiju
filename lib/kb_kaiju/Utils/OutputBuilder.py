@@ -957,7 +957,7 @@ class OutputBuilder(object):
         
 
         # plot fraction measured
-        frac = ax_top.bar(ind, frac_vals, bar_width_unit, color='black', alpha=0.4, ec='none')
+        frac = ax_top.bar(ind, frac_vals, bar_width_unit, color='black', alpha=0.5, ec='none')
         ax_top.set_title(title, fontsize=11)
         ax_top.grid(b=True, axis='y')
         ax_top.set_ylabel(frac_y_label, fontsize=10)
@@ -977,7 +977,7 @@ class OutputBuilder(object):
             else:
                 this_bottom = last_bottom
                 last_bottom = this_bottom + val_vec
-            p.append (ax_bot.bar (ind, val_vec, bar_width_unit, bottom=this_bottom, color=color_names[vec_i], alpha=0.4, ec='none'))
+            p.append (ax_bot.bar (ind, val_vec, bar_width_unit, bottom=this_bottom, color=color_names[vec_i], alpha=0.5, ec='none'))
 
         ax_bot.set_ylabel(y_label, fontsize=10)
         ax_bot.tick_params(axis='y', direction='in', length=4, width=0.5, colors='black', labelsize=9, labelcolor='black')
@@ -1266,7 +1266,7 @@ class OutputBuilder(object):
         
 
         # plot fraction measured
-        frac = ax_top.bar(ind, frac_vals, bar_width_unit, color='black', alpha=0.4, ec='none')
+        frac = ax_top.bar(ind, frac_vals, bar_width_unit, color='black', alpha=0.5, ec='none')
         ax_top.set_title(title, fontsize=11)
         ax_top.grid(b=True, axis='y')
         ax_top.set_ylabel(frac_y_label, fontsize=10)
@@ -1277,7 +1277,7 @@ class OutputBuilder(object):
         ax_top.set_xlim([-plot_x_pad_unit,N-plot_x_pad_unit])
 
         """
-        ax.stackplot (ind, np_vals, colors=color_names, alpha=0.4, edgecolor='none')
+        ax.stackplot (ind, np_vals, colors=color_names, alpha=0.5, edgecolor='none')
 
         plt.ylabel(y_label)
         plt.title(title)
@@ -1287,7 +1287,7 @@ class OutputBuilder(object):
         # creating the legend manually
         key_colors = []
         for color_i in reversed(np.arange(N-1)):
-            key_colors.append(mpatches.Patch(color=color_names[color_i], alpha=0.4, ec='black'))
+            key_colors.append(mpatches.Patch(color=color_names[color_i], alpha=0.5, ec='black'))
         box = ax.get_position()
         ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])   
         plt.legend(key_colors, reversed(element_labels), loc='upper left', bbox_to_anchor=(1, 1))
@@ -1295,7 +1295,7 @@ class OutputBuilder(object):
 
 
         # plot stacked
-        ax_bot.stackplot (ind, np_vals, colors=color_names, alpha=0.4, edgecolor='none')
+        ax_bot.stackplot (ind, np_vals, colors=color_names, alpha=0.5, edgecolor='none')
 
         ax_bot.set_ylabel(y_label, fontsize=10)
         ax_bot.tick_params(axis='y', direction='in', length=4, width=0.5, colors='black', labelsize=9, labelcolor='black')
@@ -1381,7 +1381,7 @@ class OutputBuilder(object):
         w_scale = 0.8
         key_colors = []
         for color_i in reversed(np.arange(N-1)):
-            key_colors.append(mpatches.Patch(color=color_names[color_i], alpha=0.4, ec='black'))
+            key_colors.append(mpatches.Patch(color=color_names[color_i], alpha=0.5, ec='black'))
         box = ax_top.get_position()
         ax_top.set_position([box.x0, box.y0, box.width * w_scale, box.height])   
         box = ax_bot.get_position()
@@ -1460,7 +1460,7 @@ class OutputBuilder(object):
         #    ax.spines['left'].set_visible(False)    # left axis line
         #    ax.spines['right'].set_visible(False)   # right axis line
 
-        ax.stackplot (ind, np_vals, colors=color_names, alpha=0.4, edgecolor='none')
+        ax.stackplot (ind, np_vals, colors=color_names, alpha=0.5, edgecolor='none')
 
         plt.ylabel(y_label)
         plt.title(title)
@@ -1470,7 +1470,7 @@ class OutputBuilder(object):
         # creating the legend manually
         key_colors = []
         for color_i in reversed(np.arange(N-1)):
-            key_colors.append(mpatches.Patch(color=color_names[color_i], alpha=0.4, ec='black'))
+            key_colors.append(mpatches.Patch(color=color_names[color_i], alpha=0.5, ec='black'))
         box = ax.get_position()
         ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])   
         plt.legend(key_colors, reversed(element_labels), loc='upper left', bbox_to_anchor=(1, 1))
