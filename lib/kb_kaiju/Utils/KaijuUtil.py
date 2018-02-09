@@ -195,7 +195,6 @@ class KaijuUtil:
         self.run_kaijuReport_batch (kaijuReport_options)
 
 
-        """
         # 6) create Summary Report plots in batch
         kaijuReportPlots_options = {'input_reads':                   expanded_input,
                                     'in_folder':                     kaijuReport_output_folder,
@@ -223,7 +222,6 @@ class KaijuUtil:
         if build_area_plots_flag:
             kaijuReportPlotsHTML_options['stacked_area_plot_files'] = kaijuReport_plot_files['stacked_area_plot_files']
         html_plot_pages = self.run_kaijuReportPlotsHTML_batch (kaijuReportPlotsHTML_options)
-        """
 
 
         # 8) create Krona plots
@@ -237,12 +235,12 @@ class KaijuUtil:
 
 
         # 9) Package results
-#        output_packages = self._build_output_packages(params, self.outputBuilder_client)
+        output_packages = self._build_output_packages(params, self.outputBuilder_client)
 
 
         # 10) add top nav to html pages and build the HTML report
         html_pages = []
-#        html_pages.extend(html_plot_pages['bar'])
+        html_pages.extend(html_plot_pages['bar'])
         if build_area_plots_flag:
             html_pages.extend(html_plot_pages['area'])
         #html_pages.extend(html_plot_pages['per_sample'])
@@ -281,7 +279,7 @@ class KaijuUtil:
                          'objects_created': generated_biom_objs,
                          'direct_html_link_index': 0,
                          'html_links': [html_zipped],
-#                         'file_links': output_packages,
+                         'file_links': output_packages,
                          'file_links': [],
                          'report_object_name': 'kb_kaiju_report_' + str(uuid.uuid4()),
                          'workspace_name': params['workspace_name']
