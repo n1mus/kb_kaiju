@@ -23,6 +23,7 @@ class KaijuUtil:
         self.config = config
         self.ctx = ctx
         self.callback_url = config['SDK_CALLBACK_URL']
+        self.workspace_url = config['workspace-url']
         self.scratch = config['scratch']
         self.threads = config['threads']
         self.suffix = str(int(time.time() * 1000))
@@ -160,7 +161,7 @@ class KaijuUtil:
         #                             'desc': 'Stacked Area Abundance Plots (PNG + PDF)',
         #                             'path': kaijuReport_StackedAreaPlots_output_folder
         #                           })
-        self.outputBuilder_client = OutputBuilder(output_folders, self.scratch, self.callback_url)
+        self.outputBuilder_client = OutputBuilder(output_folders, self.scratch, self.callback_url, self.workspace_url)
 
 
         # 4) run Kaiju in batch (download happens one-by-one and then deleted to save space)
@@ -252,11 +253,34 @@ class KaijuUtil:
         html_zipped = self.outputBuilder_client.package_folder(html_dir, report_html_file, report_html_desc)
 
 
-        # 11) save report
+        # 11) save biom output for each tax level
+        generated_biom_objs = []
+        timestamp_epoch = time.time()
+        for tax_level in params['tax_levels']:
+            obj_name = params['output_biom_name']
+            if len(params['tax_levels']) != 1:
+                obj_name += '-'+tax_level
+
+            generate_biom_options = {'tax_level':       tax_level,
+                                     'db_type':         params['db_type'],
+                                     'input_reads':     expanded_input,
+                                     'in_folder':       kaiju_output_folder,
+                                     'workspace_name':  params['workspace_name'],
+                                     'output_obj_name': obj_name,
+                                     'timestamp_epoch': timestamp_epoch
+                                 }
+            biom_obj_ref = self.outputBuilder_client.generate_sparse_biom1_0_matrix(self.ctx, generate_biom_options)
+            generated_biom_objs.append({'ref': biom_obj_ref,
+                                        'description': 'Kaiju Taxonomic Classification at '+tax_level+' Level.  BIOM format'})
+
+
+        # 12) save report
         report_params = {'message': '',
+                         'objects_created': generated_biom_objs,
                          'direct_html_link_index': 0,
                          'html_links': [html_zipped],
                          'file_links': output_packages,
+                         'file_links': [],
                          'report_object_name': 'kb_kaiju_report_' + str(uuid.uuid4()),
                          'workspace_name': params['workspace_name']
                          }

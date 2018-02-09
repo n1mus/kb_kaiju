@@ -5,12 +5,16 @@ import sys
 import time
 import re
 
+from datetime import datetime as dt
+import pytz
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import random
 from random import shuffle
 
+from biokbase.workspace.client import Workspace as workspaceService
+#from Workspace.WorkspaceClient import Workspace as workspaceService
 from DataFileUtil.DataFileUtilClient import DataFileUtil
 
 
@@ -27,10 +31,19 @@ class OutputBuilder(object):
     modifying the Krona HTML to offer tabbed href links between html pages
     '''
 
-    def __init__(self, output_folders, scratch_dir, callback_url):
+    def __init__(self, output_folders, scratch_dir, callback_url, workspace_url):
         self.output_folders = output_folders
         self.scratch = scratch_dir
         self.callback_url = callback_url
+        self.workspace_url = workspace_url
+        self.wsClient = None
+
+        # store Kaiju DBs
+        self.NODES_DB = None
+        self.NAMES_DB = None
+
+        # store species counts by sample
+        self.species_abundance_by_sample = dict()
 
         # store parsed info
         self.parsed_summary = dict()
@@ -162,6 +175,141 @@ class OutputBuilder(object):
             #'yellow',
             #'yellowgreen'
         ]
+
+
+    def generate_sparse_biom1_0_matrix(self, ctx, options): 
+        tax_level       = options['tax_level']
+        db_type         = options['db_type']
+        input_reads     = options['input_reads']
+        in_folder       = options['in_folder']
+        workspace_name  = options['workspace_name']
+        output_obj_name = options['output_obj_name']
+        timestamp_epoch = options['timestamp_epoch']
+
+        abundance_matrix = []
+        abundance_by_sample = []
+        lineage_seen = dict()
+        lineage_order = []
+        #extra_bucket_order = []
+        sample_order = []
+        #classified_frac = []
+        biom_obj = dict()
+
+        """ # we want the raw counts for the biom object, not percs (so SparCC can use it)
+        # parse summary
+        for input_reads_item in input_reads:
+            sample_order.append(input_reads_item['name'])
+
+            this_summary_file = os.path.join (in_folder, input_reads_item['name']+'-'+tax_level+'.kaijuReport')
+            (this_abundance, this_lineage_order, this_classified_frac) = self._parse_kaiju_summary_file (this_summary_file, tax_level)
+            for lineage_name in this_lineage_order:
+                if lineage_name not in lineage_seen:
+                    lineage_seen[lineage_name] = True
+                    if lineage_name.startswith('tail (<') \
+                       or lineage_name.startswith('viruses') \
+                       or lineage_name.startswith('unassigned at'):
+                        #extra_bucket_order.append(lineage_name)
+                        continue
+                    else:
+                        lineage_order.append(lineage_name)
+            abundance_by_sample.append(this_abundance)
+            #classified_frac.append(this_classified_frac)
+        """
+
+        # parse kaiju classification files and tally raw count abundance
+        for input_reads_item in input_reads:
+            sample_order.append(input_reads_item['name'])
+
+            this_classification_file = os.path.join (in_folder, input_reads_item['name']+'.kaiju')
+            (this_abundance_cnts, this_lineage_order) = self._parse_kaiju_classification_file (this_classification_file, tax_level, db_type)
+            for lineage_name in this_lineage_order:
+                if lineage_name not in lineage_seen:
+                    lineage_seen[lineage_name] = True
+                    #if lineage_name.startswith('tail (<') \
+                    #   or lineage_name.startswith('viruses') \
+                    #   or lineage_name.startswith('unassigned at'):
+                    #    #extra_bucket_order.append(lineage_name)
+                    #    continue
+                    #else:
+                    #    lineage_order.append(lineage_name)
+                    lineage_order.append(lineage_name)
+            abundance_by_sample.append(this_abundance_cnts)
+            #classified_frac.append(this_classified_frac)
+
+
+        # create sparse matrix (note: vals in each sample do not sum to 100% because we're dumping buckets)
+        biom_data = []
+        for lineage_i,lineage_name in enumerate(lineage_order):
+            for sample_i,sample_name in enumerate(sample_order):
+                if lineage_name in abundance_by_sample[sample_i]:
+                    biom_data.append([lineage_i, sample_i, abundance_by_sample[sample_i][lineage_name]])
+
+        # build biom obj
+        shape = [len(lineage_order), len(sample_order)]
+        rows_struct = []
+        cols_struct = []
+        timestamp_iso = dt.fromtimestamp(timestamp_epoch,pytz.utc).strftime('%Y-%m-%d'+'T'+'%H:%M:%S')
+        for lineage_name in lineage_order:
+            # KBase BIOM typedef only supports string, not dict.  This is wrong (see format_url below)
+            #rows_struct.append({'id': lineage_name, 'metadata': None})  # could add metadata full tax path if parsed from KaijuReport
+            rows_struct.append(lineage_name)
+        for sample_name in sample_order:
+            # KBase BIOM typedef only supports string, not dict.  This is wrong (see format_url below)
+            #cols_struct.append({'id': sample_name, 'metadata': None})  # sample metadata not provided to App
+            cols_struct.append(sample_name)
+
+        biom_obj = { 'id':                  output_obj_name,
+                     'format':              'Biological Observation Matrix 1.0',
+                     'format_url':          'http://biom-format.org/documentation/format_versions/biom-1.0.html',
+                     'type':                'Taxon table',
+                     'generated_by':        'KBase Kaiju App (Kaiju v1.5.0, KBase App v1.0.0)',
+                     'date':                timestamp_iso,
+                     'rows':                rows_struct,
+                     'columns':             cols_struct,
+                     'matrix_type':         'sparse',
+                     #'matrix_element_type': 'float',
+                     'matrix_element_type': 'int',
+                     'shape':               shape,
+                     'data':                biom_data
+                 }
+        # extra KBase BIOM obj required fields that aren't part of biom-1.0 spec (probably custom to MG-RAST)
+        biom_obj['url'] = None
+        biom_obj['matrix_element_value'] = None
+        
+
+        # save the biom obj to workspace
+        provenance = [{}]
+        if 'provenance' in ctx:
+            provenance = ctx['provenance']
+        # add additional info to provenance here, in this case the input data object reference
+        provenance[0]['input_ws_objects'] = []
+        for input_reads_item in input_reads:
+            provenance[0]['input_ws_objects'].append(input_reads_item['ref'])
+        provenance[0]['service'] = 'kb_kaiju'
+        provenance[0]['method'] = 'run_kaiju'
+
+        if self.wsClient == None:
+            try:
+                self.wsClient = workspaceService(self.workspace_url, token=ctx['token'])
+            except:
+                raise ValueError ("Unable to connect to workspace service at workspace_url: "+self.workspace_url)
+        print ("SAVING BIOM OBJECT")
+        #print (biom_obj)  # DEBUG
+
+        new_obj_info = self.wsClient.save_objects({'workspace':workspace_name,
+                                                   'objects':[
+                                                       { 'type': 'Communities.Biom',
+                                                         'data': biom_obj,
+                                                         'name': output_obj_name,
+                                                         'meta': {},
+                                                         'provenance': provenance
+                                                     }]
+                                               })[0]        
+        [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
+        biom_obj_ref = str(new_obj_info[WSID_I])+'/'+str(new_obj_info[OBJID_I])+'/'+str(new_obj_info[VERSION_I])
+
+        return biom_obj_ref
+
 
     def package_folder(self, folder_path, zip_file_name, zip_file_description):
         ''' Simple utility for packaging a folder and saving to shock '''
@@ -473,6 +621,151 @@ class OutputBuilder(object):
         self.parsed_summary[summary_file]['classified_frac'] = classified_frac
 
         return (abundance, lineage_order, classified_frac)
+
+
+    def _parse_kaiju_classification_file (self, classification_file, tax_level, db_type):
+        KAIJU_DB_DIR   = os.path.join(os.path.sep, 'data', 'kaijudb', db_type)
+        KAIJU_DB_NODES = os.path.join(KAIJU_DB_DIR, 'nodes.dmp')
+        KAIJU_DB_NAMES = os.path.join(KAIJU_DB_DIR, 'names.dmp')
+
+        abundance_cnts = dict()
+        lineage_order = []
+        classified_cnt = 0
+        unclassified_cnt = 0
+
+        # store names db
+        if self.NAMES_DB != None:
+            largest_id = len(self.NAMES_DB)
+        else:
+            ID_I   = 0
+            NAME_I = 1
+            CAT_I  = 3
+            largest_id = 0
+            with open (KAIJU_DB_NAMES, 'r') as names_handle:
+                for names_line in names_handle.readlines():
+                    names_line = names_line.rstrip()
+                    names_line_info = names_line.split("\t|")
+                    name_category = names_line_info[CAT_I].strip()
+                    if name_category != 'scientific name':
+                        continue
+                    name_id = int(names_line_info[ID_I].strip())
+                    if name_id > largest_id:
+                        largest_id = name_id
+            self.NAMES_DB = []
+            for name_i in range(largest_id+1):
+                self.NAMES_DB.append(None)
+            with open (KAIJU_DB_NAMES, 'r') as names_handle:
+                for names_line in names_handle.readlines():
+                    names_line = names_line.rstrip()
+                    names_line_info = names_line.split("\t|")
+                    name_category = names_line_info[CAT_I].strip()
+                    if name_category != 'scientific name':
+                        continue
+                    name_id = int(names_line_info[ID_I].strip())
+                    self.NAMES_DB[name_id] = names_line_info[NAME_I].strip()
+
+        # store nodes db
+        all_tax_levels = ['class',
+                          'cohort',
+                          'family',
+                          'forma',
+                          'genus',
+                          'infraclass',
+                          'infraorder',
+                          'kingdom',
+                          'no rank',
+                          'order',
+                          'parvorder',
+                          'phylum',
+                          'species',
+                          'subclass',
+                          'subfamily',
+                          'subgenus',
+                          'subkingdom',
+                          'suborder',
+                          'subphylum',
+                          'subspecies',
+                          'subtribe',
+                          'superclass',
+                          'superfamily',
+                          'superkingdom',
+                          'superorder',
+                          'superphylum',
+                          'tribe',
+                          'varietas']
+        tax_level_id2str = []
+        tax_level_str2id = dict()
+        for tax_level_id,tax_level_str in enumerate(all_tax_levels):
+            tax_level_id2str.append(tax_level_str)
+            tax_level_str2id[tax_level_str] = tax_level_id
+
+        # store [PAR_ID, TAX_LEVEL_I]
+        if self.NODES_DB == None:
+            NODE_ID_I = 0
+            PAR_ID_I  = 1
+            LEVEL_I   = 2
+            self.NODES_DB = []
+            for node_i in range(largest_id+1):
+                self.NODES_DB.append(None)
+            with open (KAIJU_DB_NODES, 'r') as nodes_handle:
+                for nodes_line in nodes_handle.readlines():
+                    nodes_line = nodes_line.rstrip()
+                    nodes_line_info = nodes_line.split("\t|")
+                    node_id = int(nodes_line_info[NODE_ID_I].strip())
+                    par_id = int(nodes_line_info[PAR_ID_I].strip())
+                    tax_level_str = nodes_line_info[LEVEL_I].strip()
+                    if tax_level_str == 'species group' or tax_level_str == 'species subgroup':
+                        tax_level_str = 'species'
+                    tax_level_id = tax_level_str2id[tax_level_str]
+
+                    self.NODES_DB[node_id] = [par_id, tax_level_id]
+
+        # parse species from kaiju read classification
+        if classification_file not in self.species_abundance_by_sample:
+            species_abundance_cnts = []
+            for node_i in range(largest_id+1):
+                species_abundance_cnts.append(0)
+            CLASS_FLAG_I = 0
+            READ_ID_I    = 1
+            NODE_ID_I    = 2
+            with open (classification_file, 'r') as class_handle:
+                for class_line in class_handle.readlines():
+                    class_line.rstrip()
+                    class_info = class_line.split("\t")
+                    if class_info[CLASS_FLAG_I] == 'U':
+                        continue
+                    node_id = int(class_info[NODE_ID_I])
+                    species_abundance_cnts[node_id] += 1
+            self.species_abundance_by_sample[classification_file] = species_abundance_cnts
+
+
+        # navigate up tax hierarchy until reach desired level and store abundance by name
+        abundance_cnts = dict()
+        PAR_ID_I       = 0
+        TAX_LEVEL_ID_I = 1
+        level_limit = 100
+        for node_id,species_cnt in enumerate(self.species_abundance_by_sample[classification_file]):
+            if species_cnt > 0:
+                this_par_id       = self.NODES_DB[node_id][PAR_ID_I]
+                this_tax_level_id = self.NODES_DB[node_id][TAX_LEVEL_ID_I]
+                level_lim_i = 0
+                while level_lim_i < level_limit:
+                    level_lim_i += 1
+                    if tax_level_id2str[this_tax_level_id] == tax_level:
+                        node_name = self.NAMES_DB[node_id]
+                        if node_name not in abundance_cnts:
+                            abundance_cnts[node_name] = 0
+                        abundance_cnts[node_name] += species_cnt
+                        break
+                    else:
+                        node_id = this_par_id
+                        this_par_id       = self.NODES_DB[node_id][PAR_ID_I]
+                        this_tax_level_id = self.NODES_DB[node_id][TAX_LEVEL_ID_I]
+                        if this_par_id == 1:
+                            break
+
+        lineage_order = abundance_cnts.keys()
+        return (abundance_cnts, lineage_order)
 
 
     def _create_bar_plots (self, out_folder=None, 
