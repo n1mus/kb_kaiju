@@ -110,8 +110,8 @@ module kb_kaiju {
 	int            greedy_allowed_mismatches;
 	int            greedy_min_match_score;
 	float          greedy_max_e_value;
-	bool           filter_unclassified;
-	bool           full_tax_path;
+	/*bool           filter_unclassified;*/  /* always filter unclassified */
+	/*bool           full_tax_path;*/  /* will implement later */
 	string         sort_taxa_by;
     } KaijuInputParams;
 

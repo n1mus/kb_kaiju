@@ -271,48 +271,6 @@
 			}
 		},
 		{
-			"id": "full_tax_path",
-			"optional": false,
-			"advanced": true,
-			"allow_multiple": false,
-			"default_values": [ 0 ],
-			"field_type": "dropdown",
-				"dropdown_options": {
-					"options": [
-						{
-							"value": 0,
-							"display": "single tax level",
-							"id": "single_tax",
-							"ui-name": "single_tax"
-						},
-						{
-							"value": 1,
-							"display": "full tax lineage",
-							"id": "full_tax",
-							"ui-name": "full_tax"
-						}
-					]
-				}
-		},
-		{
-			"id": "filter_unclassified",
-			"optional": false,
-			"advanced": true,
-			"allow_multiple": false,
-			"default_values": [ 1 ],
-			"field_type": "dropdown",
-				"dropdown_options": {
-					"options": [
-						{
-							"value": 1,
-							"display": "remove unclassified reads from summary",
-							"id": "filter_unclassified_reads",
-							"ui-name": "filter_unclassified_reads"
-						}
-					]
-				}
-		},
-		{
 			"id": "sort_taxa_by",
 			"optional": false,
 			"advanced": true,
@@ -406,14 +364,6 @@
 				{
 					"input_parameter": "greedy_max_e_value",
 					"target_property": "greedy_max_e_value"
-				},
-				{
-					"input_parameter": "full_tax_path",
-					"target_property": "full_tax_path"
-				},
-				{
-					"input_parameter": "filter_unclassified",
-					"target_property": "filter_unclassified"
 				},
 				{
 					"input_parameter": "sort_taxa_by",

@@ -51,8 +51,6 @@ class KaijuUtil:
                            'seg_filter',
                            'min_match_length',
                            'greedy_run_mode',
-                           'filter_unclassified',
-                           'full_tax_path',
                            'sort_taxa_by'
                           ]
         for arg in required_params:
@@ -72,6 +70,8 @@ class KaijuUtil:
         default_param_vals = {'subsample_percent': 10,
                               'subsample_replicates': 1,
                               'subsample_seed': int(self.suffix)
+                              'filter_unclassified': 1,
+                              'full_tax_path': 0
                           }
         for arg in default_param_vals.keys():
             if arg not in params or params[arg] == None or params[arg] == '':

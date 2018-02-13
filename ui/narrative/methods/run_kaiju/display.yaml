@@ -125,20 +125,6 @@ parameters :
             Greedy (imperfect) match maximum e-value (default: 0.05)
         long-hint : |
             Greedy (imperfect) match maximum e-value (default: 0.05)
-    full_tax_path :
-        ui-name : |
-            Summary full tax lineage?
-        short-hint : |
-            Place the full taxonomic lineage into the summary? (default: NO)
-        long-hint : |
-            Place the full taxonomic lineage into the summary? (default: NO)
-    filter_unclassified :
-        ui-name : |
-            Summary classified
-        short-hint : |
-            Do not include unclassified reads in the summaries (default: YES)
-        long-hint : |
-            Do not include unclassified reads in the summaries (default: YES)
     sort_taxa_by :
         ui-name : |
             Sort Plots by
