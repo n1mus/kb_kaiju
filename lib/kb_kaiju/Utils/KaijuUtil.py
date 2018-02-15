@@ -294,7 +294,7 @@ class KaijuUtil:
         # default vals for not required params
         default_param_vals = {'subsample_percent': 10,
                               'subsample_replicates': 1,
-                              'subsample_seed': int(self.suffix)
+                              'subsample_seed': int(self.suffix),
                               'filter_unclassified': 1,
                               'full_tax_path': 0
                           }
@@ -333,7 +333,7 @@ class KaijuUtil:
                 elif 'max' in limit_vals[arg] and float(params[arg]) > limit_vals[arg]['max']:
                     bad_vals_msgs.append('Value greater than maximum for parameter '+arg+' ('+str(param[arg])+' > '+str(limit_vals[arg]['max']))
         if len(bad_vals_msgs) > 0:
-            raise ValueError ("\n".join(bad_vals_msgs+"\n")
+            raise ValueError ("\n".join(bad_vals_msgs)+"\n")
                     
         # return adjusted params
         return params
