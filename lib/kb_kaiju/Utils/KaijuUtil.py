@@ -40,64 +40,11 @@ class KaijuUtil:
         Main entry point for running kaiju + krona as a KBase App
         '''
 
-        # 0) validate basic parameters
-        method = 'run_kaiju_and_krona'
-        required_params = ['workspace_name',
-                           'input_refs',
-                           'output_biom_name',
-                           'tax_levels',
-                           'db_type',
-                           'filter_percent',
-                           'seg_filter',
-                           'min_match_length',
-                           'greedy_run_mode',
-                           'sort_taxa_by'
-                          ]
-        for arg in required_params:
-            if arg not in params or params[arg] == None or params[arg] == '':
-                raise ValueError ("Must define required param: '"+arg+"' for method: '"+str(method)+"()'")
-
-        if 'greedy_run_mode' in params and int(params['greedy_run_mode']) == 1:
-            greedy_required_params = ['greedy_allowed_mismatches',
-                                      'greedy_min_match_score',
-                                      'greedy_max_e_value'
-                                  ]
-            for arg in greedy_required_params:
-                if arg not in params or params[arg] == None or params[arg] == '':
-                    raise ValueError ("Must define GREEDY MODE required param: '"+arg+"' for method: '"+str(method)+"()'")
-
-        # Defaults for not required params
-        default_param_vals = {'subsample_percent': 10,
-                              'subsample_replicates': 1,
-                              'subsample_seed': int(self.suffix)
-                              'filter_unclassified': 1,
-                              'full_tax_path': 0
-                          }
-        for arg in default_param_vals.keys():
-            if arg not in params or params[arg] == None or params[arg] == '':
-                params[arg] = default_param_vals[arg]
-
-        # check math
-        total_perc = float(params['subsample_percent']) * int(params['subsample_replicates'])
-        if total_perc > 100:
-            raise ValueError ("Subsample is non-overlapping, so too many subsample replicates "+str(params['subsample_replicates'])+" at subsample percent: "+str(params['subsample_perc'])+" (replicates * percent = "+str(total_perc)+" > 100)")
-
-
-        # adjust param values by flag
-        tax_levels_all = ['phylum', 'class', 'order', 'family', 'genus', 'species']
-        for tax_level in params['tax_levels']:
-            if tax_level == 'ALL':
-                params['tax_levels'] = tax_levels_all
-                break
-            elif tax_level not in tax_levels_all:
-                raise ValueError ("Bad tax level "+tax_level)
-
+        # 0) validate basic parameters and set defaults
+        params = self.validate_run_kaiju_with_krona_params(params)
 
         # 1) expand input members that are sets
         expanded_input = self.dsu_client.expand_input(params['input_refs'])
-        #staged_input = self.dsu_client.stage_input(params['input_refs'], 'fastq')
-        #input_dir = staged_input['input_dir']
-        #log('Staged input directory: ' + input_dir)
 
 
         # 2) establish output folders
@@ -314,6 +261,83 @@ class KaijuUtil:
                              'Exit Code: ' + str(exitCode))
         return exitCode
             
+
+    def validate_run_kaiju_with_krona_params(self, params):
+        method = 'run_kaiju_with_krona'
+
+        # base required params
+        required_params = ['workspace_name',
+                           'input_refs',
+                           'output_biom_name',
+                           'tax_levels',
+                           'db_type',
+                           'filter_percent',
+                           'seg_filter',
+                           'min_match_length',
+                           'greedy_run_mode',
+                           'sort_taxa_by'
+                          ]
+        for arg in required_params:
+            if arg not in params or params[arg] == None or params[arg] == '':
+                raise ValueError ("Must define required param: '"+arg+"' for method: '"+str(method)+"()'")
+
+        # custom mode params
+        if 'greedy_run_mode' in params and int(params['greedy_run_mode']) == 1:
+            greedy_required_params = ['greedy_allowed_mismatches',
+                                      'greedy_min_match_score',
+                                      'greedy_max_e_value'
+                                  ]
+            for arg in greedy_required_params:
+                if arg not in params or params[arg] == None or params[arg] == '':
+                    raise ValueError ("Must define GREEDY MODE required param: '"+arg+"' for method: '"+str(method)+"()'")
+
+        # default vals for not required params
+        default_param_vals = {'subsample_percent': 10,
+                              'subsample_replicates': 1,
+                              'subsample_seed': int(self.suffix)
+                              'filter_unclassified': 1,
+                              'full_tax_path': 0
+                          }
+        for arg in default_param_vals.keys():
+            if arg not in params or params[arg] == None or params[arg] == '':
+                params[arg] = default_param_vals[arg]
+
+        # check math
+        total_perc = float(params['subsample_percent']) * int(params['subsample_replicates'])
+        if total_perc > 100:
+            raise ValueError ("Subsample is non-overlapping, so too many subsample replicates "+str(params['subsample_replicates'])+" at subsample percent: "+str(params['subsample_perc'])+" (replicates * percent = "+str(total_perc)+" > 100)")
+
+        # adjust param values by flag
+        tax_levels_all = ['phylum', 'class', 'order', 'family', 'genus', 'species']
+        for tax_level in params['tax_levels']:
+            if tax_level == 'ALL':
+                params['tax_levels'] = tax_levels_all
+                break
+            elif tax_level not in tax_levels_all:
+                raise ValueError ("Bad tax level "+tax_level)
+
+        # make sure min and max vals not exceeded (input widget constraints not reliable)
+        limit_vals = {'filter_percent':            {'min': 0, 'max': 10 },
+                      'subsample_percent':         {'min': 1, 'max': 100 },
+                      'subsample_replicates':      {'min': 1 },
+                      'min_match_length':          {'min': 9 },
+                      'greedy_allowed_mismatches': {'min': 1 },
+                      'greedy_min_match_score':    {'min': 10},
+                      'greedy_max_e_value':        {'min': 0.0, 'max': 1.0}
+                  }
+        bad_vals_msgs = []
+        for arg in params.keys():
+            if arg in limit_vals:
+                if 'min' in limit_vals[arg] and float(params[arg]) < limit_vals[arg]['min']:
+                    bad_vals_msgs.append('Value less than minimum for parameter '+arg+' ('+str(param[arg])+' < '+str(limit_vals[arg]['min']))
+                elif 'max' in limit_vals[arg] and float(params[arg]) > limit_vals[arg]['max']:
+                    bad_vals_msgs.append('Value greater than maximum for parameter '+arg+' ('+str(param[arg])+' > '+str(limit_vals[arg]['max']))
+        if len(bad_vals_msgs) > 0:
+            raise ValueError ("\n".join(bad_vals_msgs+"\n")
+                    
+        # return adjusted params
+        return params
+
 
     def run_kaiju_batch(self, options, dropOutput=False):
         new_expanded_input = []
