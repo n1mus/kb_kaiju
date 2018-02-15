@@ -156,10 +156,16 @@ description : |
 	 </p>
 	 <hr>
 	 <p>
-	 wrapped for KBase by Dylan Chivian
+	 wrapped for KBase by <a href="mailto:DCChivian@lbl.gov">Dylan Chivian</a>
 	 </p>
 	 <h3>Description</h3>
-
+	 Kaiju offers four reference databases for classification, which are downloaded from the <a href="http://kaiju.binf.ku.dk/server">Kaiju webserver page</a> (last updated 2017-05-16).  The databases are<p>
+	 <ul>
+	 <li> <b>RefSeq Complete Genomes</b>: 25M protein sequences from 7065 complete bacterial and archaeal genomes and 9334 viral genomes from NCBI RefSeq. 
+	 <li> <b>proGenomes</b>: 20M protein sequences from bacterial and archaeal genomes and 9334 viral genomes from NCBI RefSeq.
+	 <li> <b>NCBI BLAST nr</b>: 94M protein sequences from nr: Bacteria, Archaea, and Viruses.
+	 <li> <b>NCBI BLAST nr+euk</b>: 103M protein sequences from nr: Bacteria, Archaea, Viruses, Fungi and microbial eukaryotes.
+	 </ul>
 
 publications :
     -
