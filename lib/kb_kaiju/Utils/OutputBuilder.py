@@ -568,7 +568,7 @@ class OutputBuilder(object):
                 lineage = lineage_str.strip()
 
                 if lineage == 'unclassified':
-                    unclassified = perc
+                    unclassified_perc = perc
                 elif lineage.startswith('cannot be assigned'):
                     unassigned_perc = perc
                 elif lineage.startswith('belong to a'):
