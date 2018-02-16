@@ -177,6 +177,23 @@ class OutputBuilder(object):
         ]
 
 
+    def package_folder(self, folder_path, zip_file_name, zip_file_description):
+        ''' Simple utility for packaging a folder and saving to shock '''
+        if folder_path == self.scratch:
+            raise ValueError ("cannot package scatch itself.  folder path: "+folder_path)
+        elif not folder_path.startswith(self.scratch):
+            raise ValueError ("cannot package folder that is not a subfolder of scratch.  folder path: "+folder_path)
+        dfu = DataFileUtil(self.callback_url)
+        if not os.path.exists(folder_path):
+            raise ValueError ("cannot package folder that doesn't exist: "+folder_path)
+        output = dfu.file_to_shock({'file_path': folder_path,
+                                    'make_handle': 0,
+                                    'pack': 'zip'})
+        return {'shock_id': output['shock_id'],
+                'name': zip_file_name,
+                'label': zip_file_description}
+
+        
     def generate_sparse_biom1_0_matrix(self, ctx, options): 
         tax_level       = options['tax_level']
         db_type         = options['db_type']
@@ -292,23 +309,6 @@ class OutputBuilder(object):
         return biom_obj_ref
 
 
-    def package_folder(self, folder_path, zip_file_name, zip_file_description):
-        ''' Simple utility for packaging a folder and saving to shock '''
-        if folder_path == self.scratch:
-            raise ValueError ("cannot package scatch itself.  folder path: "+folder_path)
-        elif not folder_path.startswith(self.scratch):
-            raise ValueError ("cannot package folder that is not a subfolder of scratch.  folder path: "+folder_path)
-        dfu = DataFileUtil(self.callback_url)
-        if not os.path.exists(folder_path):
-            raise ValueError ("cannot package folder that doesn't exist: "+folder_path)
-        output = dfu.file_to_shock({'file_path': folder_path,
-                                    'make_handle': 0,
-                                    'pack': 'zip'})
-        return {'shock_id': output['shock_id'],
-                'name': zip_file_name,
-                'label': zip_file_description}
-
-        
     def generate_kaijuReport_PerSamplePlots(self, options):
         pass
 

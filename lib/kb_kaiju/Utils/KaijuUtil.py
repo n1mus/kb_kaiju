@@ -227,7 +227,6 @@ class KaijuUtil:
                          'direct_html_link_index': 0,
                          'html_links': [html_zipped],
                          'file_links': output_packages,
-                         'file_links': [],
                          'report_object_name': 'kb_kaiju_report_' + str(uuid.uuid4()),
                          'workspace_name': params['workspace_name']
                          }
