@@ -134,8 +134,8 @@
 			"field_type": "text",
 			"text_options": {
 				"validate_as": "float",
-			        "min_float": 0.0,
-			        "max_float": 10.0
+			        "min_int": 0,
+			        "max_int": 10
 			}
 		},
 		{
@@ -267,8 +267,8 @@
 			"field_type": "text",
 			"text_options": {
 				"validate_as": "float",
-			        "min_float": 0.0,
-			        "max_float": 1.0
+			        "min_int": 0,
+			        "max_int": 1
 			}
 		},
 		{
