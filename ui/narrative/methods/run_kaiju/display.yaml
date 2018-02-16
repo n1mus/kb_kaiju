@@ -4,7 +4,9 @@
 name: Kaiju - Taxonomic Classifier - v1.5.0
 tooltip: |
 	Taxonomic Classification of Shotgun Metagenomic Read data
-screenshots: []
+screenshots:
+    - stacked_bar_plots.png
+    - krona.png
 
 icon: kaiju-green.png
 
