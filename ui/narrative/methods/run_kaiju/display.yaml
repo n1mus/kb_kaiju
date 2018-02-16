@@ -35,7 +35,7 @@ parameters :
         short-hint : |
             The read library or read library set to examine
         long-hint  : |
-            The read library or read library set for which you want to trim.
+            The read library or read library set to examine
     output_biom_name :
         ui-name : |
             Output BIOM name <font color=red>*</font>
@@ -151,15 +151,17 @@ description : |
 	 Kaiju DBs from: http://kaiju.binf.ku.dk/server<br>
 	 Github repo for Kaiju: https://github.com/bioinformatics-centre/kaiju<br>
 	 Github repo for Krona: https://github.com/marbl/Krona<br>
+	 </p>
 	 <hr>
-	 Kaiju paper: Menzel, P. et al. (2016) Fast and sensitive taxonomic classification for metagenomics with Kaiju. Nat. Commun. 7:11257.
+	 Kaiju paper: Menzel, P. et al. (2016) <a href="http://www.ncbi.nlm.nih.gov/pubmed/27071849">Fast and sensitive taxonomic classification for metagenomics with Kaiju.</a> Nat. Commun. 7:11257.
 	 <br>
-	 Krona paper: Ondov BD, Bergman NH, and Phillippy AM. Interactive metagenomic visualization in a Web browser. BMC Bioinformatics. 2011 Sep 30; 12(1):385.
+	 Krona paper: Ondov BD, Bergman NH, and Phillippy AM. <a href="http://www.ncbi.nlm.nih.gov/pubmed/21961884">Interactive metagenomic visualization in a Web browser.</a> BMC Bioinformatics. 2011 Sep 30; 12(1):385.
 	 </p>
 	 <hr>
 	 <p>
 	 wrapped for KBase by <a href="mailto:DCChivian@lbl.gov">Dylan Chivian</a>
 	 </p>
+	 <hr>
 	 <h3>Description</h3>
 	 Kaiju offers four reference databases for classification, which are downloaded from the <a href="http://kaiju.binf.ku.dk/server">Kaiju webserver page</a> (last updated 2017-05-16).  The databases are<p>
 	 <ul>
