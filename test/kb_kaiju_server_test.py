@@ -105,8 +105,9 @@ class kb_kaijuTest(unittest.TestCase):
 
         [OBJID_I, NAME_I, TYPE_I, SAVE_DATE_I, VERSION_I, SAVED_BY_I, WSID_I, WORKSPACE_I, CHSUM_I, SIZE_I, META_I] = range(11)  # object_info tuple
 
-        # upload sequences
-        cls.reads_refs = []
+        # upload Paired End Libs
+        #
+        cls.PE_reads_refs = []
         for basename in ['seven_species_nonuniform_10K.PE_reads_', 'seven_species_nonuniform_05K.PE_reads_']:
             fwd_filename = basename+'fwd-0.FASTQ'
             rev_filename = basename+'rev-0.FASTQ'
@@ -130,14 +131,45 @@ class kb_kaijuTest(unittest.TestCase):
                                   'name': reads_objname
                               }
             reads_ref = cls.ru.upload_reads(read_upload_params)['obj_ref']
-            cls.reads_refs.append(reads_ref)
+            cls.PE_reads_refs.append(reads_ref)
             pprint('Saved PE Lib Reads: ' + reads_ref)
+
+
+        # Upload Single End Libraries
+        #
+        cls.SE_reads_refs = []
+        for basename in ['seven_species_nonuniform_10K.PE_reads_', 'seven_species_nonuniform_05K.PE_reads_']:
+            fwd_filename = basename+'fwd-0.FASTQ'
+            #rev_filename = basename+'rev-0.FASTQ'
+            reads_objname = basename+'.PElib'
+            #shutil.copy(os.path.join("data", fwd_filename), fwd_fastq_file_path)
+            #shutil.copy(os.path.join("data", rev_filename), rev_fastq_file_path)
+
+            # unzip and put where ReadsUtils can see them (only sees shared scratch)
+            fwd_fastq_file_path = os.path.join(cls.scratch, fwd_filename)
+            #rev_fastq_file_path = os.path.join(cls.scratch, rev_filename)
+            # already done above
+            #with gzip.open(os.path.join("data", fwd_filename+'.gz'), 'rb') as f_in, open(fwd_fastq_file_path, 'wb') as f_out:
+            #    shutil.copyfileobj(f_in, f_out)
+            #with gzip.open(os.path.join("data", rev_filename+'.gz'), 'rb') as f_in, open(rev_fastq_file_path, 'wb') as f_out:
+            #    shutil.copyfileobj(f_in, f_out)
+
+            read_upload_params = {'fwd_file': fwd_fastq_file_path,
+                                  #'rev_file': rev_fastq_file_path,
+                                  'sequencing_tech': 'artificial reads',
+                                  'interleaved': 0,
+                                  'wsname': cls.ws_info[1],
+                                  'name': reads_objname
+                              }
+            reads_ref = cls.ru.upload_reads(read_upload_params)['obj_ref']
+            cls.SE_reads_refs.append(reads_ref)
+            pprint('Saved SE Lib Reads: ' + reads_ref)
 
 
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
 
 
-    ### Test 1: single PE lib object
+    ### Test 1: PE lib objects
     #
     # Uncomment to skip this test
     #HIDE @unittest.skip("skipped test_1_kaiju_PE_lib")
@@ -148,9 +180,64 @@ class kb_kaijuTest(unittest.TestCase):
         print (('='*(10+len(method_name)))+"\n")
 
         # run kaiju
-        #input_refs = [self.reads_refs[0]]
-        input_refs = [self.reads_refs[0], self.reads_refs[1]]
+        #input_refs = [self.PE_reads_refs[0]]
+        input_refs = [self.PE_reads_refs[0], self.PE_reads_refs[1]]
         output_biom_name = 'test_kb_kaiju_test1.BIOM'        
+        params = {
+            'workspace_name':            self.ws_info[1],
+            'input_refs':                input_refs,
+            'output_biom_name':          output_biom_name,
+            'tax_levels':                ['phylum','genus'],
+            #'tax_levels':                ['phylum'],
+            'db_type':                   'kaiju_index',  
+            #'filter_percent':            1,
+            'filter_percent':            0.5,
+            #'subsample_percent':         10,
+            'subsample_percent':         100,
+            #'subsample_replicates':      3,
+            'subsample_replicates':      1,
+            'subsample_seed':            1,
+            'seg_filter':                1,
+            'min_match_length':          11,
+            'greedy_run_mode':           1,
+            'greedy_allowed_mismatches': 5,
+            'greedy_min_match_score':    75,
+            'greedy_max_e_value':        0.05,
+            'filter_unclassified':       1,
+            'full_tax_path':             0,
+            'sort_taxa_by':              'totals'
+        }
+        result = self.getImpl().run_kaiju(self.getContext(), params)[0]
+
+        pprint('End to end test result:')
+        pprint(result)
+
+        self.assertIn('report_name', result)
+        self.assertIn('report_ref', result)
+
+        # make sure the report was created and includes the HTML report and download links
+        #rep = self.getWsClient().get_objects2({'objects': [{'ref': result['report_ref']}]})['data'][0]['data']
+        #self.assertEquals(rep['direct_html_link_index'], 0)
+        #self.assertEquals(len(rep['file_links']), 2)
+        #self.assertEquals(len(rep['html_links']), 1)
+        #self.assertEquals(rep['html_links'][0]['name'], 'report.html')
+        pass
+
+
+    ### Test 2: SE lib object
+    #
+    # Uncomment to skip this test
+    #HIDE @unittest.skip("skipped test_1_kaiju_SE_lib")
+    def test_1_kaiju_SE_lib(self):
+        method_name = 'test_1_kaiju_SE_lib'
+        print ("\n"+('='*(10+len(method_name))))
+        print ("RUNNING "+method_name+"()")
+        print (('='*(10+len(method_name)))+"\n")
+
+        # run kaiju
+        #input_refs = [self.SE_reads_refs[0]]
+        input_refs = [self.SE_reads_refs[0], self.SE_reads_refs[1]]
+        output_biom_name = 'test_kb_kaiju_test2.BIOM'        
         params = {
             'workspace_name':            self.ws_info[1],
             'input_refs':                input_refs,

@@ -514,6 +514,8 @@ class DataStagingUtils(object):
 
             # get "paired" ids
             print ("DETERMINING IDS")  # DEBUG
+            paired_ids = dict()
+            paired_ids_list = []
             with open (input_item['fwd_file'], 'r', 0) as input_reads_file_handle:
                 rec_line_i = -1
                 for line in input_reads_file_handle:
