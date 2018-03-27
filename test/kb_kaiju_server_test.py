@@ -108,16 +108,17 @@ class kb_kaijuTest(unittest.TestCase):
         # upload Paired End Libs
         #
         cls.PE_reads_refs = []
-        for basename in ['seven_species_nonuniform_10K.PE_reads_', 'seven_species_nonuniform_05K.PE_reads_']:
-            fwd_filename = basename+'fwd-0.FASTQ'
-            rev_filename = basename+'rev-0.FASTQ'
+        for basename in ['seven_species_nonuniform_10K-PE_reads_', 'seven_species_nonuniform_05K-PE_reads_']:
+            fwd_filename = basename+'fwd-0.fastq'
+            rev_filename = basename+'rev-0.fastq'
             reads_objname = basename+'.PElib'
+
+            # put where ReadsUtils can see them (only sees shared scratch and requires unzipped)
+            fwd_fastq_file_path = os.path.join(cls.scratch, fwd_filename)
+            rev_fastq_file_path = os.path.join(cls.scratch, rev_filename)
             #shutil.copy(os.path.join("data", fwd_filename), fwd_fastq_file_path)
             #shutil.copy(os.path.join("data", rev_filename), rev_fastq_file_path)
 
-            # unzip and put where ReadsUtils can see them (only sees shared scratch)
-            fwd_fastq_file_path = os.path.join(cls.scratch, fwd_filename)
-            rev_fastq_file_path = os.path.join(cls.scratch, rev_filename)
             with gzip.open(os.path.join("data", fwd_filename+'.gz'), 'rb') as f_in, open(fwd_fastq_file_path, 'wb') as f_out:
                 shutil.copyfileobj(f_in, f_out)
             with gzip.open(os.path.join("data", rev_filename+'.gz'), 'rb') as f_in, open(rev_fastq_file_path, 'wb') as f_out:
@@ -138,26 +139,39 @@ class kb_kaijuTest(unittest.TestCase):
         # Upload Single End Libraries
         #
         cls.SE_reads_refs = []
-        for basename in ['seven_species_nonuniform_10K.PE_reads_', 'seven_species_nonuniform_05K.PE_reads_']:
-            fwd_filename = basename+'fwd-0.FASTQ'
-            #rev_filename = basename+'rev-0.FASTQ'
-            reads_objname = basename+'.PElib'
-            #shutil.copy(os.path.join("data", fwd_filename), fwd_fastq_file_path)
-            #shutil.copy(os.path.join("data", rev_filename), rev_fastq_file_path)
+        for basename in ['seven_species_nonuniform_10K-PE_reads_', 'seven_species_nonuniform_05K-PE_reads_']:
+            fwd_filename = basename+'fwd-0.fastq'
+            #rev_filename = basename+'rev-0.fastq'
+            reads_objname = basename+'.SElib'
 
-            # unzip and put where ReadsUtils can see them (only sees shared scratch)
+            # put where ReadsUtils can see them (only sees shared scratch and requires unzipped)
             fwd_fastq_file_path = os.path.join(cls.scratch, fwd_filename)
             #rev_fastq_file_path = os.path.join(cls.scratch, rev_filename)
-            # already done above
-            #with gzip.open(os.path.join("data", fwd_filename+'.gz'), 'rb') as f_in, open(fwd_fastq_file_path, 'wb') as f_out:
-            #    shutil.copyfileobj(f_in, f_out)
-            #with gzip.open(os.path.join("data", rev_filename+'.gz'), 'rb') as f_in, open(rev_fastq_file_path, 'wb') as f_out:
-            #    shutil.copyfileobj(f_in, f_out)
+            #shutil.copy(os.path.join("data", fwd_filename), fwd_fastq_file_path)
+            ##shutil.copy(os.path.join("data", rev_filename), rev_fastq_file_path)
+
+            # already done above?
+            if not os.path.isfile(fwd_fastq_file_path):
+                #raise ValueError("no such file '"+fwd_fastq_file_path+"'")
+                fwd_infile = os.path.join("data", fwd_filename)
+                if os.path.isfile(fwd_infile+'.gz') and os.path.getsize(fwd_infile+'.gz') > 0:
+                    with gzip.open(fwd_infile+'.gz', 'rb') as f_in, open(fwd_fastq_file_path, 'wb') as f_out:
+                        shutil.copyfileobj(f_in, f_out)
+                elif os.path.isfile(fwd_infile) and os.path.getsize(fwd_infile) > 0:
+                    with open(fwd_infile, 'rb') as f_in, open(fwd_fastq_file_path, 'wb') as f_out:
+                        shutil.copyfileobj(f_in, f_out)
+                else:
+                    raise ValueError("missing input file "+fwd_filename)
+
+            if not os.path.isfile(fwd_fastq_file_path):
+                raise ValueError("missing file '"+fwd_fastq_file_path+"'")
+            elif not os.path.getsize(fwd_fastq_file_path) > 0:
+                raise ValueError("empty file '"+fwd_fastq_file_path+"'")
 
             read_upload_params = {'fwd_file': fwd_fastq_file_path,
                                   #'rev_file': rev_fastq_file_path,
                                   'sequencing_tech': 'artificial reads',
-                                  'interleaved': 0,
+                                  #'interleaved': 0,
                                   'wsname': cls.ws_info[1],
                                   'name': reads_objname
                               }
@@ -165,14 +179,13 @@ class kb_kaijuTest(unittest.TestCase):
             cls.SE_reads_refs.append(reads_ref)
             pprint('Saved SE Lib Reads: ' + reads_ref)
 
-
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
 
 
     ### Test 1: PE lib objects
     #
     # Uncomment to skip this test
-    #HIDE @unittest.skip("skipped test_1_kaiju_PE_lib")
+    # HIDE @unittest.skip("skipped test_1_kaiju_PE_lib")
     def test_1_kaiju_PE_lib(self):
         method_name = 'test_1_kaiju_PE_lib'
         print ("\n"+('='*(10+len(method_name))))
@@ -227,7 +240,7 @@ class kb_kaijuTest(unittest.TestCase):
     ### Test 2: SE lib object
     #
     # Uncomment to skip this test
-    #HIDE @unittest.skip("skipped test_1_kaiju_SE_lib")
+    # HIDE @unittest.skip("skipped test_1_kaiju_SE_lib")
     def test_1_kaiju_SE_lib(self):
         method_name = 'test_1_kaiju_SE_lib'
         print ("\n"+('='*(10+len(method_name))))
