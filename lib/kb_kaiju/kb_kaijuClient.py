@@ -56,10 +56,7 @@ class kb_kaiju(object):
            "bool" (A boolean - 0 for false, 1 for true. @range (0, 1)),
            parameter "greedy_allowed_mismatches" of Long, parameter
            "greedy_min_match_score" of Long, parameter "greedy_max_e_value"
-           of Double, parameter "filter_unclassified" of type "bool" (A
-           boolean - 0 for false, 1 for true. @range (0, 1)), parameter
-           "full_tax_path" of type "bool" (A boolean - 0 for false, 1 for
-           true. @range (0, 1)), parameter "sort_taxa_by" of String
+           of Double, parameter "sort_taxa_by" of String
         :returns: instance of type "KaijuOutput" (Kaiju App Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"

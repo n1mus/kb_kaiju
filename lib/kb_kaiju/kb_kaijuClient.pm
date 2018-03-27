@@ -161,8 +161,6 @@ KaijuInputParams is a reference to a hash where the following keys are defined:
 	greedy_allowed_mismatches has a value which is an int
 	greedy_min_match_score has a value which is an int
 	greedy_max_e_value has a value which is a float
-	filter_unclassified has a value which is a kb_kaiju.bool
-	full_tax_path has a value which is a kb_kaiju.bool
 	sort_taxa_by has a value which is a string
 workspace_name is a string
 data_obj_ref is a string
@@ -196,8 +194,6 @@ KaijuInputParams is a reference to a hash where the following keys are defined:
 	greedy_allowed_mismatches has a value which is an int
 	greedy_min_match_score has a value which is an int
 	greedy_max_e_value has a value which is a float
-	filter_unclassified has a value which is a kb_kaiju.bool
-	full_tax_path has a value which is a kb_kaiju.bool
 	sort_taxa_by has a value which is a string
 workspace_name is a string
 data_obj_ref is a string
@@ -506,8 +502,6 @@ greedy_run_mode has a value which is a kb_kaiju.bool
 greedy_allowed_mismatches has a value which is an int
 greedy_min_match_score has a value which is an int
 greedy_max_e_value has a value which is a float
-filter_unclassified has a value which is a kb_kaiju.bool
-full_tax_path has a value which is a kb_kaiju.bool
 sort_taxa_by has a value which is a string
 
 </pre>
@@ -532,8 +526,6 @@ greedy_run_mode has a value which is a kb_kaiju.bool
 greedy_allowed_mismatches has a value which is an int
 greedy_min_match_score has a value which is an int
 greedy_max_e_value has a value which is a float
-filter_unclassified has a value which is a kb_kaiju.bool
-full_tax_path has a value which is a kb_kaiju.bool
 sort_taxa_by has a value which is a string
 
 

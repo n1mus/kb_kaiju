@@ -157,16 +157,18 @@ class DataStagingUtils(object):
         if not os.path.exists(input_dir):
             os.makedirs(input_dir)
 
+        #
+        # Download reads
+        #
 
-        # 1) Download reads and subsample
-        try:
-            readsLibrary = self.readsUtils_Client.download_reads ({'read_libraries': [input_item['ref']],
-                                                                   'interleaved': 'false'})
-        except Exception as e:
-            raise ValueError('Unable to get read library object from workspace: (' + str(input_item['ref']) +")\n" + str(e))
-
-        # PE Lib
+        # Paired End Lib
         if input_item['type'] == self.PE_flag:
+            try:
+                readsLibrary = self.readsUtils_Client.download_reads ({'read_libraries': [input_item['ref']],
+                                                                       'interleaved': 'false'})
+            except Exception as e:
+                raise ValueError('Unable to get read library object from workspace: (' + str(input_item['ref']) +")\n" + str(e))
+
             input_fwd_file_path = readsLibrary['files'][input_item['ref']]['files']['fwd']
             input_rev_file_path = readsLibrary['files'][input_item['ref']]['files']['rev']
             fwd_filename = os.path.join(input_dir, input_item['name'] + '.fwd.' + fasta_file_extension)
@@ -189,7 +191,13 @@ class DataStagingUtils(object):
             if not self._fasta_seq_len_at_least(rev_filename, min_fasta_len):
                 raise ValueError('Reads Library is empty in filename: '+str(rev_filename))
 
+        # Single End Lib
         elif input_item['type'] == self.SE_flag:
+            try:
+                readsLibrary = self.readsUtils_Client.download_reads ({'read_libraries': [input_item['ref']]})
+            except Exception as e:
+                raise ValueError('Unable to get read library object from workspace: (' + str(input_item['ref']) +")\n" + str(e))
+
             input_fwd_file_path = readsLibrary['files'][input_item['ref']]['files']['fwd']
             fwd_filename = os.path.join(input_dir, input_item['name'] + '.fwd.' + fasta_file_extension)
             if input_fwd_file_path != fwd_filename:
@@ -203,8 +211,14 @@ class DataStagingUtils(object):
             if not self._fasta_seq_len_at_least(fwd_filename, min_fasta_len):
                 raise ValueError('Reads Library is empty in filename: '+str(fwd_filename))
 
+        else:
+            raise ValueError ("No type set for input library "+str(input_item['name'])+" ("+str(input_item['ref'])+")")
 
+
+        #
         # Subsample
+        #
+
         if subsample_percent == 100:
             replicate_input = [input_item]
         else:
@@ -514,6 +528,8 @@ class DataStagingUtils(object):
 
             # get "paired" ids
             print ("DETERMINING IDS")  # DEBUG
+            paired_ids = dict()
+            paired_ids_list = []
             with open (input_item['fwd_file'], 'r', 0) as input_reads_file_handle:
                 rec_line_i = -1
                 for line in input_reads_file_handle:

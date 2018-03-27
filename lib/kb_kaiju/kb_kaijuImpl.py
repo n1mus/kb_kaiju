@@ -46,9 +46,9 @@ You should have received a copy of the GNU General Public License along with the
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "1.0.0"
+    VERSION = "1.0.1"
     GIT_URL = "https://github.com/kbaseapps/kb_kaiju"
-    GIT_COMMIT_HASH = "444ccef436a540131d19756ec4f5c57211cbe54c"
+    GIT_COMMIT_HASH = "26cfc4b5f649d2894fbe9c98d0a926256e71fe40"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -87,10 +87,7 @@ You should have received a copy of the GNU General Public License along with the
            "bool" (A boolean - 0 for false, 1 for true. @range (0, 1)),
            parameter "greedy_allowed_mismatches" of Long, parameter
            "greedy_min_match_score" of Long, parameter "greedy_max_e_value"
-           of Double, parameter "filter_unclassified" of type "bool" (A
-           boolean - 0 for false, 1 for true. @range (0, 1)), parameter
-           "full_tax_path" of type "bool" (A boolean - 0 for false, 1 for
-           true. @range (0, 1)), parameter "sort_taxa_by" of String
+           of Double, parameter "sort_taxa_by" of String
         :returns: instance of type "KaijuOutput" (Kaiju App Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
