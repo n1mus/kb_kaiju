@@ -280,7 +280,7 @@ class DataStagingUtils(object):
             paired_ids_list = []
             paired_lib_i = dict()
             paired_buf_size = 100000
-            recs_beep_n = 100000
+            recs_beep_n = 1000000
 
 
             # read fwd file to get fwd ids
@@ -379,7 +379,7 @@ class DataStagingUtils(object):
                                 paired_output_reads_file_handles[lib_i].writelines(rec_buf)
                                 paired_cnt += 1
                                 total_paired_reads_by_set[lib_i] += 1
-                                if paired_cnt % recs_beep_n == 0:
+                                if paired_cnt != 0 and paired_cnt % recs_beep_n == 0:
                                     print ("\t"+str(paired_cnt)+" recs processed")
                             else:
                                 #unpaired_fwd_buf.extend(rec_buf)
@@ -402,7 +402,7 @@ class DataStagingUtils(object):
                         lib_i = paired_lib_i[last_read_id]
                         paired_output_reads_file_handles[lib_i].writelines(rec_buf)
                         paired_cnt += 1
-                        if paired_cnt % recs_beep_n == 0:
+                        if paired_cnt != 0 and paired_cnt % recs_beep_n == 0:
                             print ("\t"+str(paired_cnt)+" recs processed")
                     else:
                         #unpaired_fwd_buf.extend(rec_buf)
@@ -440,7 +440,7 @@ class DataStagingUtils(object):
                                 lib_i = paired_lib_i[last_read_id]
                                 paired_output_reads_file_handles[lib_i].writelines(rec_buf)
                                 paired_cnt += 1
-                                if paired_cnt % recs_beep_n == 0:
+                                if paired_cnt != 0 and paired_cnt % recs_beep_n == 0:
                                     print ("\t"+str(paired_cnt)+" recs processed")
                             else:
                                 #unpaired_fwd_buf.extend(rec_buf)
@@ -463,7 +463,7 @@ class DataStagingUtils(object):
                         lib_i = paired_lib_i[last_read_id]
                         paired_output_reads_file_handles[lib_i].writelines(rec_buf)
                         paired_cnt += 1
-                        if paired_cnt % recs_beep_n == 0:
+                        if paired_cnt != 0 and paired_cnt % recs_beep_n == 0:
                             print ("\t"+str(paired_cnt)+" recs processed")
                     else:
                         #unpaired_fwd_buf.extend(rec_buf)
@@ -530,6 +530,10 @@ class DataStagingUtils(object):
             print ("DETERMINING IDS")  # DEBUG
             paired_ids = dict()
             paired_ids_list = []
+            paired_lib_i = dict()
+            paired_buf_size = 100000
+            recs_beep_n = 100000
+
             with open (input_item['fwd_file'], 'r', 0) as input_reads_file_handle:
                 rec_line_i = -1
                 for line in input_reads_file_handle:
@@ -542,6 +546,8 @@ class DataStagingUtils(object):
                         read_id = line.rstrip('\n')
                         read_id = re.sub ("[ \t]+.*$", "", read_id)
                         read_id = re.sub ("[\/\.\_\-\:\;][012lrLRfrFR53]\'*$", "", read_id)
+                        if read_id in paired_ids:
+                            raise ValueError ("repeat read_id: "+read_id)
                         paired_ids[read_id] = True
                         paired_ids_list.append(read_id)
                         # DEBUG
@@ -549,7 +555,7 @@ class DataStagingUtils(object):
 #                            print ("read_id: '"+str(read_id)+"'")
 #                        rec_cnt += 1
             total_paired_reads = len(paired_ids_list)
-            print ("TOTAL READS CNT: "+str(total_paired_reads))  # DEBUG                                    
+            print ("TOTAL READS CNT: "+str(total_paired_reads))  # DEBUG
 
 
             # Determine sublibrary sizes
@@ -588,7 +594,7 @@ class DataStagingUtils(object):
             rec_buf = []
             last_read_id = None
             paired_cnt = 0
-            recs_beep_n = 100000
+            recs_beep_n = 1000000
             with open (input_item['fwd_file'], 'r', 0) as input_reads_file_handle:
                 rec_line_i = -1
                 for line in input_reads_file_handle:
@@ -607,12 +613,12 @@ class DataStagingUtils(object):
                                 paired_cnt += 1
                             except:
                                 pass
-                            if paired_cnt % recs_beep_n == 0:
+                            if paired_cnt != 0 and paired_cnt % recs_beep_n == 0:
                                 print ("\t"+str(paired_cnt)+" recs processed")
                             rec_buf = []
                         read_id = line.rstrip('\n')
                         read_id = re.sub ("[ \t]+.*$", "", read_id)
-                        #read_id = re.sub ("[\/\.\_\-\:\;][012lrLRfrFR53]\'*$", "", read_id)                            
+                        read_id = re.sub ("[\/\.\_\-\:\;][012lrLRfrFR53]\'*$", "", read_id)
                         last_read_id = read_id
                     rec_buf.append(line)
                 # last rec
@@ -625,7 +631,7 @@ class DataStagingUtils(object):
                             paired_cnt += 1
                         except:
                             pass
-                    if paired_cnt % recs_beep_n == 0:
+                    if paired_cnt != 0 and paired_cnt % recs_beep_n == 0:
                         print ("\t"+str(paired_cnt)+" recs processed")
                     rec_buf = []
 
@@ -636,7 +642,7 @@ class DataStagingUtils(object):
             report = 'SUMMARY FOR SUBSAMPLE OF READ LIBRARY: '+input_item['name']+"\n"
             report += "TOTAL READS: "+str(total_paired_reads)+"\n"
             for lib_i in range(split_num):
-                report += "PAIRED READS IN SET "+str(lib_i)+": "+str(total_paired_reads_by_set[lib_i])+"\n"
+                report += "SINGLE END READS IN SET "+str(lib_i)+": "+str(total_paired_reads_by_set[lib_i])+"\n"
             print (report)
 
 
@@ -650,6 +656,7 @@ class DataStagingUtils(object):
 
                     raise ValueError ("failed to create paired output")
                 else:
+                    zero_pad = '0'*(len(str(split_num))-len(str(lib_i+1)))
                     replicate_files.append({'fwd_file': output_fwd_paired_file_path,
                                             'ref':  input_item['ref'],  # note: this is for the src, not the subsample which is not saved
                                             'type': input_item['type'],
