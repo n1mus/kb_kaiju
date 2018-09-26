@@ -50,7 +50,7 @@ parameters :
             The Taxonomic level that should be used for generating summary plots
         long-hint : |
             The Taxonomic level that should be used for generating summary plots
-    db_type : 
+    db_type :
         ui-name : |
             Reference DB
         short-hint : |
@@ -64,28 +64,28 @@ parameters :
             Dont include below this percentage of the reads in the summaries (default: 1%, note: must be integer)
         long-hint : |
             Dont include below this percentage of the reads in the summaries (default: 1%, note: must be integer)
-    subsample_percent : 
+    subsample_percent :
         ui-name : |
             Subsample Percent
         short-hint : |
             Subsample each data set to run faster
         long-hint : |
             Subsample each data set to run faster
-    subsample_replicates : 
+    subsample_replicates :
         ui-name : |
             Subsample Replicates
         short-hint : |
             Add replicates to determine robustness of measurement
         long-hint : |
             Add replicates to determine robustness of measurement
-    subsample_seed : 
+    subsample_seed :
         ui-name : |
             Subsample Seed
         short-hint : |
             Set seed for random subsample
         long-hint : |
             Set seed for random subsample
-    seg_filter : 
+    seg_filter :
         ui-name : |
             Filter low-complexity
         short-hint : |
@@ -99,7 +99,7 @@ parameters :
             Shortest alignment match to use for classification, in base pairs (default: 11)
         long-hint : |
             Shortest alignment match to use for classification, in base pairs (default: 11)
-    greedy_run_mode : 
+    greedy_run_mode :
         ui-name : |
             Allow imperfect matches?
         short-hint : |
@@ -140,22 +140,8 @@ parameters :
 # Desc
 #
 description : |
-	<p>This is a Narrative Method for running <a href="http://kaiju.binf.ku.dk/">Kaiju: Fast and sensitive taxonomic classification for metagenomics.</a> 
+	<p>This is a Narrative Method for running <a href="http://kaiju.binf.ku.dk/">Kaiju: Fast and sensitive taxonomic classification for metagenomics.</a>
 	Kaiju is written by Peter Menzel and Anders Krogh at the Bioinfomratics Centre, a part of the <a href="http://www1.bio.ku.dk/binf/" target="centre">Section for Computational and RNA Biology</a> at the <a href="http://www.ku.dk/english" target="ucop">University of Copenhagen</a>.
-	 </p>
-	 <hr>
-	 <p>
-	 References:<br>
-	 Kaiju Homepage: http://kaiju.binf.ku.dk/<br>
-	 Krona Homepage: https://github.com/marbl/Krona/wiki<br>
-	 Kaiju DBs from: http://kaiju.binf.ku.dk/server<br>
-	 Github repo for Kaiju: https://github.com/bioinformatics-centre/kaiju<br>
-	 Github repo for Krona: https://github.com/marbl/Krona<br>
-	 </p>
-	 <hr>
-	 Kaiju paper: Menzel, P. et al. (2016) <a href="http://www.ncbi.nlm.nih.gov/pubmed/27071849">Fast and sensitive taxonomic classification for metagenomics with Kaiju.</a> Nat. Commun. 7:11257.
-	 <br>
-	 Krona paper: Ondov BD, Bergman NH, and Phillippy AM. <a href="http://www.ncbi.nlm.nih.gov/pubmed/21961884">Interactive metagenomic visualization in a Web browser.</a> BMC Bioinformatics. 2011 Sep 30; 12(1):385.
 	 </p>
 	 <hr>
 	 <p>
@@ -165,7 +151,7 @@ description : |
 	 <h3>Description</h3>
 	 Kaiju offers four reference databases for classification, which are downloaded from the <a href="http://kaiju.binf.ku.dk/server">Kaiju webserver page</a> (last updated 2017-05-16).  The databases are<p>
 	 <ul>
-	 <li> <b>RefSeq Complete Genomes</b>: 25M protein sequences from 7065 complete bacterial and archaeal genomes and 9334 viral genomes from NCBI RefSeq. 
+	 <li> <b>RefSeq Complete Genomes</b>: 25M protein sequences from 7065 complete bacterial and archaeal genomes and 9334 viral genomes from NCBI RefSeq.
 	 <li> <b>proGenomes</b>: 20M protein sequences from bacterial and archaeal genomes and 9334 viral genomes from NCBI RefSeq.
 	 <li> <b>NCBI BLAST nr</b>: 94M protein sequences from nr: Bacteria, Archaea, and Viruses.
 	 <li> <b>NCBI BLAST nr+euk</b>: 103M protein sequences from nr: Bacteria, Archaea, Viruses, Fungi and microbial eukaryotes.
@@ -175,20 +161,36 @@ publications :
     -
         pmid: 27071849
         display-text : |
-            'Menzel P, Ng KL, Krogh A. (2016) Fast and sensitive taxonomic classification for metagenomics with Kaiju. Nat Commun. 2016 Apr 13;7:11257. doi: 10.1038/ncomms11257'
+            Menzel P, Ng KL, Krogh A. Fast and sensitive taxonomic classification for metagenomics with Kaiju. Nat Commun. 2016;7: 11257. doi:10.1038/ncomms11257
         link: http://www.ncbi.nlm.nih.gov/pubmed/27071849
+
     -
         pmid: 21961884
         display-text : |
-            'Ondov BD, Bergman NH, and Phillippy AM. (2011) Interactive metagenomic visualization in a Web browser. BMC Bioinformatics. 2011 Sep 30; 12(1):385. doi: 10.1186/1471-2105-12-385'
+            Ondov BD, Bergman NH, Phillippy AM. Interactive metagenomic visualization in a Web browser. BMC Bioinformatics. 2011;12: 385. doi:10.1186/1471-2105-12-385
         link: http://www.ncbi.nlm.nih.gov/pubmed/21961884
+
     -
-    	link: http://kaiju.binf.ku.dk/
+        display-text: |
+            Kaiju Homepage:
+        link: http://kaiju.binf.ku.dk/
+
     -
-    	link: http://kaiju.binf.ku.dk/server
+        display-text: |
+            Kaiju DBs from:
+        link: http://kaiju.binf.ku.dk/server
+
     -
-    	link: https://github.com/bioinformatics-centre/kaiju
+        display-text: |
+            Github for Kaiju:
+        link: https://github.com/bioinformatics-centre/kaiju
+
     -
-    	link: https://github.com/marbl/Krona/wiki
+        display-text: |
+            Krona homepage:
+        link: https://github.com/marbl/Krona/wiki
+
     -
-    	link: https://github.com/marbl/Krona
+        display-text: |
+            Github for Krona:
+        link: https://github.com/marbl/Krona
