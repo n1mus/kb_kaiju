@@ -1,6 +1,5 @@
 ### Version 1.0.2
 __Changes__
-- Updated base image in Dockerfile
 
 ### Version 1.0.1
 __Changes__

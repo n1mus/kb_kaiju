@@ -46,7 +46,7 @@ You should have received a copy of the GNU General Public License along with the
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "1.0.1"
+    VERSION = "1.0.2"
     GIT_URL = "https://github.com/kbaseapps/kb_kaiju"
     GIT_COMMIT_HASH = "26cfc4b5f649d2894fbe9c98d0a926256e71fe40"
 
@@ -62,7 +62,6 @@ You should have received a copy of the GNU General Public License along with the
         self.config['KB_AUTH_TOKEN'] = os.environ['KB_AUTH_TOKEN']
         #END_CONSTRUCTOR
         pass
-
 
     def run_kaiju(self, ctx, params):
         """
@@ -108,6 +107,7 @@ You should have received a copy of the GNU General Public License along with the
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]
+
     def status(self, ctx):
         #BEGIN_STATUS
         returnVal = {'state': "OK",
