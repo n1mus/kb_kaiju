@@ -200,6 +200,7 @@ class KaijuUtil:
         html_zipped = self.outputBuilder_client.package_folder(html_dir, report_html_file, report_html_desc)
 
 
+        """
         # 11) save biom output for each tax level
         generated_biom_objs = []
         timestamp_epoch = time.time()
@@ -219,11 +220,13 @@ class KaijuUtil:
             biom_obj_ref = self.outputBuilder_client.generate_sparse_biom1_0_matrix(self.ctx, generate_biom_options)
             generated_biom_objs.append({'ref': biom_obj_ref,
                                         'description': 'Kaiju Taxonomic Classification at '+tax_level+' Level.  BIOM format'})
+        """
 
 
         # 12) save report
         report_params = {'message': '',
-                         'objects_created': generated_biom_objs,
+                         #'objects_created': generated_biom_objs,
+                         'objects_created': [],
                          'direct_html_link_index': 0,
                          'html_links': [html_zipped],
                          'file_links': output_packages,

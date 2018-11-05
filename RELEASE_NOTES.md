@@ -1,3 +1,7 @@
+### Version 1.0.4
+__Changes__
+- removed deprecated BIOM output object
+
 ### Version 1.0.3
 __Changes__
 - updated base image to sdkbase2

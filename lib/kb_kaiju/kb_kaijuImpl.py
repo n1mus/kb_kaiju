@@ -46,9 +46,9 @@ You should have received a copy of the GNU General Public License along with the
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "1.0.3"
+    VERSION = "1.0.4"
     GIT_URL = "https://github.com/kbaseapps/kb_kaiju"
-    GIT_COMMIT_HASH = "26cfc4b5f649d2894fbe9c98d0a926256e71fe40"
+    GIT_COMMIT_HASH = "6d7e531782136056d61638c13f43afc1c9e2989c"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -63,6 +63,7 @@ You should have received a copy of the GNU General Public License along with the
         #END_CONSTRUCTOR
         pass
 
+
     def run_kaiju(self, ctx, params):
         """
         Kaiju Method
@@ -76,17 +77,16 @@ You should have received a copy of the GNU General Public License along with the
            should just be used for workspace ** "name" is a string identifier
            of a workspace or object.  This is received from Narrative.),
            parameter "input_refs" of type "data_obj_ref", parameter
-           "output_biom_name" of type "data_obj_ref", parameter "tax_levels"
-           of list of String, parameter "db_type" of String, parameter
-           "filter_percent" of Double, parameter "subsample_percent" of Long,
-           parameter "subsample_replicates" of Long, parameter
-           "subsample_seed" of Long, parameter "seg_filter" of type "bool" (A
-           boolean - 0 for false, 1 for true. @range (0, 1)), parameter
-           "min_match_length" of Long, parameter "greedy_run_mode" of type
-           "bool" (A boolean - 0 for false, 1 for true. @range (0, 1)),
-           parameter "greedy_allowed_mismatches" of Long, parameter
-           "greedy_min_match_score" of Long, parameter "greedy_max_e_value"
-           of Double, parameter "sort_taxa_by" of String
+           "tax_levels" of list of String, parameter "db_type" of String,
+           parameter "filter_percent" of Double, parameter
+           "subsample_percent" of Long, parameter "subsample_replicates" of
+           Long, parameter "subsample_seed" of Long, parameter "seg_filter"
+           of type "bool" (A boolean - 0 for false, 1 for true. @range (0,
+           1)), parameter "min_match_length" of Long, parameter
+           "greedy_run_mode" of type "bool" (A boolean - 0 for false, 1 for
+           true. @range (0, 1)), parameter "greedy_allowed_mismatches" of
+           Long, parameter "greedy_min_match_score" of Long, parameter
+           "greedy_max_e_value" of Double, parameter "sort_taxa_by" of String
         :returns: instance of type "KaijuOutput" (Kaiju App Output) ->
            structure: parameter "report_name" of type "data_obj_name",
            parameter "report_ref" of type "data_obj_ref"
@@ -107,7 +107,6 @@ You should have received a copy of the GNU General Public License along with the
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]
-
     def status(self, ctx):
         #BEGIN_STATUS
         returnVal = {'state': "OK",

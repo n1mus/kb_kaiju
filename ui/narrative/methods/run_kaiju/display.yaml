@@ -36,13 +36,6 @@ parameters :
             The read library or read library set to examine
         long-hint  : |
             The read library or read library set to examine
-    output_biom_name :
-        ui-name : |
-            Output BIOM name <font color=red>*</font>
-        short-hint : |
-            Name for output community abundance object
-        long-hint : |
-            Name for output community abundance object
     tax_levels :
         ui-name : |
             Taxonomic level

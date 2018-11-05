@@ -1,5 +1,5 @@
 {
-	"ver": "1.0.3",
+	"ver": "1.0.4",
 
 	"authors": [
 		"dylan"
@@ -21,18 +21,6 @@
 			"field_type": "text",
 			"text_options": {
 				"valid_ws_types": [ "KBaseSets.ReadsSet", "KBaseFile.PairedEndLibrary", "KBaseFile.SingleEndLibrary", "KBaseAssembly.PairedEndLibrary", "KBaseAssembly.SingleEndLibrary" ]
-			}
-		},
-		{
-			"id": "output_biom_name",
-			"optional": false,
-			"advanced": false,
-			"allow_multiple": false,
-			"default_values": [ "KAIJU.biom" ],
-			"field_type": "text",
-			"text_options": {
-				"valid_ws_types": ["Communities.Biom"],
-				"is_output_name": true
 			}
 		},
 		{
@@ -311,11 +299,6 @@
 					"input_parameter": "input_refs",
 					"target_property": "input_refs",
 					"target_type_transform": "list<resolved-ref>"
-
-				},
-				{
-					"input_parameter": "output_biom_name",
-					"target_property": "output_biom_name"
 
 				},
 				{
