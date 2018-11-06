@@ -36,13 +36,6 @@ parameters :
             The read library or read library set to examine
         long-hint  : |
             The read library or read library set to examine
-    output_biom_name :
-        ui-name : |
-            Output BIOM name <font color=red>*</font>
-        short-hint : |
-            Name for output community abundance object
-        long-hint : |
-            Name for output community abundance object
     tax_levels :
         ui-name : |
             Taxonomic level
@@ -155,6 +148,10 @@ description : |
 	 <li> <b>proGenomes</b>: 20M protein sequences from bacterial and archaeal genomes and 9334 viral genomes from NCBI RefSeq.
 	 <li> <b>NCBI BLAST nr</b>: 94M protein sequences from nr: Bacteria, Archaea, and Viruses.
 	 <li> <b>NCBI BLAST nr+euk</b>: 103M protein sequences from nr: Bacteria, Archaea, Viruses, Fungi and microbial eukaryotes.
+	 </ul>
+	 <h3>Notes</h3>
+	 <ul>
+	 <li> <b>Krona Snapshots</b>: It may be that you will not be able to take a snapshot of the Krona plot.  This is a known issue with Krona for some versions of Chrome, Firefox on Windows 7 and 10 (https://github.com/marbl/Krona/issues/83).  We suggest trying with a different browser.
 	 </ul>
 
 publications :

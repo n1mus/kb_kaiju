@@ -148,7 +148,6 @@ $return is a kb_kaiju.KaijuOutput
 KaijuInputParams is a reference to a hash where the following keys are defined:
 	workspace_name has a value which is a kb_kaiju.workspace_name
 	input_refs has a value which is a kb_kaiju.data_obj_ref
-	output_biom_name has a value which is a kb_kaiju.data_obj_ref
 	tax_levels has a value which is a reference to a list where each element is a string
 	db_type has a value which is a string
 	filter_percent has a value which is a float
@@ -181,7 +180,6 @@ $return is a kb_kaiju.KaijuOutput
 KaijuInputParams is a reference to a hash where the following keys are defined:
 	workspace_name has a value which is a kb_kaiju.workspace_name
 	input_refs has a value which is a kb_kaiju.data_obj_ref
-	output_biom_name has a value which is a kb_kaiju.data_obj_ref
 	tax_levels has a value which is a reference to a list where each element is a string
 	db_type has a value which is a string
 	filter_percent has a value which is a float
@@ -489,7 +487,6 @@ Kaiju App Input Params
 a reference to a hash where the following keys are defined:
 workspace_name has a value which is a kb_kaiju.workspace_name
 input_refs has a value which is a kb_kaiju.data_obj_ref
-output_biom_name has a value which is a kb_kaiju.data_obj_ref
 tax_levels has a value which is a reference to a list where each element is a string
 db_type has a value which is a string
 filter_percent has a value which is a float
@@ -513,7 +510,6 @@ sort_taxa_by has a value which is a string
 a reference to a hash where the following keys are defined:
 workspace_name has a value which is a kb_kaiju.workspace_name
 input_refs has a value which is a kb_kaiju.data_obj_ref
-output_biom_name has a value which is a kb_kaiju.data_obj_ref
 tax_levels has a value which is a reference to a list where each element is a string
 db_type has a value which is a string
 filter_percent has a value which is a float
