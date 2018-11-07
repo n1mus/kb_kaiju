@@ -270,7 +270,7 @@ class KaijuUtil:
         # base required params
         required_params = ['workspace_name',
                            'input_refs',
-                           'output_biom_name',
+                           #'output_biom_name',
                            'tax_levels',
                            'db_type',
                            'filter_percent',

@@ -1,3 +1,7 @@
+### Version 1.0.5
+__Changes__
+- fixed biom param check in code
+
 ### Version 1.0.4
 __Changes__
 - removed deprecated BIOM output object
