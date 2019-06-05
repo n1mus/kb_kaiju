@@ -195,11 +195,11 @@ class kb_kaijuTest(unittest.TestCase):
         # run kaiju
         #input_refs = [self.PE_reads_refs[0]]
         input_refs = [self.PE_reads_refs[0], self.PE_reads_refs[1]]
-        output_biom_name = 'test_kb_kaiju_test1.BIOM'        
+        #output_biom_name = 'test_kb_kaiju_test1.BIOM'        
         params = {
             'workspace_name':            self.ws_info[1],
             'input_refs':                input_refs,
-            'output_biom_name':          output_biom_name,
+            #'output_biom_name':          output_biom_name,
             'tax_levels':                ['phylum','genus'],
             #'tax_levels':                ['phylum'],
             'db_type':                   'kaiju_index',  
@@ -250,11 +250,11 @@ class kb_kaijuTest(unittest.TestCase):
         # run kaiju
         #input_refs = [self.SE_reads_refs[0]]
         input_refs = [self.SE_reads_refs[0], self.SE_reads_refs[1]]
-        output_biom_name = 'test_kb_kaiju_test2.BIOM'        
+        #output_biom_name = 'test_kb_kaiju_test2.BIOM'        
         params = {
             'workspace_name':            self.ws_info[1],
             'input_refs':                input_refs,
-            'output_biom_name':          output_biom_name,
+            #'output_biom_name':          output_biom_name,
             'tax_levels':                ['phylum','genus'],
             #'tax_levels':                ['phylum'],
             'db_type':                   'kaiju_index',  

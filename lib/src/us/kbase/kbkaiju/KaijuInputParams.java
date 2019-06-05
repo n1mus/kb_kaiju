@@ -24,7 +24,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({
     "workspace_name",
     "input_refs",
-    "output_biom_name",
     "tax_levels",
     "db_type",
     "filter_percent",
@@ -45,8 +44,6 @@ public class KaijuInputParams {
     private java.lang.String workspaceName;
     @JsonProperty("input_refs")
     private java.lang.String inputRefs;
-    @JsonProperty("output_biom_name")
-    private java.lang.String outputBiomName;
     @JsonProperty("tax_levels")
     private List<String> taxLevels;
     @JsonProperty("db_type")
@@ -102,21 +99,6 @@ public class KaijuInputParams {
 
     public KaijuInputParams withInputRefs(java.lang.String inputRefs) {
         this.inputRefs = inputRefs;
-        return this;
-    }
-
-    @JsonProperty("output_biom_name")
-    public java.lang.String getOutputBiomName() {
-        return outputBiomName;
-    }
-
-    @JsonProperty("output_biom_name")
-    public void setOutputBiomName(java.lang.String outputBiomName) {
-        this.outputBiomName = outputBiomName;
-    }
-
-    public KaijuInputParams withOutputBiomName(java.lang.String outputBiomName) {
-        this.outputBiomName = outputBiomName;
         return this;
     }
 
@@ -327,7 +309,7 @@ public class KaijuInputParams {
 
     @Override
     public java.lang.String toString() {
-        return ((((((((((((((((((((((((((((((((((("KaijuInputParams"+" [workspaceName=")+ workspaceName)+", inputRefs=")+ inputRefs)+", outputBiomName=")+ outputBiomName)+", taxLevels=")+ taxLevels)+", dbType=")+ dbType)+", filterPercent=")+ filterPercent)+", subsamplePercent=")+ subsamplePercent)+", subsampleReplicates=")+ subsampleReplicates)+", subsampleSeed=")+ subsampleSeed)+", segFilter=")+ segFilter)+", minMatchLength=")+ minMatchLength)+", greedyRunMode=")+ greedyRunMode)+", greedyAllowedMismatches=")+ greedyAllowedMismatches)+", greedyMinMatchScore=")+ greedyMinMatchScore)+", greedyMaxEValue=")+ greedyMaxEValue)+", sortTaxaBy=")+ sortTaxaBy)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((((((((((((((((((((((((((("KaijuInputParams"+" [workspaceName=")+ workspaceName)+", inputRefs=")+ inputRefs)+", taxLevels=")+ taxLevels)+", dbType=")+ dbType)+", filterPercent=")+ filterPercent)+", subsamplePercent=")+ subsamplePercent)+", subsampleReplicates=")+ subsampleReplicates)+", subsampleSeed=")+ subsampleSeed)+", segFilter=")+ segFilter)+", minMatchLength=")+ minMatchLength)+", greedyRunMode=")+ greedyRunMode)+", greedyAllowedMismatches=")+ greedyAllowedMismatches)+", greedyMinMatchScore=")+ greedyMinMatchScore)+", greedyMaxEValue=")+ greedyMaxEValue)+", sortTaxaBy=")+ sortTaxaBy)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }
