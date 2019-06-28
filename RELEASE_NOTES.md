@@ -1,3 +1,7 @@
+### Version 1.0.6
+__Changes__
+- update docs
+
 ### Version 1.0.5
 __Changes__
 - fixed biom param check in code
