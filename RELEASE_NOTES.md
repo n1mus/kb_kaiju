@@ -1,3 +1,7 @@
+### Version 1.0.7
+__Changes__
+- Pin Kaiju version to v1.5.0 which still has kaijuReport
+
 ### Version 1.0.6
 __Changes__
 - update docs

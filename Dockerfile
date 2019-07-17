@@ -25,6 +25,7 @@ WORKDIR /kb/module
 RUN \
     git clone https://github.com/bioinformatics-centre/kaiju.git && \
     cd kaiju/src && \
+    git checkout v1.5.0 && \
     make
 
 # For Krona Tools
