@@ -8,7 +8,7 @@ KRONA_HOME=$HOME/proj/SDK/sdk_modules/kb_kaiju/bin/Krona
 KRONA_BINDIR=$KRONA_HOME/bin/bin
 
 KAIJU_BIN=$KAIJU_BINDIR/kaiju
-KAIJU_REPORT_BIN=$KAIJU_BINDIR/kaijuReport
+KAIJU_REPORT_BIN=$KAIJU_BINDIR/kaiju2table
 KAIJU2KRONA_BIN=$KAIJU_BINDIR/kaiju2krona
 KRONAIMPORT_BIN=$KRONA_BINDIR/ktImportText
 
@@ -77,10 +77,10 @@ if [ $filter_perc -gt 0 ] ; then
 else
     filter_arg=$filter_unclassified
 fi
-cmd="$KAIJU_REPORT_BIN -t $KAIJU_NODES -n $KAIJU_NAMES -i $kaiju_out_file -r $tax_level $filter_arg $taxon_fullpath_arg -o $kaiju_summary_out_file"
+cmd="$KAIJU_REPORT_BIN -t $KAIJU_NODES -n $KAIJU_NAMES -r $tax_level $filter_arg $taxon_fullpath_arg -o $kaiju_summary_out_file $kaiju_out_file"
 if [ ! -s $kaiju_summary_out_file ] ; then
     echo
-    echo $cmd 
+    echo $cmd
     exec $cmd
 fi
 
