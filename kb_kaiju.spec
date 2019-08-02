@@ -69,15 +69,15 @@ module kb_kaiju {
 
 	kaiju2table command line:
 	=========================
-	kaiju2table -t nodes.dmp -n names.dmp -i kaiju.out -r genus -o kaiju.out.summary
+	kaiju2table -t nodes.dmp -n names.dmp -r genus -o kaiju.out.summary kaiju.out
 
 	-m <percent>                     (filter out members that are < percent of total reads)
 	-m -u                            (filter out members that are < percent of all classified reads)
 	-p                               (full taxon path instead of just taxon name)
 
-	addTaxonNames command line:
+	kaiju-addTaxonNames command line:
 	===========================
-	addTaxonNames -t nodes.dmp -n names.dmp -i kaiju.out -o kaiju.names.out
+	kaiju-addTaxonNames -t nodes.dmp -n names.dmp -i kaiju.out -o kaiju.names.out
 	-u                               (omit unclassified reads)
 	-p                               (print the full taxon path instead of just the taxon name)
 	-r <class1>[,<class2>,...]       (print the path containing only to the specified ranks. e.g. "-r phylum,genus")
