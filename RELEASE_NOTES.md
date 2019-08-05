@@ -1,3 +1,8 @@
+### Version 1.0.7
+__Changes__
+- renamed kaijuReport binary to kaiju2table
+- updated Kaiju reference databases; now using 2019-06-25 versions
+
 ### Version 1.0.6
 __Changes__
 - update docs
