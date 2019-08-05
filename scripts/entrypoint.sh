@@ -22,29 +22,29 @@ elif [ "${1}" = "init" ] ; then
   cd /data/kaijudb
 
   echo "downloading: http://kaiju.binf.ku.dk/database/kaiju_db_refseq_2019-06-25.tgz"
-  mkdir -p /data/kaijudb/kaiju_db_refseq_2019-06-25
-  cd /data/kaijudb/kaiju_db_refseq_2019-06-25
+  mkdir -p /data/kaijudb/
+  cd /data/kaijudb/
   wget -q http://kaiju.binf.ku.dk/database/kaiju_db_refseq_2019-06-25.tgz
   tar -xzf kaiju_db_refseq_2019-06-25.tgz
   rm kaiju_db_refseq_2019-06-25.tgz
 
   echo "downloading: http://kaiju.binf.ku.dk/database/kaiju_db_progenomes_2019-06-25.tgz"
-  mkdir -p /data/kaijudb/kaiju_db_progenomes_2019-06-25
-  cd /data/kaijudb/kaiju_db_progenomes_2019-06-25
+  mkdir -p /data/kaijudb/
+  cd /data/kaijudb/
   wget -q http://kaiju.binf.ku.dk/database/kaiju_db_progenomes_2019-06-25.tgz
   tar -xzf kaiju_db_progenomes_2019-06-25.tgz
   rm kaiju_db_progenomes_2019-06-25.tgz
 
   echo "downloading: http://kaiju.binf.ku.dk/database/kaiju_db_nr_2019-06-25.tgz"
-  mkdir -p /data/kaijudb/kaiju_db_nr_2019-06-25
-  cd /data/kaijudb/kaiju_db_nr_2019-06-25
+  mkdir -p /data/kaijudb/
+  cd /data/kaijudb/
   wget -q http://kaiju.binf.ku.dk/database/kaiju_db_nr_2019-06-25.tgz
   tar -xzf kaiju_db_nr_2019-06-25.tgz
   rm kaiju_db_nr_2019-06-25.tgz
 
   echo "downloading: http://kaiju.binf.ku.dk/database/kaiju_db_nr_euk_2019-06-25.tgz"
-  mkdir -p /data/kaijudb/kaiju_db_nr_euk_2019-06-25
-  cd /data/kaijudb/kaiju_db_nr_euk_2019-06-25
+  mkdir -p /data/kaijudb/
+  cd /data/kaijudb/
   wget -q http://kaiju.binf.ku.dk/database/kaiju_db_nr_euk_2019-06-25.tgz
   tar -xzf kaiju_db_nr_euk_2019-06-25.tgz
   rm kaiju_db_nr_euk_2019-06-25.tgz
@@ -52,7 +52,7 @@ elif [ "${1}" = "init" ] ; then
   cd /data/kaijudb
 #  if [ -s "/data/kaijudb/kaiju_index/kaiju_db.fmi" ] ; then
 #  if [ -s "/data/kaijudb/kaiju_index/kaiju_db.fmi" -eq 15851683711 -a -s "/data/kaijudb/kaiju_index_pg/kaiju_db.fmi" -eq 12737853741 -a -s "/data/kaijudb/kaiju_index_nr/kaiju_db_nr.fmi" -eq 45220614796 -a -s "/data/kaijudb/kaiju_index_nr_euk/kaiju_db_nr_euk.fmi" -eq 51503967892 ] ; then
-  if [ -s "/data/kaijudb/kaiju_index/kaiju_db.fmi" -a -s "/data/kaijudb/kaiju_db_progenomes_2019-06-25/progenomes/kaiju_db_progenomes.fmi" -a -s "/data/kaijudb/kaiju_index_nr/kaiju_db_nr.fmi" -a -s "/data/kaijudb/kaiju_index_nr_euk/kaiju_db_nr_euk.fmi" ] ; then
+  if [ -s "/data/kaijudb/refseq/kaiju_db_refseq.fmi" -a -s "/data/kaijudb/progenomes/kaiju_db_progenomes.fmi" -a -s "/data/kaijudb/nr/kaiju_db_nr.fmi" -a -s "/data/kaijudb/nr_euk/kaiju_db_nr_euk.fmi" ] ; then
     echo "DATA DOWNLOADED SUCCESSFULLY"
     touch /data/__READY__
   else
