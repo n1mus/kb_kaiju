@@ -58,7 +58,7 @@ if [ -s rev_reads ] ; then
 else
     rev_reads_arg=""
 fi
-cmd="$KAIJU_BIN -t $KAIJU_NODES -f $KAIJU_DBPATH $fwd_reads_arg $rev_reads_arg -o $kaiju_out_file $SEG_filter $minlength $minscore $greedy $mismatches $e_value $threads $verbose"
+cmd="$KAIJU_BIN -t $KAIJU_NODES -f $KAIJU_DBPATH -i $fwd_reads_arg -j $rev_reads_arg -o $kaiju_out_file $SEG_filter $minlength $minscore $greedy $mismatches $e_value $threads $verbose"
 if [ ! -s $kaiju_out_file ] ; then
     echo $cmd
     exec $cmd
