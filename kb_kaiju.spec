@@ -50,8 +50,8 @@ module kb_kaiju {
     /*
         kaiju command line:
 	===================
-	kaiju -t nodes.dmp -f kaiju_db.fmi -i inputfile.fastq  (for single-end libraries)
-	kaiju -t nodes.dmp -f kaiju_db.fmi -i fwd_file.fastq -j rev_file.fastq  (for paired-end libraries)
+	kaiju -t nodes.dmp -f kaiju_db_refseq.fmi -i inputfile.fastq  (for single-end libraries)
+	kaiju -t nodes.dmp -f kaiju_db_refseq.fmi -i fwd_file.fastq -j rev_file.fastq  (for paired-end libraries)
 
 	-o <output_file>
 	-z <thread_count>                (e.g. 4)

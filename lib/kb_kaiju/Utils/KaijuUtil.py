@@ -595,16 +595,16 @@ class KaijuUtil:
             options['threads'] = self.threads
         options['KAIJU_DB_NODES'] = os.path.join(KAIJU_DB_DIR, 'nodes.dmp')
         #options['KAIJU_DB_NAMES'] = os.path.join(KAIJU_DB_DIR, 'names.dmp')  # don't need for kaiju cmd
-        if options['db_type'] == 'kaiju_index':
-            options['KAIJU_DB_PATH'] = os.path.join(KAIJU_DB_DIR, 'kaiju_db.fmi')
-        elif options['db_type'] == 'kaiju_index_pg':
-            options['KAIJU_DB_PATH'] = os.path.join(KAIJU_DB_DIR, 'kaiju_db.fmi')
-        elif options['db_type'] == 'kaiju_index_nr':
+        if options['db_type'] == 'refseq':
+            options['KAIJU_DB_PATH'] = os.path.join(KAIJU_DB_DIR, 'kaiju_db_refseq.fmi')
+        elif options['db_type'] == 'progenomes':
+            options['KAIJU_DB_PATH'] = os.path.join(KAIJU_DB_DIR, 'kaiju_db_progenomes.fmi')
+        elif options['db_type'] == 'nr':
             options['KAIJU_DB_PATH'] = os.path.join(KAIJU_DB_DIR, 'kaiju_db_nr.fmi')
-        elif options['db_type'] == 'kaiju_index_nr_euk':
+        elif options['db_type'] == 'nr_euk':
             options['KAIJU_DB_PATH'] = os.path.join(KAIJU_DB_DIR, 'kaiju_db_nr_euk.fmi')
         else:
-            raise ValueError ('bad db_type: '+options['db_type']+' (must be one of "kaiju_index", "kaiju_index_pg", "kaiju_index_nr", "kaiju_index_nr_euk")')
+            raise ValueError ('bad db_type: '+options['db_type']+' (must be one of "refseq", "progenomes", "nr", "nr_euk")')
 
         self._validate_kaiju_options(options)
         command = [KAIJU_BIN]

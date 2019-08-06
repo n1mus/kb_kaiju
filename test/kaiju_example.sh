@@ -13,20 +13,20 @@ KAIJU2KRONA_BIN=$KAIJU_BINDIR/kaiju2krona
 KRONAIMPORT_BIN=$KRONA_BINDIR/ktImportText
 
 KAIJU_DBDIR=$HOME/proj/SDK/sdk_modules/kb_kaiju/data/kaijudb
-KAIJU_DBTYPE=kaiju_index
-#KAIJU_DBTYPE=kaiju_index_pg
-#KAIJU_DBTYPE=kaiju_index_nr
-#KAIJU_DBTYPE=kaiju_index_nr_euk
+KAIJU_DBTYPE=refseq
+#KAIJU_DBTYPE=progenomes
+#KAIJU_DBTYPE=nr
+#KAIJU_DBTYPE=nr_euk
 KAIJU_NODES=$KAIJU_DBDIR/$KAIJU_DBTYPE/nodes.dmp
 KAIJU_NAMES=$KAIJU_DBDIR/$KAIJU_DBTYPE/names.dmp
 
-if [ $KAIJU_DBTYPE = "kaiju_index" ] ; then
-    KAIJU_DBPATH=$KAIJU_DBDIR/$KAIJU_DBTYPE/kaiju_db.fmi
-elif [ $KAIJU_DBTYPE = "kaiju_index_pg" ] ; then
-    KAIJU_DBPATH=$KAIJU_DBDIR/$KAIJU_DBTYPE/kaiju_db.fmi
-elif [ $KAIJU_DBTYPE = "kaiju_index_nr" ] ; then
+if [ $KAIJU_DBTYPE = "refseq" ] ; then
+    KAIJU_DBPATH=$KAIJU_DBDIR/$KAIJU_DBTYPE/kaiju_db_refseq.fmi
+elif [ $KAIJU_DBTYPE = "progenomes" ] ; then
+    KAIJU_DBPATH=$KAIJU_DBDIR/$KAIJU_DBTYPE/kaiju_db_progenomes.fmi
+elif [ $KAIJU_DBTYPE = "nr" ] ; then
     KAIJU_DBPATH=$KAIJU_DBDIR/$KAIJU_DBTYPE/kaiju_db_nr.fmi
-elif [ $KAIJU_DBTYPE = "kaiju_index_nr_euk" ] ; then
+elif [ $KAIJU_DBTYPE = "nr_euk" ] ; then
     KAIJU_DBPATH=$KAIJU_DBDIR/$KAIJU_DBTYPE/kaiju_db_nr_euk.fmi
 fi
 
