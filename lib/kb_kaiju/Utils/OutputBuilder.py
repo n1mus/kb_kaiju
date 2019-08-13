@@ -562,7 +562,7 @@ class OutputBuilder(object):
                 line = line.strip()
                 if line.startswith('-') or line.startswith('%'):
                     continue
-                print(str(line.split("\n")))
+                print(line.split("\n"))
                 (perc_str, reads_cnt_str, lineage_str) = line.split("\t")[:3]
                 perc = float(perc_str.strip())
                 reads_cnt = int(reads_cnt_str.strip())
