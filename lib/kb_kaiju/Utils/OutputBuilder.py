@@ -581,8 +581,8 @@ class OutputBuilder(object):
                     else:
                         lineage_order.append(lineage)
                         abundance[lineage] = perc
-                except ValueError,e:
-                    print("Problem with output file.")
+                except ValueError:
+                    print("Non-standard line detected, skipping...")
 
         if tail_cutoff != None:
             this_key = 'tail (< '+tail_cutoff+'% each taxon)'
