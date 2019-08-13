@@ -568,8 +568,6 @@ class OutputBuilder(object):
                     perc = float(perc_str.strip())
                     reads_cnt = int(reads_cnt_str.strip())
                     lineage = lineage_str.strip()
-                # except ValueError,e:
-                #     print("error"+str(e))
                     if lineage == 'unclassified':
                         unclassified_perc = perc
                     elif lineage.startswith('cannot be assigned'):
@@ -583,6 +581,8 @@ class OutputBuilder(object):
                     else:
                         lineage_order.append(lineage)
                         abundance[lineage] = perc
+                except ValueError,e:
+                    print("Problem with output file.")
 
         if tail_cutoff != None:
             this_key = 'tail (< '+tail_cutoff+'% each taxon)'
