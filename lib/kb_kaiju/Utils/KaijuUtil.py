@@ -646,11 +646,6 @@ class KaijuUtil:
         if options.get('KAIJU_DB_NAMES'):
             command_list.append('-n')
             command_list.append(str(options.get('KAIJU_DB_NAMES')))
-        if options.get('in_folder'): #might need changes here?
-            in_file = options['input_item']['name']+'.kaiju'
-            in_path = os.path.join(options['in_folder'], in_file)
-            command_list.append('-i')
-            command_list.append(in_path)
         if options.get('tax_level'):
             command_list.append('-r')
             command_list.append(str(options.get('tax_level')))
@@ -666,7 +661,11 @@ class KaijuUtil:
             command_list.append('-u')
         if int(options.get('full_tax_path')) == 1:
             command_list.append('-p')
-
+        if options.get('in_folder'): # needs to be last
+            #in_file = options['input_item']['name']+'.kaiju'
+            in_path = options['in_folder']
+            #in_path = os.path.join(options['in_folder'], in_file)
+            command_list.append(in_path)
 
     def _build_kaijuReport_command(self, options):
         KAIJU_BIN_DIR    = os.path.join(os.path.sep, 'kb', 'module', 'kaiju', 'bin')
