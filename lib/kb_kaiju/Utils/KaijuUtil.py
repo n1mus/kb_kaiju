@@ -662,9 +662,7 @@ class KaijuUtil:
         if int(options.get('full_tax_path')) == 1:
             command_list.append('-p')
         if options.get('in_folder'): # needs to be last
-            #in_file = options['input_item']['name']+'.kaiju'
             in_path = options['in_folder']
-            #in_path = os.path.join(options['in_folder'], in_file)
             command_list.append(in_path)
 
     def _build_kaijuReport_command(self, options):

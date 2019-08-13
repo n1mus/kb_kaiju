@@ -5,6 +5,7 @@ __Changes__
 - renamed kaijuReport binary to kaiju2table
 - removed discontinued flag -i from kaiju2table
 - addressed new kaiju database directory structure
+- added new logic to address five-column kaiju report output
 
 ### Version 1.0.6
 __Changes__
