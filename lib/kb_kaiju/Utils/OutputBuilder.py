@@ -564,10 +564,12 @@ class OutputBuilder(object):
                     continue
                 (perc_str, reads_cnt_str) = line.split("\t")[1:3]
                 lineage_str = line.split("\t")[4]
-                perc = float(perc_str.strip())
-                reads_cnt = int(reads_cnt_str.strip())
-                lineage = lineage_str.strip()
-
+                try:
+                    perc = float(perc_str.strip())
+                    reads_cnt = int(reads_cnt_str.strip())
+                    lineage = lineage_str.strip()
+                except ValueError,e:
+                    print("error"+str(e))
                 if lineage == 'unclassified':
                     unclassified_perc = perc
                 elif lineage.startswith('cannot be assigned'):
