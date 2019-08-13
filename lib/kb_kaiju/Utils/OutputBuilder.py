@@ -560,9 +560,10 @@ class OutputBuilder(object):
         with open (summary_file, 'r') as summary_handle:
             for line in summary_handle.readlines():
                 line = line.strip()
+                print(line)
                 if line.startswith('-') or line.startswith('%'):
                     continue
-                (perc_str, reads_cnt_str, lineage_str) = line.split("\t")[:3]
+                (perc_str, reads_cnt_str, lineage_str) = line.split("\t")
                 perc = float(perc_str.strip())
                 reads_cnt = int(reads_cnt_str.strip())
                 lineage = lineage_str.strip()
