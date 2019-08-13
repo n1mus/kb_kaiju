@@ -559,7 +559,7 @@ class OutputBuilder(object):
 
         with open (summary_file, 'r') as summary_handle:
             for line in summary_handle.readlines():
-                line = line.strip()
+                line = line.strip() # five column table, need to save columns 2,3,5 as respectively, perc_str, reads_cnt_str, lineage_str
                 if line.startswith('-') or line.startswith('%'):
                     continue
                 (perc_str, reads_cnt_str) = line.split("\t")[1:3]
