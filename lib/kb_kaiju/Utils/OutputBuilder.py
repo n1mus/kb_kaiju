@@ -560,7 +560,7 @@ class OutputBuilder(object):
         with open (summary_file, 'r') as summary_handle:
             for line in summary_handle.readlines():
                 line = line.strip()
-                print(line)
+                print("Is this working")
                 if line.startswith('-') or line.startswith('%'):
                     continue
                 (perc_str, reads_cnt_str, lineage_str) = line.split("\t")
