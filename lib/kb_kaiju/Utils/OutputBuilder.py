@@ -581,7 +581,7 @@ class OutputBuilder(object):
                     else:
                         lineage_order.append(lineage)
                         abundance[lineage] = perc
-                except ValueError:
+                except ValueError: # non-standard line detected, need to explore more but currently passing tests
                     print("Non-standard line detected, skipping...")
 
         if tail_cutoff != None:
