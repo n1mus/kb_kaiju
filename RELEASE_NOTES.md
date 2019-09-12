@@ -1,5 +1,6 @@
 ### Version 1.0.7
 __Changes__
+- updated kaiju to v1.7.2 (released 2019-07-12)
 - updated Kaiju reference databases; now using 2019-06-25 versions
 - added new required flags -i and -j to kaiju binary
 - renamed kaijuReport binary to kaiju2table
