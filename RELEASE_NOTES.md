@@ -1,4 +1,4 @@
-### Version 1.0.7
+### Version 1.1.0
 __Changes__
 - updated kaiju to v1.7.2 (released 2019-07-12)
 - updated Kaiju reference databases; now using 2019-06-25 versions
