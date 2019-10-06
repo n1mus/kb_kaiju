@@ -595,6 +595,7 @@ class KaijuUtil:
             options['threads'] = self.threads
         options['KAIJU_DB_NODES'] = os.path.join(KAIJU_DB_DIR, 'nodes.dmp')
         #options['KAIJU_DB_NAMES'] = os.path.join(KAIJU_DB_DIR, 'names.dmp')  # don't need for kaiju cmd
+        print('db_type')
         if options['db_type'] == 'kaiju_index':
             options['KAIJU_DB_PATH'] = os.path.join(KAIJU_DB_DIR, 'kaiju_db_refseq.fmi')
         elif options['db_type'] == 'kaiju_index_pg':
