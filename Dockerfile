@@ -45,8 +45,13 @@ RUN mkdir -p /data/kaijudb
 # -----------------------------------------
 
 COPY ./ /kb/module
+
+# for testing only
+# RUN mv /kb/module/data/refseq /data/kaijudb/refseq
+
 RUN mkdir -p /kb/module/work
 RUN chmod -R a+rw /kb/module
+
 
 WORKDIR /kb/module
 
