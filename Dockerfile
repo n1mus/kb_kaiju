@@ -41,13 +41,9 @@ RUN \
 # For kaiju dbs (rest of db installation to ref data mount in entrypoint.sh init script)
 RUN mkdir -p /data/kaijudb
 
-
 # -----------------------------------------
 
 COPY ./ /kb/module
-
-# for testing only
-# RUN mv /kb/module/data/refseq /data/kaijudb/refseq
 
 RUN mkdir -p /kb/module/work
 RUN chmod -R a+rw /kb/module

@@ -90,25 +90,25 @@
 							"value": "refseq",
 							"display": "RefSeq Genomes (no Euks)",
 							"id": "refseq",
-							"ui-name": "kaiju_index"
+							"ui-name": "refseq"
 						},
 						{
 							"value": "progenomes",
 							"display": "proGenomes (no Euks)",
 							"id": "progenomes",
-							"ui-name": "kaiju_index_pg"
+							"ui-name": "progenomes"
 						},
 						{
 							"value": "nr",
 							"display": "NCBI BLAST nr (no Euks)",
 							"id": "nr",
-							"ui-name": "kaiju_index_nr"
+							"ui-name": "nr"
 						},
 						{
 							"value": "nr_euk",
 							"display": "NCBI BLAST nr+euk",
 							"id": "nr_euk",
-							"ui-name": "kaiju_index_nr_euk"
+							"ui-name": "nr_euk"
 						}
 					]
 				}

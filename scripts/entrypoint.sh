@@ -57,12 +57,8 @@ elif [ "${1}" = "init" ] ; then
   mv nodes.dmp nr_euk/nodes.dmp
   rm kaiju_db_nr_euk_2019-06-25.tgz
 
-
-  # touch /data/__READY__ ## Used for testing when using local databases
-
   cd /data/kaijudb
-#  if [ -s "/data/kaijudb/kaiju_index/kaiju_db.fmi" ] ; then
-#  if [ -s "/data/kaijudb/kaiju_index/kaiju_db.fmi" -eq 15851683711 -a -s "/data/kaijudb/kaiju_index_pg/kaiju_db.fmi" -eq 12737853741 -a -s "/data/kaijudb/kaiju_index_nr/kaiju_db_nr.fmi" -eq 45220614796 -a -s "/data/kaijudb/kaiju_index_nr_euk/kaiju_db_nr_euk.fmi" -eq 51503967892 ] ; then
+
   if [ -s "/data/kaijudb/refseq/kaiju_db_refseq.fmi" -a -s "/data/kaijudb/progenomes/kaiju_db_progenomes.fmi" -a -s "/data/kaijudb/nr/kaiju_db_nr.fmi" -a -s "/data/kaijudb/nr_euk/kaiju_db_nr_euk.fmi" ] ; then
     echo "DATA DOWNLOADED SUCCESSFULLY"
     touch /data/__READY__
