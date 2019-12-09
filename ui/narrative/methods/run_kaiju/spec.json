@@ -87,28 +87,28 @@
 				"dropdown_options": {
 					"options": [
 						{
-							"value": "kaiju_index",
+							"value": "refseq",
 							"display": "RefSeq Genomes (no Euks)",
-							"id": "kaiju_index",
-							"ui-name": "kaiju_index"
+							"id": "refseq",
+							"ui-name": "refseq"
 						},
 						{
-							"value": "kaiju_index_pg",
+							"value": "progenomes",
 							"display": "proGenomes (no Euks)",
-							"id": "kaiju_index_pg",
-							"ui-name": "kaiju_index_pg"
+							"id": "progenomes",
+							"ui-name": "progenomes"
 						},
 						{
-							"value": "kaiju_index_nr",
+							"value": "nr",
 							"display": "NCBI BLAST nr (no Euks)",
-							"id": "kaiju_index_nr",
-							"ui-name": "kaiju_index_nr"
+							"id": "nr",
+							"ui-name": "nr"
 						},
 						{
-							"value": "kaiju_index_nr_euk",
+							"value": "nr_euk",
 							"display": "NCBI BLAST nr+euk",
-							"id": "kaiju_index_nr_euk",
-							"ui-name": "kaiju_index_nr_euk"
+							"id": "nr_euk",
+							"ui-name": "nr_euk"
 						}
 					]
 				}
