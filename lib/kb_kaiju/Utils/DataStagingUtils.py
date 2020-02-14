@@ -320,7 +320,7 @@ class DataStagingUtils(object):
                         read_id = line.rstrip('\n')
                         read_id = re.sub ("[ \t]+.*$", "", read_id)
                         read_id = re.sub ("[\/\.\_\-\:\;][012lrLRfrFR53]\'*$", "", read_id)
-                        if fwd_ids[read_id]:
+                        if fwd_ids.get(read_id, False):
                             paired_ids[read_id] = True
                             paired_ids_list.append(read_id)
 
