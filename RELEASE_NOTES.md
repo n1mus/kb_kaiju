@@ -1,3 +1,7 @@
+### Version 1.1.1
+__Changes__
+- fixed error due to unpaired rev reads
+
 ### Version 1.1.0
 __Changes__
 - updated kaiju to v1.7.2 (released 2019-07-12)
