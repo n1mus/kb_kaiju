@@ -1,3 +1,7 @@
+### Version 1.1.2
+__Changes__
+- fixed default database value
+
 ### Version 1.1.1
 __Changes__
 - fixed error due to unpaired rev reads
