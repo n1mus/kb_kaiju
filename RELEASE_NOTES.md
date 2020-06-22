@@ -1,3 +1,7 @@
+### Version 1.1.3
+__Changes__
+- fixed a read_id edge case
+
 ### Version 1.1.2
 __Changes__
 - fixed default database value
