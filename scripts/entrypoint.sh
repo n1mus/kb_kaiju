@@ -11,7 +11,6 @@ fi
 if [ $# -eq 0 ] ; then
   sh ./scripts/start_server.sh
 elif [ "${1}" = "test" ] ; then
-  head -10 /data/kaijudb/refseq/nodes.dmp
   echo "Run Tests"
   make test
 elif [ "${1}" = "async" ] ; then
