@@ -1,3 +1,8 @@
+### Version 1.1.4
+__Changes__
+- updated Kaiju to version 1.7.3
+- updated Kaiju databases to the 2020-05-25 releases
+
 ### Version 1.1.3
 __Changes__
 - fixed a read_id edge case
