@@ -1,7 +1,7 @@
 #
 #  define display information
 #
-name: Classify Taxonomy of Metagenomic Reads with Kaiju - v1.7.2
+name: Classify Taxonomy of Metagenomic Reads with Kaiju - v1.7.3
 tooltip: |
 	Allows users to perform taxonomic classification of shotgun metagenomic read data with Kaiju.
 screenshots:
