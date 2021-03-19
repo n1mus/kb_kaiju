@@ -1,3 +1,7 @@
+### Version 1.1.5
+__Changes__
+- updated documentation to reflect 2020-05-25 releases
+
 ### Version 1.1.4
 __Changes__
 - updated Kaiju to version 1.7.3
