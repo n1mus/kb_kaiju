@@ -755,7 +755,7 @@ class KaijuUtil:
         # input file validation
         in_file = os.path.join(options['out_folder'], options['input_item']['name']+'.krona')
         if not os.path.getsize(in_file) > 0:
-            raise ValueError ('missing or empty krona input file: '+in_file)
+            raise ValueError ('missing or empty krona input file (your filters may be too strict): {}'.format(in_file))
 
 
     def _process_kronaImport_options(self, command_list, options):
