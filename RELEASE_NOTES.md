@@ -1,6 +1,7 @@
 ### Version 1.1.6
 __Changes__
 - prepped version numbers for release
+- improved error handling message : Updating the message a user receives when their parameters are too strict and no output is produced.
 
 ### Version 1.1.5
 __Changes__
