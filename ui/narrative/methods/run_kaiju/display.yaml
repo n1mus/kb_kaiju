@@ -133,12 +133,12 @@ description : |
     </blockquote>
   </p>
 
-  <p>Kaiju offers four reference databases for classification, which are downloaded from the <a href="http://kaiju.binf.ku.dk/server">Kaiju webserver page</a> (last updated 2019-06-25). The databases are:
+  <p>Kaiju offers four reference databases for classification, which are downloaded from the <a href="http://kaiju.binf.ku.dk/server">Kaiju webserver page</a> (last updated 2020-05-25). The databases are:
     <ul>
-      <li><b>RefSeq Complete Genomes</b>: 50.9M protein sequences from completely assembled bacterial, archaeal, and viral genomes from NCBI RefSeq.</li>
-      <li><b>proGenomes</b>: 19.7M protein sequences from a representative set of genomes derived from NCBI RefSeq bacterial, archaeal, and viral genomes.</li>
-      <li><b>NCBI BLAST nr</b>: 164M protein sequences from nr: Bacteria, Archaea, and Viruses.</li>
-      <li><b>NCBI BLAST nr+euk</b>: 178M protein sequences from nr: Bacteria, Archaea, Viruses, Fungi and microbial eukaryotes.</li>
+      <li><b>RefSeq Complete Genomes</b>: protein sequences from completely assembled bacterial, archaeal, and viral genomes from NCBI RefSeq.</li>
+      <li><b>proGenomes</b>: protein sequences from a representative set of genomes derived from NCBI RefSeq bacterial, archaeal, and viral genomes.</li>
+      <li><b>NCBI BLAST nr</b>: protein sequences from nr: Bacteria, Archaea, and Viruses.</li>
+      <li><b>NCBI BLAST nr+euk</b>: protein sequences from nr: Bacteria, Archaea, Viruses, Fungi and microbial eukaryotes.</li>
     </ul>
   </p>
 
