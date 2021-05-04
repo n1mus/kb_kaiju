@@ -1,3 +1,7 @@
+### Version 1.1.6
+__Changes__
+- prepped version numbers for release
+
 ### Version 1.1.5
 __Changes__
 - updated documentation to reflect 2020-05-25 releases
