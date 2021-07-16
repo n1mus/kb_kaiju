@@ -21,45 +21,45 @@ elif [ "${1}" = "init" ] ; then
   mkdir -p /data/kaijudb
   cd /data/kaijudb
 
-  echo "downloading: http://kaiju.binf.ku.dk/database/kaiju_db_refseq_2020-05-25.tgz"
+  echo "downloading: http://kaiju.binf.ku.dk/database/kaiju_db_refseq_2021-02-26.tgz"
   mkdir -p /data/kaijudb/refseq
   cd /data/kaijudb/
-  wget -q http://kaiju.binf.ku.dk/database/kaiju_db_refseq_2020-05-25.tgz
-  tar -xzf kaiju_db_refseq_2020-05-25.tgz
+  wget -q http://kaiju.binf.ku.dk/database/kaiju_db_refseq_2021-02-26.tgz
+  tar -xzf kaiju_db_refseq_2021-02-26.tgz
   mv kaiju_db_refseq.fmi refseq/kaiju_db_refseq.fmi
   mv names.dmp refseq/names.dmp
   mv nodes.dmp refseq/nodes.dmp
-  rm kaiju_db_refseq_2020-05-25.tgz
+  rm kaiju_db_refseq_2021-02-26.tgz
 
-  echo "downloading: http://kaiju.binf.ku.dk/database/kaiju_db_progenomes_2020-05-25.tgz"
+  echo "downloading: http://kaiju.binf.ku.dk/database/kaiju_db_progenomes_2021-03-02.tgz"
   mkdir -p /data/kaijudb/progenomes
   cd /data/kaijudb/
-  wget -q http://kaiju.binf.ku.dk/database/kaiju_db_progenomes_2020-05-25.tgz
-  tar -xzf kaiju_db_progenomes_2020-05-25.tgz
+  wget -q http://kaiju.binf.ku.dk/database/kaiju_db_progenomes_2021-03-02.tgz
+  tar -xzf kaiju_db_progenomes_2021-03-02.tgz
   mv kaiju_db_progenomes.fmi progenomes/kaiju_db_progenomes.fmi
   mv names.dmp progenomes/names.dmp
   mv nodes.dmp progenomes/nodes.dmp
-  rm kaiju_db_progenomes_2020-05-25.tgz
+  rm kaiju_db_progenomes_2021-03-02.tgz
 
-  echo "downloading: http://kaiju.binf.ku.dk/database/kaiju_db_nr_2020-05-25.tgz"
+  echo "downloading: http://kaiju.binf.ku.dk/database/kaiju_db_nr_2021-02-24.tgz"
   mkdir -p /data/kaijudb/nr
   cd /data/kaijudb/
-  wget -q http://kaiju.binf.ku.dk/database/kaiju_db_nr_2020-05-25.tgz
-  tar -xzf kaiju_db_nr_2020-05-25.tgz
+  wget -q http://kaiju.binf.ku.dk/database/kaiju_db_nr_2021-02-24.tgz
+  tar -xzf kaiju_db_nr_2021-02-24.tgz
   mv kaiju_db_nr.fmi nr/kaiju_db_nr.fmi
   mv names.dmp nr/names.dmp
   mv nodes.dmp nr/nodes.dmp
-  rm kaiju_db_nr_2020-05-25.tgz
+  rm kaiju_db_nr_2021-02-24.tgz
 
-  echo "downloading: http://kaiju.binf.ku.dk/database/kaiju_db_nr_euk_2020-05-25.tgz"
+  echo "downloading: http://kaiju.binf.ku.dk/database/kaiju_db_nr_euk_2021-02-24.tgz"
   mkdir -p /data/kaijudb/nr_euk
   cd /data/kaijudb/
-  wget -q http://kaiju.binf.ku.dk/database/kaiju_db_nr_euk_2020-05-25.tgz
-  tar -xzf kaiju_db_nr_euk_2020-05-25.tgz
+  wget -q http://kaiju.binf.ku.dk/database/kaiju_db_nr_euk_2021-02-24.tgz
+  tar -xzf kaiju_db_nr_euk_2021-02-24.tgz
   mv kaiju_db_nr_euk.fmi nr_euk/kaiju_db_nr_euk.fmi
   mv names.dmp nr_euk/names.dmp
   mv nodes.dmp nr_euk/nodes.dmp
-  rm kaiju_db_nr_euk_2020-05-25.tgz
+  rm kaiju_db_nr_euk_2021-02-24.tgz
 
   cd /data/kaijudb
 

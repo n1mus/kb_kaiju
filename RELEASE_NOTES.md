@@ -1,3 +1,8 @@
+### Version 1.1.7
+__Changes__
+- updated to 2021-02-26 releases
+- updated to Kaiju version 1.8
+
 ### Version 1.1.6
 __Changes__
 - prepped version numbers for release

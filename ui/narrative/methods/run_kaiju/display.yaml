@@ -1,7 +1,7 @@
 #
 #  define display information
 #
-name: Classify Taxonomy of Metagenomic Reads with Kaiju - v1.7.3
+name: Classify Taxonomy of Metagenomic Reads with Kaiju - v1.8
 tooltip: |
 	Allows users to perform taxonomic classification of shotgun metagenomic read data with Kaiju.
 screenshots:
@@ -133,7 +133,7 @@ description : |
     </blockquote>
   </p>
 
-  <p>Kaiju offers four reference databases for classification, which are downloaded from the <a href="http://kaiju.binf.ku.dk/server">Kaiju webserver page</a> (last updated 2020-05-25). The databases are:
+  <p>Kaiju offers at least four reference databases for classification, which are downloaded from the <a href="http://kaiju.binf.ku.dk/server">Kaiju webserver page</a> (last updated 2021-02-24). The databases are:
     <ul>
       <li><b>RefSeq Complete Genomes</b>: protein sequences from completely assembled bacterial, archaeal, and viral genomes from NCBI RefSeq.</li>
       <li><b>proGenomes</b>: protein sequences from a representative set of genomes derived from NCBI RefSeq bacterial, archaeal, and viral genomes.</li>
