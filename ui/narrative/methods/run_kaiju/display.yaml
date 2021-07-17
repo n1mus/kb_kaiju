@@ -133,7 +133,7 @@ description : |
     </blockquote>
   </p>
 
-  <p>Kaiju offers at least four reference databases for classification, which are downloaded from the <a href="http://kaiju.binf.ku.dk/server">Kaiju webserver page</a> (last updated 2021-02-24). The databases are:
+  <p>Kaiju offers at least four reference databases for classification, which are downloaded from the <a href="http://kaiju.binf.ku.dk/server">Kaiju webserver page</a> (last updated early 2021). The databases are:
     <ul>
       <li><b>RefSeq Complete Genomes</b>: protein sequences from completely assembled bacterial, archaeal, and viral genomes from NCBI RefSeq.</li>
       <li><b>proGenomes</b>: protein sequences from a representative set of genomes derived from NCBI RefSeq bacterial, archaeal, and viral genomes.</li>
