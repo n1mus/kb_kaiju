@@ -19,7 +19,7 @@ determines taxonomic structure for microbial communities from shotgun metagenomi
 
 Module also utilizes Krona for visualization of results
 
-References: 
+References:
 Kaiju Homepage: http://kaiju.binf.ku.dk/
 Krona Homepage: https://github.com/marbl/Krona/wiki
 Kaiju DBs from: http://kaiju.binf.ku.dk/server
@@ -46,7 +46,7 @@ You should have received a copy of the GNU General Public License along with the
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "1.1.0"
+    VERSION = "1.2.0"
     GIT_URL = "https://github.com/kbaseapps/kb_kaiju"
     GIT_COMMIT_HASH = "6d7e531782136056d61638c13f43afc1c9e2989c"
 
@@ -69,7 +69,7 @@ You should have received a copy of the GNU General Public License along with the
         Kaiju Method
         :param params: instance of type "KaijuInputParams" (Kaiju App Input
            Params) -> structure: parameter "workspace_name" of type
-           "workspace_name" (** The workspace object refs are of form: ** ** 
+           "workspace_name" (** The workspace object refs are of form: ** **
            objects = ws.get_objects([{'ref':
            params['workspace_id']+'/'+params['obj_name']}]) ** ** "ref" means
            the entire name combining the workspace id and the object name **

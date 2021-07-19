@@ -1,7 +1,8 @@
-### Version 1.1.7
+### Version 1.2.0
 __Changes__
-- updated to early 2021 releases
-- updated to Kaiju version 1.8
+- updated to early 2021 database releases (range of dates)
+- added new databases as selectable options: viruses, plasmids, rvdb, fungi
+- updated to Kaiju version 1.7.4
 
 ### Version 1.1.6
 __Changes__

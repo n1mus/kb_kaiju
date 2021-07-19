@@ -290,3 +290,57 @@ class kb_kaijuTest(unittest.TestCase):
         #self.assertEquals(len(rep['html_links']), 1)
         #self.assertEquals(rep['html_links'][0]['name'], 'report.html')
         pass
+
+    ### Test 3: PE lib objects with newly added database example (one of fungi, plasmids, rvdb, and viruses)
+    #
+    # Uncomment to skip this test
+    # HIDE @unittest.skip("skipped test_3_kaiju_PE_lib_new_dbs")
+    def test_3_kaiju_PE_lib_new_dbs(self):
+        method_name = 'test_3_kaiju_PE_lib_new_dbs'
+        print ("\n"+('='*(10+len(method_name))))
+        print ("RUNNING "+method_name+"()")
+        print (('='*(10+len(method_name)))+"\n")
+
+        # run kaiju
+        #input_refs = [self.PE_reads_refs[0]]
+        input_refs = [self.PE_reads_refs[0], self.PE_reads_refs[1]]
+        #output_biom_name = 'test_kb_kaiju_test1.BIOM'
+        params = {
+            'workspace_name':            self.ws_info[1],
+            'input_refs':                input_refs,
+            #'output_biom_name':          output_biom_name,
+            'tax_levels':                ['phylum','genus'],
+            #'tax_levels':                ['phylum'],
+            'db_type':                   'plasmids',
+            #'filter_percent':            1,
+            'filter_percent':            0.5,
+            #'subsample_percent':         100,
+            'subsample_percent':         10,
+            #'subsample_replicates':      1,
+            'subsample_replicates':      2,
+            'subsample_seed':            1,
+            'seg_filter':                1,
+            'min_match_length':          11,
+            'greedy_run_mode':           1,
+            'greedy_allowed_mismatches': 5,
+            'greedy_min_match_score':    75,
+            'greedy_max_e_value':        0.05,
+            'filter_unclassified':       1,
+            'full_tax_path':             0,
+            'sort_taxa_by':              'totals'
+        }
+        result = self.getImpl().run_kaiju(self.getContext(), params)[0]
+
+        pprint('End to end test result:')
+        pprint(result)
+
+        self.assertIn('report_name', result)
+        self.assertIn('report_ref', result)
+
+        # make sure the report was created and includes the HTML report and download links
+        #rep = self.getWsClient().get_objects2({'objects': [{'ref': result['report_ref']}]})['data'][0]['data']
+        #self.assertEquals(rep['direct_html_link_index'], 0)
+        #self.assertEquals(len(rep['file_links']), 2)
+        #self.assertEquals(len(rep['html_links']), 1)
+        #self.assertEquals(rep['html_links'][0]['name'], 'report.html')
+        pass
