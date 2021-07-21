@@ -604,8 +604,17 @@ class KaijuUtil:
             options['KAIJU_DB_PATH'] = os.path.join(KAIJU_DB_DIR, 'kaiju_db_nr.fmi')
         elif options['db_type'] == 'nr_euk':
             options['KAIJU_DB_PATH'] = os.path.join(KAIJU_DB_DIR, 'kaiju_db_nr_euk.fmi')
+        elif options['db_type'] == 'viruses':
+            options['KAIJU_DB_PATH'] = os.path.join(KAIJU_DB_DIR, 'kaiju_db_viruses.fmi')
+        elif options['db_type'] == 'plasmids':
+            options['KAIJU_DB_PATH'] = os.path.join(KAIJU_DB_DIR, 'kaiju_db_plasmids.fmi')
+        elif options['db_type'] == 'rvdb':
+            options['KAIJU_DB_PATH'] = os.path.join(KAIJU_DB_DIR, 'kaiju_db_rvdb.fmi')
+        elif options['db_type'] == 'fungi':
+            options['KAIJU_DB_PATH'] = os.path.join(KAIJU_DB_DIR, 'kaiju_db_fungi.fmi')
+
         else:
-            raise ValueError ('bad db_type: '+options['db_type']+' (must be one of "refseq", "progenomes", "nr", "nr_euk")')
+            raise ValueError ('bad db_type: '+options['db_type']+' (must be one of "refseq", "progenomes", "nr", "nr_euk", "viruses", "plasmids", "rvdb", "fungi")')
 
         self._validate_kaiju_options(options)
         command = [KAIJU_BIN]

@@ -28,6 +28,14 @@ elif [ $KAIJU_DBTYPE = "nr" ] ; then
     KAIJU_DBPATH=$KAIJU_DBDIR/$KAIJU_DBTYPE/kaiju_db_nr.fmi
 elif [ $KAIJU_DBTYPE = "nr_euk" ] ; then
     KAIJU_DBPATH=$KAIJU_DBDIR/$KAIJU_DBTYPE/kaiju_db_nr_euk.fmi
+elif [ $KAIJU_DBTYPE = "viruses" ] ; then
+    KAIJU_DBPATH=$KAIJU_DBDIR/$KAIJU_DBTYPE/kaiju_db_viruses.fmi
+elif [ $KAIJU_DBTYPE = "plasmids" ] ; then
+    KAIJU_DBPATH=$KAIJU_DBDIR/$KAIJU_DBTYPE/kaiju_db_plasmids.fmi
+elif [ $KAIJU_DBTYPE = "rvdb" ] ; then
+    KAIJU_DBPATH=$KAIJU_DBDIR/$KAIJU_DBTYPE/kaiju_db_rvdb.fmi
+elif [ $KAIJU_DBTYPE = "plasmids" ] ; then
+    KAIJU_DBPATH=$KAIJU_DBDIR/$KAIJU_DBTYPE/kaiju_db_plasmids.fmi
 fi
 
 RUN_DATA_DIR=$HOME/proj/SDK/sdk_modules/kb_kaiju/test/data

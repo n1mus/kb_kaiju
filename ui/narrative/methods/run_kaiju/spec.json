@@ -1,5 +1,5 @@
 {
-	"ver": "1.1.6",
+	"ver": "1.2.0",
 
 	"authors": [
 		"dylan","seanjungbluth"
@@ -109,6 +109,30 @@
 							"display": "NCBI BLAST nr+euk",
 							"id": "nr_euk",
 							"ui-name": "nr_euk"
+						},
+						{
+							"value": "viruses",
+							"display": "Viruses",
+							"id": "viruses",
+							"ui-name": "viruses"
+						},
+						{
+							"value": "plasmids",
+							"display": "Plasmids",
+							"id": "plasmids",
+							"ui-name": "plasmids"
+						},
+						{
+							"value": "rvdb",
+							"display": "Reference Viral DataBase (RVDB)",
+							"id": "rvdb",
+							"ui-name": "rvdb"
+						},
+						{
+							"value": "fungi",
+							"display": "Fungi",
+							"id": "fungi",
+							"ui-name": "fungi"
 						}
 					]
 				}
