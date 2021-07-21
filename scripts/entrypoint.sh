@@ -103,7 +103,7 @@ elif [ "${1}" = "init" ] ; then
 
   cd /data/kaijudb
 
-  if [ -s "/data/kaijudb/refseq/kaiju_db_refseq.fmi" -a -s "/data/kaijudb/progenomes/kaiju_db_progenomes.fmi" -a -s "/data/kaijudb/nr/kaiju_db_nr.fmi" -a -s "/data/kaijudb/nr_euk/kaiju_db_nr_euk.fmi" -a -s "/data/kaijudb/viruses/kaiju_db_viruses.fmi" -a -s "/data/kaijudb/plasmids/kaiju_db_plasmids.fmi" -a -s "/data/kaijudb/rvdb/kaiju_db_rvdb.fmi" -a -s "/data/kaijudb/fungi/kaiju_db_fungi.fmi"] ; then
+  if [ -s "/data/kaijudb/refseq/kaiju_db_refseq.fmi" -a -s "/data/kaijudb/progenomes/kaiju_db_progenomes.fmi" -a -s "/data/kaijudb/nr/kaiju_db_nr.fmi" -a -s "/data/kaijudb/nr_euk/kaiju_db_nr_euk.fmi" -a -s "/data/kaijudb/viruses/kaiju_db_viruses.fmi" -a -s "/data/kaijudb/plasmids/kaiju_db_plasmids.fmi" -a -s "/data/kaijudb/rvdb/kaiju_db_rvdb.fmi" -a -s "/data/kaijudb/fungi/kaiju_db_fungi.fmi" ] ; then
     echo "DATA DOWNLOADED SUCCESSFULLY"
     touch /data/__READY__
   else
